@@ -67,7 +67,15 @@ features:
   - type: cover-position
 ```
 
-Its position remains unknown because the motor has not supplied a valid position. This is separate from network availability. The earlier Office Curtains entity was not replaced: its relationship to the intended Studio installation has not yet been confirmed.
+At initial pairing, its position remained unknown because the motor had not supplied a valid position. This was separate from network availability. The earlier Office Curtains entity was not replaced during pairing.
+
+## On-track commissioning on 2026-10-12
+
+The user installed this motor on the track previously driven by **Office Curtains R**, initially fully open. The original direction was reversed for this installation: an `open_cover` command physically closed the curtain halfway. Setting **Motor direction** to **Back** (DP 5 enum `1`) made `close_cover` close it fully, as confirmed by the user. This is an installation-specific direction setting, not a new default for every matching motor.
+
+A subsequent full opening took approximately 9.3 seconds and produced a real DP 3 position report of `0`, shown by Home Assistant as **100% open**. The radio acknowledged and echoed the movement and direction commands. Command acknowledgements alone were not treated as proof of physical movement.
+
+A `set_cover_position` command to **50%** was acknowledged and echoed on DP 2; the user confirmed that the curtain stopped approximately halfway open. The curtain was then commanded back to fully open. No factory reset, pairing change or speculative limit-datapoint write was used. Power-loss retention of the learned limits has not been tested. The existing Office Curtains entity, dashboard references and automations have not been migrated as part of calibration.
 
 ## Commissioning and troubleshooting
 
