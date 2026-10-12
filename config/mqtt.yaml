@@ -434,21 +434,6 @@ sensor:
       \ - hours * 3600) / 60) | round(0, 'floor') | int %}\n\n  {% if 2 > days >= 1 %}\n    {{days}} Day\n  {% elif\
       \ days >= 2 %}\n    {{days}} Days\n  {% elif hours > 0 %}\n    {{hours}} Hours\n  {% elif minutes > 0 %}\n\
       \    {{minutes}} Minutes\n  {% endif %}\n{% endif %}\n"
-  - name: Top CPU consumer
-    state_topic: home-assistant/ps
-  - name: Track
-    state_topic: home-assistant/track
-device_tracker:
-  - name: vitaly
-    state_topic: home-assistant/presence/vitalys-iphone
-  - name: maria
-    state_topic: home-assistant/presence/marias-iphone
-  - name: vitaly_iwatch
-    state_topic: home-assistant/presence/vitalys-iwatch
-  - name: maria_iwatch
-    state_topic: home-assistant/presence/marias-iwatch
-  - name: airbnb
-    state_topic: home-assistant/presence/airbnb
 number:
   - unique_id: multiplus_grid_setpoint
     name: Grid Setpoint

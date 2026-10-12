@@ -1,62 +1,4 @@
 # Home Assistant configuration; retain stable entity identifiers.
-sensor.comcast_utilization:
-  icon: mdi:percent
-  friendly_name: Utilization
-sensor.comcast_template:
-  icon: mdi:calendar-clock
-  friendly_name: Time Left
-sensor.comcast_avg_gb_current:
-  icon: mdi:chart-line
-  friendly_name: Current Daily Avg.
-sensor.comcast_avg_gb_left:
-  icon: mdi:chart-line-stacked
-  friendly_name: Remaining Daily Avg.
-sensor.5r_arrival_40th_ave_outbound_to_ocean_beach:
-  icon: mdi:bus
-  friendly_name: 5R to Ocean 40th
-sensor.5r_arrival_40th_ave_inbound_to_transbay_terminal:
-  icon: mdi:bus
-  friendly_name: 5R to Transbay 40th
-sensor.5_arrival_40th_ave_outbound_to_ocean_beach:
-  icon: mdi:bus
-  friendly_name: 5 to Ocean 40th
-sensor.5_arrival_40th_ave_inbound_to_transbay_terminal:
-  icon: mdi:bus
-  friendly_name: 5 to Transbay 40th
-sensor.38_arrival_39th_ave_inbound_to_transbay_terminal:
-  icon: mdi:bus
-  friendly_name: 38 to Transbay 39th
-sensor.38R_arrival_39th_ave_inbound_to_transbay_terminal:
-  icon: mdi:bus
-  friendly_name: 38R to Transbay 39th
-sensor.31_arrival_40th_ave_inbound_to_ferry_plaza:
-  icon: mdi:bus
-  friendly_name: 31 to Ferry Plaza 40th
-sensor.18_arrival_40th_ave_inbound_to_legion_of_honor:
-  icon: mdi:bus
-  friendly_name: 18 to Legion of Honor 40tt
-sensor.31_arrival_19th_ave_outbound_to_ocean_beach:
-  icon: mdi:bus
-  friendly_name: 31 from Han Il Kwan Korean
-sensor.31ax_arrival_19th_ave_outbound_to_ocean_beach:
-  icon: mdi:bus
-  friendly_name: 31ax from Han Il Kwan Korean
-sensor.31ax_arrival_40th_ave_inbound_to_ferry_plaza:
-  icon: mdi:bus
-  friendly_name: 31ax to Ferry Plaza 40th
-sensor.31ax_davis_and_pine:
-  icon: mdi:bus
-sensor.31bx_davis_and_pine:
-  icon: mdi:bus
-sensor.38ax_davis_and_pine:
-  icon: mdi:bus
-  friendly_name: 38ax Pine and Front
-sensor.38bx_davis_and_pine:
-  icon: mdi:bus
-  friendly_name: 38bx Pine and Front
-sensor.muni_info:
-  icon: mdi:information-variant
-  friendly_name: ''
 device_tracker.maria:
   entity_picture: /local/maria2.jpg
   friendly_name: Maria
@@ -66,16 +8,6 @@ device_tracker.airbnb:
 sensor.street_sweeping:
   icon: mdi:car
   friendly_name: Sweeping
-sensor.airbnb_event_0:
-  friendly_name: Current guest
-sensor.airbnb_event_1:
-  friendly_name: Next guest
-sensor.airbnb_event_2:
-  friendly_name: Guest 2
-sensor.airbnb_event_3:
-  friendly_name: Guest 3
-sensor.airbnb_event_4:
-  friendly_name: Guest 4
 sensor.recology:
   icon: mdi:recycle
   friendly_name: Recology
@@ -84,24 +16,6 @@ sensor.battery_consumption:
   device_class: energy
   state_class: total_increasing
   unit_of_measurement: kWh
-binary_sensor.counter_motion:
-  state_card_mode: badges
-  templates:
-    theme: 'if (state === ''Clear'') return ''green_badge''; else return ''yellow_badge'';
-
-      '
-cover.74622088cc50e3315521:
-  device_class: shade
-cover.02036272bcddc25823c0:
-  device_class: shade
-cover.70615835ecfabc69c9cb:
-  device_class: shade
-cover.70615835ecfabc698d5b:
-  device_class: shade
-cover.70615835ecfabc698d12:
-  device_class: shade
-
-# Complete display names: prevent device + entity name duplication. IDs stay stable.
 cover.bedroom_curtains_l:
   friendly_name: "Bedroom curtains"
 cover.dining_curtains_l:
@@ -136,8 +50,6 @@ switch.dining_guard:
   friendly_name: "Dining guard"
 switch.dining_wall_lights_l:
   friendly_name: "Dining wall lights"
-switch.garage_opener_l:
-  friendly_name: "Garage opener"
 switch.switch06:
   friendly_name: "Switch06"
 switch.switch06_mqtt:
