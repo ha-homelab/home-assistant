@@ -1,0 +1,21 @@
+# Heating: Lower a sustained high thermostat setpoint.
+# Stable entity: automation.thermostat_temperature_control.
+- id: ha_homelab_heating_lower_a_sustained_high_thermostat_setpoint
+  alias: 'Heating: Lower a sustained high thermostat setpoint'
+  description: Lower a sustained high thermostat setpoint. Responds to climate.thermostat_2 (temperature)
+    above 19 for 00:06:00.
+  triggers:
+  - platform: numeric_state
+    entity_id: climate.thermostat_2
+    attribute: temperature
+    above: 19
+    for: 00:06:00
+  actions:
+  - service: climate.set_temperature
+    target:
+      entity_id: climate.thermostat_2
+    data:
+      temperature: 17
+  mode: single
+  trace:
+    stored_traces: 5

@@ -1,0 +1,46 @@
+# Notifications: Report covers closing.
+# Stable entity: automation.cover_trigger_notifications_closing.
+- id: ha_homelab_notifications_report_covers_closing
+  alias: 'Notifications: Report covers closing'
+  description: Report covers closing. Responds to cover.living_light_curtains_l, cover.living_curtains_l, cover.kitchen_curtains_l,
+    cover.dining_curtains_l, cover.mishka_curtains_one_l, cover.mishka_curtains_two_l, cover.bedroom_curtains_l
+    changing to closing.
+  triggers:
+    platform: state
+    from: opening
+    to: closing
+    entity_id:
+    - cover.living_light_curtains_l
+    - cover.living_curtains_l
+    - cover.kitchen_curtains_l
+    - cover.dining_curtains_l
+    - cover.mishka_curtains_one_l
+    - cover.mishka_curtains_two_l
+    - cover.bedroom_curtains_l
+  actions:
+  - action: script.notify_optional
+    data:
+      notify_service: notify.lg_webos_tv_oled77c5pua_dusqljr
+      notify_data:
+        message: '{{ trigger.to_state.attributes.friendly_name }} turned {{ trigger.to_state.state }}'
+  - action: script.notify_optional
+    data:
+      notify_service: notify.roomba
+      also_chrome: true
+      notify_data:
+        title: Switch {{ trigger.to_state.attributes.friendly_name }} triggered:{{ trigger.to_state.state }}
+        message: '{{ trigger.to_state.attributes.friendly_name }} turned {{ trigger.to_state.state }}'
+  - action: script.notify_optional
+    data:
+      notify_service: notify.imac21
+      notify_data:
+        title: Switch {{ trigger.to_state.attributes.friendly_name }} triggered:{{ trigger.to_state.state }}
+        message: '{{ trigger.to_state.attributes.friendly_name }} {{ trigger.to_state.state }}'
+  - action: script.notify_optional
+    data:
+      notify_service: notify.almbpo
+      notify_data:
+        message: '{{ trigger.to_state.attributes.friendly_name }} {{ trigger.to_state.state }}'
+  mode: single
+  trace:
+    stored_traces: 5

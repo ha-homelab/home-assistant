@@ -1,0 +1,45 @@
+turn_off_living_room:
+  alias: 'Household: turn off lights and media power'
+  description: Turn off the original multi-room light and switch lists, then invoke the iNew host shutdown helper.
+  icon: mdi:home-lightbulb-outline
+  mode: single
+  sequence:
+  - service: homeassistant.turn_off
+    entity_id:
+    - light.bedroom_light_dimmer_l
+    - light.bedroom_lamp
+    - light.hall_1_m
+    - light.hall_2_m
+    - switch.tea_table
+    - switch.led_under_cabinet
+    - light.kitchen_lamp_m
+    - light.fireplace_led_ll
+    - light.bathroom_mirror_light
+    - light.dining_lights_dimmer_l
+    - light.balcony
+    - light.porch_one
+    - light.porch_two
+    - light.garage_one
+    - light.garage_two
+    - light.garage_three
+    - light.backdoor_porch
+    - light.living_wall_dimmer_l
+    - light.garage_bulb_one
+    - light.garage_bulb_two
+    - light.garage_bulb_three
+    - light.garage_bulb_four
+    - light.garage_bulb_five
+    - light.bedroom_five
+    continue_on_error: true
+  - service: switch.turn_off
+    entity_id:
+    - switch.bath2
+    - switch.fireplace_led_ll
+    - switch.tv_backlight_l
+    - switch.mishka_bedroom_desk_lamp_l
+    - switch.dining_wall_lights_l
+    - switch.living_room_light_l
+    - switch.living_lamp
+    - switch.audiosystem_l
+    continue_on_error: true
+  - service: shell_command.shutdown_inew

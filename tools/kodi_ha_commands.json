@@ -1,0 +1,218 @@
+{
+  "T": {
+    "reload_domain": "localtuya"
+  },
+  "M": {
+    "reload_domain": "mqtt"
+  },
+  "ha-check": {
+    "check": true
+  },
+  "gaoff": {
+    "service": "light.turn_off",
+    "entities": [
+      "light.garage_one",
+      "light.garage_two",
+      "light.garage_three"
+    ]
+  },
+  "gaon": {
+    "service": "light.turn_on",
+    "entities": [
+      "light.garage_one",
+      "light.garage_two",
+      "light.garage_three"
+    ]
+  },
+  "ton": {
+    "retired": "The old kitchen table lamp entity is gone; no replacement has been assumed."
+  },
+  "toff": {
+    "retired": "The old kitchen table lamp entity is gone; no replacement has been assumed."
+  },
+  "oneon": {
+    "retired": "This legacy scene targets retired cloud Tuya switches and a removed kitchen light."
+  },
+  "oz": {
+    "service": "switch.toggle",
+    "entities": [
+      "switch.ozon"
+    ]
+  },
+  "wa": {
+    "service": "light.toggle",
+    "entities": [
+      "light.garage_bulb_five"
+    ]
+  },
+  "po": {
+    "service": "light.toggle",
+    "entities": [
+      "light.porch_one"
+    ]
+  },
+  "po1": {
+    "service": "light.toggle",
+    "entities": [
+      "light.porch_one"
+    ]
+  },
+  "po2": {
+    "service": "light.toggle",
+    "entities": [
+      "light.porch_two"
+    ]
+  },
+  "pu": {
+    "retired": "The old purple table lamp has been retired."
+  },
+  "au": {
+    "service": "switch.toggle",
+    "entities": [
+      "switch.audio_l"
+    ]
+  },
+  "aa": {
+    "service": "switch.toggle",
+    "entities": [
+      "switch.audio_l"
+    ]
+  },
+  "aaf": {
+    "service": "switch.turn_off",
+    "entities": [
+      "switch.audio_l"
+    ]
+  },
+  "tablet": {
+    "service": "switch.toggle",
+    "entities": [
+      "switch.tablet"
+    ]
+  },
+  "tabletf": {
+    "service": "switch.toggle",
+    "entities": [
+      "switch.tablet"
+    ]
+  },
+  "lg": {
+    "retired": "The owner retired switch.tv_l; no replacement is configured."
+  },
+  "tv": {
+    "retired": "The owner retired switch.tv_l; no replacement is configured."
+  },
+  "tvon": {
+    "retired": "The owner retired switch.tv_l; no replacement is configured."
+  },
+  "tvo": {
+    "retired": "The owner retired switch.tv_l; no replacement is configured."
+  },
+  "tvoff": {
+    "retired": "The owner retired switch.tv_l; no replacement is configured."
+  },
+  "tvf": {
+    "retired": "The owner retired switch.tv_l; no replacement is configured."
+  },
+  "audiooff": {
+    "service": "switch.turn_off",
+    "entities": [
+      "switch.audio_l"
+    ]
+  },
+  "af": {
+    "service": "switch.turn_off",
+    "entities": [
+      "switch.audio_l"
+    ]
+  },
+  "audioon": {
+    "service": "switch.turn_on",
+    "entities": [
+      "switch.audio_l"
+    ]
+  },
+  "ao": {
+    "service": "switch.turn_on",
+    "entities": [
+      "switch.audio_l"
+    ]
+  },
+  "livingdisplayoff": {
+    "service": "switch.turn_off",
+    "entities": [
+      "switch.living_display"
+    ]
+  },
+  "ldf": {
+    "service": "switch.turn_off",
+    "entities": [
+      "switch.living_display"
+    ]
+  },
+  "livingdisplayon": {
+    "service": "switch.turn_on",
+    "entities": [
+      "switch.living_display"
+    ]
+  },
+  "ldo": {
+    "service": "switch.turn_on",
+    "entities": [
+      "switch.living_display"
+    ]
+  },
+  "fireplaceswitchon": {
+    "service": "switch.turn_on",
+    "entities": [
+      "switch.fireplace_switch"
+    ]
+  },
+  "fpso": {
+    "service": "switch.turn_on",
+    "entities": [
+      "switch.fireplace_switch"
+    ]
+  },
+  "fireplaceswitchoff": {
+    "service": "switch.turn_off",
+    "entities": [
+      "switch.fireplace_switch"
+    ]
+  },
+  "fpsf": {
+    "service": "switch.turn_off",
+    "entities": [
+      "switch.fireplace_switch"
+    ]
+  },
+  "ga": {
+    "service": "light.toggle",
+    "entities": [
+      "light.garage_three"
+    ]
+  },
+  "ga1": {
+    "service": "light.toggle",
+    "entities": [
+      "light.garage_one"
+    ]
+  },
+  "ga2": {
+    "service": "light.toggle",
+    "entities": [
+      "light.garage_two"
+    ]
+  },
+  "harestart": {
+    "service": "homeassistant.restart",
+    "entities": []
+  },
+  "hareload": {
+    "service": "homeassistant.restart",
+    "entities": []
+  },
+  "resetcreebulb": {
+    "retired": "script.resetcreebulb was retired with its obsolete Tuya target."
+  }
+}

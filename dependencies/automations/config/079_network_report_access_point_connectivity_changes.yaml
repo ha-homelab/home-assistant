@@ -1,0 +1,46 @@
+# Network: Report access-point connectivity changes.
+# Stable entity: automation.ping_notifications.
+- id: ha_homelab_network_report_access_point_connectivity_changes
+  alias: 'Network: Report access-point connectivity changes'
+  description: Report access-point connectivity changes. Responds to binary_sensor.eero_shed, binary_sensor.eero_bedroom,
+    binary_sensor.eero_main, binary_sensor.eero_attic, binary_sensor.eero_garage changing state. Runs only when
+    all configured guards pass.
+  triggers:
+    platform: state
+    entity_id:
+    - binary_sensor.eero_shed
+    - binary_sensor.eero_bedroom
+    - binary_sensor.eero_main
+    - binary_sensor.eero_attic
+    - binary_sensor.eero_garage
+  conditions:
+  - condition: state
+    entity_id: input_boolean.notifications_off
+    state: 'off'
+  actions:
+  - service: script.notify_mqtt
+    data:
+      message: '{{ trigger.to_state.attributes.friendly_name | replace(''sonoff_rf_bridge'','''') }} turned {{ trigger.to_state.state
+        }}: {{ as_timestamp(now()) | timestamp_custom(''%H:%M'', true) }}'
+    continue_on_error: true
+  - action: script.notify_optional
+    data:
+      notify_service: notify.roomba
+      also_chrome: true
+      notify_data:
+        title: Motion {{ trigger.to_state.attributes.friendly_name }} triggered:{{ trigger.to_state.state }}
+        message: '{{ trigger.to_state.attributes.friendly_name }} turned {{ trigger.to_state.state }}'
+  - action: script.notify_optional
+    data:
+      notify_service: notify.inew
+      notify_data:
+        title: Motion {{ trigger.to_state.attributes.friendly_name }} triggered:{{ trigger.to_state.state }}
+        message: '{{ trigger.to_state.attributes.friendly_name }} turned {{ trigger.to_state.state }}'
+  - action: script.notify_optional
+    data:
+      notify_service: notify.lg_webos_tv_oled77c5pua_dusqljr
+      notify_data:
+        message: '{{ trigger.to_state.attributes.friendly_name }} turned {{ trigger.to_state.state }}'
+  mode: single
+  trace:
+    stored_traces: 5

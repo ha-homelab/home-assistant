@@ -1,0 +1,24 @@
+# Home Assistant configuration; retain stable entity identifiers.
+family:
+  name: Family
+  entities:
+    - device_tracker.vitaly
+    - device_tracker.maria
+    - device_tracker.vitaly_iwatch
+    - device_tracker.maria_iwatch
+kitchen_motion:
+  name: Kitchen motion
+  entities:
+    - binary_sensor.rf_tea_motion
+    - binary_sensor.rf_counter_motion
+bathroom_motion:
+  name: Bathroom motion
+  entities:
+    - binary_sensor.rf_restroom_one_motion
+    - binary_sensor.rf_restroom_two_motion
+kitchen_lights:
+  name: Kitchen lights
+  entities:
+    - switch.led_under_cabinet
+    - switch.tea_table
+    - light.kitchen_lamp_m

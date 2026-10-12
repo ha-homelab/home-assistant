@@ -1,0 +1,5 @@
+# Preserve current logging levels while retaining Python script diagnostics.
+default: error
+logs:
+  homeassistant.core: error
+  homeassistant.components.python_script: info

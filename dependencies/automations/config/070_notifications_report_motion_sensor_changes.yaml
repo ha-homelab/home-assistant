@@ -1,0 +1,64 @@
+# Notifications: Report motion sensor changes.
+# Stable entity: automation.motion_trigger_notifications.
+- id: ha_homelab_notifications_report_motion_sensor_changes
+  alias: 'Notifications: Report motion sensor changes'
+  description: Report motion using the sensor name without the RF prefix or state boilerplate.
+    Preserve MQTT and display destinations; explicitly classify RF events so browser and phone suppression survives label changes.
+  triggers:
+    platform: state
+    to: 'on'
+    entity_id:
+    - binary_sensor.rf_lobby_motion
+    - binary_sensor.rf_bedroom_motion
+    - binary_sensor.rf_hallway_motion
+    - binary_sensor.rf_dinner_motion
+    - binary_sensor.rf_living_one_motion
+    - binary_sensor.rf_counter_motion
+    - binary_sensor.rf_tea_motion
+    - binary_sensor.rf_hallway_two_motion
+    - binary_sensor.rf_dinner_two_motion
+    - binary_sensor.rf_studio_motion
+    - binary_sensor.rf_restroom_one_motion
+    - binary_sensor.studio_bathroom_motion
+    - binary_sensor.rf_mishka_motion
+    - binary_sensor.rf_porch_one_motion
+    - binary_sensor.rf_porch_two_motion
+    - binary_sensor.rf_studio_motion
+  conditions:
+  - condition: state
+    entity_id: input_boolean.notifications_off
+    state: 'off'
+  actions:
+  - variables:
+      motion_name: >-
+        {{ trigger.to_state.name | replace('sonoff_rf_bridge', '') | trim
+           | regex_replace('(?i)^rf(?:[ _:-]+)', '') }}
+      motion_category: "{{ 'rf_motion' if trigger.entity_id.startswith('binary_sensor.rf_') else 'general' }}"
+  - service: script.notify_mqtt
+    data:
+      message: '{{ motion_name }}'
+    continue_on_error: true
+  - action: script.notify_optional
+    data:
+      notify_service: notify.roomba
+      notification_category: '{{ motion_category }}'
+      also_chrome: true
+      notify_data:
+        title: '{{ motion_name }}'
+        message: '{{ motion_name }}'
+  - action: script.notify_optional
+    data:
+      notify_service: notify.inew
+      notification_category: '{{ motion_category }}'
+      notify_data:
+        title: '{{ motion_name }}'
+        message: '{{ motion_name }}'
+  - action: script.notify_optional
+    data:
+      notify_service: notify.lg_webos_tv_oled77c5pua_dusqljr
+      notification_category: '{{ motion_category }}'
+      notify_data:
+        message: '{{ motion_name }}'
+  mode: single
+  trace:
+    stored_traces: 5

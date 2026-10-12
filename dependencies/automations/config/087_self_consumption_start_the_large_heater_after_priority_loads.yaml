@@ -1,0 +1,52 @@
+# Self-consumption: Start the large heater after priority loads.
+# Stable entity: automation.power_below_725_heater_725.
+- id: ha_homelab_self_consumption_start_the_large_heater_after_priority_loads
+  alias: 'Self-consumption: Start the large heater after priority loads'
+  description: Start the large heater after priority loads. Responds to sensor.home_123_1s below -100; or sensor.home_123_1s
+    below -150; or sensor.home_123_1s below -200; or sensor.home_123_1s below -300. Runs only when all configured
+    guards pass.
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    below: -100
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    below: -150
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    below: -200
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    below: -300
+  conditions:
+  - condition: state
+    entity_id: input_boolean.self_consuming
+    state: 'on'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: switch.bath_fan_1st_floor
+      state: 'off'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: switch.air_purifier_living
+      state: 'off'
+  - condition: state
+    entity_id: switch.bath_fan_1st_floor
+    state: 'on'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: switch.switch06
+      state: 'on'
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.switch06
+  - service: script.notify
+    data:
+      message: Power below 725 heater 725
+    continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

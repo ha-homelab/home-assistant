@@ -1,0 +1,19 @@
+# Media: Start the Plex Hub playlist from the Sailor button.
+# Stable entity: automation.sailor_switch.
+- id: ha_homelab_media_start_the_plex_hub_playlist_from_the_sailor_button
+  alias: 'Media: Start the Plex Hub playlist from the Sailor button'
+  description: Start the Plex Hub playlist from the Sailor button. Responds to the configured zha device
+    button event.
+  triggers:
+  - device_id: 67b851d430a4f4e5ac9f97bbd7224d50
+    domain: zha
+    type: remote_button_short_press
+    subtype: button_1
+    trigger: device
+  actions:
+  - action: script.run_playlist_on_plex_hub
+    metadata: {}
+    data: {}
+  mode: single
+  trace:
+    stored_traces: 5

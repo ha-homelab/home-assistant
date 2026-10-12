@@ -1,0 +1,22 @@
+# Stable entity: script.notify_mqtt
+notify_mqtt:
+  alias: 'Notifications: publish retained MQTT message'
+  description: Publish a correctly escaped JSON message to the existing retained MQTT notification topic; queue
+    simultaneous calls.
+  icon: mdi:message-text
+  fields:
+    message:
+      name: Message
+      description: Message text forwarded using the existing notification template.
+      required: true
+      selector:
+        text:
+          multiline: true
+  mode: queued
+  sequence:
+  - service: mqtt.publish
+    data_template:
+      payload: '{{ {"title": "Info", "message": message | string} | to_json }}'
+      topic: living_room/notifications
+      retain: true
+  max: 100

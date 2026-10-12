@@ -1,0 +1,14 @@
+secrets.yaml
+**/secrets.yaml
+.storage/
+.cloud/
+*.db
+*.db-*
+*.log*
+*.tar*
+.env*
+.venv/
+__pycache__/
+build/
+.DS_Store
+**/home-media-service-account.json

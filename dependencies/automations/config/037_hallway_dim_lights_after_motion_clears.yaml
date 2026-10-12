@@ -1,0 +1,46 @@
+# Hallway: Dim lights after motion clears.
+# Stable entity: automation.hallway_motion_dim.
+- id: ha_homelab_hallway_dim_lights_after_motion_clears
+  alias: 'Hallway: Dim lights after motion clears'
+  description: Dim lights after motion clears. Responds to binary_sensor.rf_hallway_motion changing to
+    off for 3 minutes; or binary_sensor.rf_hallway_two_motion changing to off for 3 minutes. Runs only
+    when all configured guards pass.
+  triggers:
+  - entity_id: binary_sensor.rf_hallway_motion
+    platform: state
+    from: 'on'
+    to: 'off'
+    for:
+      minutes: 3
+  - entity_id: binary_sensor.rf_hallway_two_motion
+    platform: state
+    from: 'on'
+    to: 'off'
+    for:
+      minutes: 3
+  conditions:
+  - condition: template
+    value_template: '{{ state_attr("sun.sun", "elevation") < 1.75 }}'
+  - condition: state
+    entity_id: light.hall_2_m
+    state: 'on'
+  - condition: state
+    entity_id: light.hall_1_m
+    state: 'on'
+  - condition: state
+    entity_id: input_boolean.hallway_sticky
+    state: 'off'
+  actions:
+  - service: light.turn_on
+    entity_id: light.hall_1_m
+    data_template:
+      brightness: '{{ 180 if trigger.from_state.state == "off" else 100 }}'
+      transition: '{{ 100 if trigger.to_state.state == "on" else 20 }}'
+  - service: light.turn_on
+    entity_id: light.hall_2_m
+    data_template:
+      brightness: '{{ 180 if trigger.from_state.state == "off" else 100 }}'
+      transition: '{{ 100 if trigger.to_state.state == "on" else 20 }}'
+  mode: single
+  trace:
+    stored_traces: 5

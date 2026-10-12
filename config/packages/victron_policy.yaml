@@ -1,0 +1,59 @@
+# Operator-visible diagnostics and continuous low-voltage confirmation.
+# None of these entities sends commands to the inverter.
+input_text:
+  victron_last_overnight_decision:
+    name: Victron last overnight decision
+    icon: mdi:clipboard-text-clock-outline
+    max: 255
+    # No initial value: preserve the last decision across HA restarts.
+
+template:
+  - binary_sensor:
+      - name: Victron Battery Low
+        unique_id: victron_battery_low
+        device_class: problem
+        icon: mdi:battery-alert
+        # Invalid/unavailable data must break the continuous-low interval.
+        state: >-
+          {% set v = states('sensor.battery_voltage') | float(none) %}
+          {{ v is not none and is_number(v) and 0 < v < 50 }}
+    sensor:
+      - name: Victron Overnight Policy
+        unique_id: victron_overnight_policy
+        icon: mdi:calendar-clock
+        state: >-
+          {% set mode = states('input_boolean.off_grid_mode') %}
+          {% set v = states('sensor.battery_voltage') | float(none) %}
+          {% if mode == 'on' %}Blocked: Off-grid
+          {% elif mode != 'off' %}Blocked: mode unavailable
+          {% elif not is_state('automation.daily_at_0_01_am_set_charging_states_and_ensure_victron_off', 'on') %}Automation disabled/unavailable
+          {% elif is_state('input_boolean.winter', 'on') %}Winter: off at 00:01
+          {% elif not is_state('input_boolean.summer', 'off') %}Skipped: Summer/unknown season
+          {% elif v is none or not is_number(v) or not 0 < v <= 70 %}Waiting for battery telemetry
+          {% elif v < 52 %}Low reserve: off at 00:01
+          {% else %}Skipped: battery at least 52 V
+          {% endif %}
+        attributes:
+          next_check: >-
+            {% set check = today_at('00:01') %}
+            {{ (check if now() < check else check + timedelta(days=1)).isoformat() }}
+          current_inverter: "{{ states('switch.victron_quattro') }}"
+          off_grid_mode: "{{ states('input_boolean.off_grid_mode') }}"
+          winter: "{{ states('input_boolean.winter') }}"
+          summer: "{{ states('input_boolean.summer') }}"
+          battery_protection: >-
+            {% set v = states('sensor.battery_voltage') | float(none) %}
+            {% if not is_state('automation.battery_voltage_below_50v_for_five_minutes', 'on') %}
+              Low-battery automation disabled/unavailable
+            {% elif not is_state('input_boolean.off_grid_mode', 'on') and not is_state('switch.inverter_only_charging', 'off') %}
+              Paused: charge-only operation or unavailable flag
+            {% elif is_state('binary_sensor.victron_battery_low', 'on') %}
+              Below 50 V; shutdown requires five continuous minutes
+            {% elif v is none or not is_number(v) or not 0 < v <= 70 %}
+              Waiting for valid battery telemetry
+            {% else %}
+              Armed: below 50 V for five continuous minutes
+            {% endif %}
+          last_overnight_decision: >-
+            {% set last = states('input_text.victron_last_overnight_decision') %}
+            {{ last if last not in ['unknown', 'unavailable', ''] else 'No midnight decision recorded yet' }}

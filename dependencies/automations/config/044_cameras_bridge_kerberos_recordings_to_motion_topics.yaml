@@ -1,0 +1,58 @@
+# Native motion bridge; stable automation.kerberos_agent_motion_to_kios_bridge.
+- id: kerberos_to_kios_bridge
+  alias: 'Cameras: Bridge Kerberos recordings to motion topics'
+  description: Bridge native Kerberos motion and Ring MQTT motion to the existing notification topics. Ignore non-motion
+    and unknown agents. Limit repeated native motion to one notification batch per camera per 30 seconds.
+  max: 20
+  triggers:
+  - trigger: mqtt
+    topic: kerberos/hub/home-assistant
+    id: kerberos
+  - trigger: state
+    entity_id: binary_sensor.front_door_motion_2
+    from: 'off'
+    to: 'on'
+    id: ring
+  actions:
+  - variables:
+      routes:
+        front_camera:
+        - kios/front
+        - motion
+        - timer.camera_motion_front
+        Garage_camera:
+        - kios/garage
+        - motion
+        - timer.camera_motion_garage
+        Tenants_camera:
+        - kios/backdoor
+        - motion
+        - timer.camera_motion_backdoor
+        Porch_camera:
+        - kios/porch
+        - '{"name":"Porch"}'
+        - timer.camera_motion_porch
+      motion: '{{ trigger.payload_json.get("payload", {}) if trigger.id == "kerberos" and trigger.payload_json is
+        defined and trigger.payload_json is mapping else {} }}'
+  - choose:
+    - conditions: '{{ trigger.id == "ring" }}'
+      sequence:
+      - action: mqtt.publish
+        data:
+          topic: kios/ring
+          payload: '{"name":"Ring"}'
+    - conditions: '{{ trigger.id == "kerberos" and motion is mapping and motion.get("action") == "motion" and motion.get("device_id")
+        in routes }}'
+      sequence:
+      - condition: template
+        value_template: '{{ is_state(routes[motion.device_id][2], "idle") }}'
+      - action: timer.start
+        target:
+          entity_id: '{{ routes[motion.device_id][2] }}'
+      - action: mqtt.publish
+        data:
+          topic: '{{ routes[motion.device_id][0] }}'
+          payload: '{{ routes[motion.device_id][1] }}'
+  mode: queued
+  trace:
+    stored_traces: 5

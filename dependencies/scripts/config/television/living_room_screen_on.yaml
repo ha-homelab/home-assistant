@@ -1,0 +1,12 @@
+# Stable entity: script.turn_on_lg_tv_screen
+# Send the webOS screen-on command to the living room 77-inch TV.
+turn_on_lg_tv_screen:
+  alias: 'Living room TV: turn screen on'
+  description: Send the webOS screen-on command to the living room 77-inch TV.
+  icon: mdi:television
+  mode: single
+  sequence:
+    - service: webostv.command
+      data:
+        entity_id: media_player.living_room_tv_77
+        command: com.webos.service.tvpower/power/turnOnScreen

@@ -1,0 +1,54 @@
+# Victron: Disable charge-only operation after sustained grid import.
+# Stable entity: automation.using_from_grid_more_than_300w_for_15_minutes_in_charge_only_mode.
+- id: ha_homelab_victron_disable_charge_only_operation_after_sustained_grid_import
+  alias: 'Victron: Disable charge-only operation after sustained grid import'
+  description: Disable charge-only operation after fifteen minutes above 300 W import only
+    with fresh import and solar readings and accepted AC input stable for two minutes.
+    Off-grid mode blocks this economic shutdown. Missing grid telemetry also blocks it.
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    above: 300
+    for:
+      minutes: 15
+  conditions:
+  - condition: state
+    entity_id: switch.inverter_only_charging
+    state: 'on'
+  - condition: state
+    entity_id: switch.victron_quattro
+    state: 'on'
+    for:
+      minutes: 5
+  - condition: numeric_state
+    entity_id: sensor.current_solar_production
+    below: 10
+  actions:
+  - condition: state
+    entity_id: input_boolean.off_grid_mode
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.victron_grid_connected
+    state: 'on'
+    for:
+      minutes: 2
+  - condition: template
+    value_template: >-
+      {% set importing = states.sensor.home_123_1s %}
+      {% set solar = states.sensor.current_solar_production %}
+      {% set watts = states('sensor.home_123_1s') | float(none) %}
+      {% set pv = states('sensor.current_solar_production') | float(none) %}
+      {{ watts is not none and is_number(watts) and watts > 300
+         and pv is not none and is_number(pv) and 0 <= pv < 10
+         and importing is defined and solar is defined
+         and 0 <= as_timestamp(now()) - as_timestamp(importing.last_reported, 0) < 90
+         and 0 <= as_timestamp(now()) - as_timestamp(solar.last_reported, 0) < 90 }}
+  - service: switch.turn_off
+    entity_id: switch.victron_quattro
+  - service: script.notify
+    data:
+      message: Using from grid more than 300W for fifteen minutes in charge-only mode
+    continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

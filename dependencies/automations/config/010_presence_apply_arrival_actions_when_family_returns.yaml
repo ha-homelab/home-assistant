@@ -1,0 +1,16 @@
+# Presence: Apply arrival actions when family returns.
+# Stable entity: automation.family_member_arriving_home.
+- id: ha_homelab_presence_apply_arrival_actions_when_family_returns
+  alias: 'Presence: Apply arrival actions when family returns'
+  description: Apply arrival actions when family returns. Responds to group.family changing to home.
+  initial_state: 'on'
+  triggers:
+  - platform: state
+    to: home
+    entity_id: group.family
+  actions:
+    service: scene.turn_on
+    entity_id: scene.away_devices_on
+  mode: single
+  trace:
+    stored_traces: 5

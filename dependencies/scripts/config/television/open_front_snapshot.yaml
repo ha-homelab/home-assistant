@@ -1,0 +1,15 @@
+# Stable entity: script.tv_pic
+# Open the front-camera snapshot through the privately configured HA origin.
+tv_pic:
+  alias: 'Living room TV: open front-camera snapshot'
+  description: Open the front-camera snapshot URL with the webOS launcher.
+  icon: mdi:cctv
+  mode: single
+  sequence:
+    - service: webostv.command
+      target:
+        entity_id: media_player.living_room_tv_77
+      data:
+        command: system.launcher/open
+        payload:
+          target: "{{ states('input_text.base_url') }}/local/front_camera_alert.jpg?{{ as_timestamp(now()) }}"

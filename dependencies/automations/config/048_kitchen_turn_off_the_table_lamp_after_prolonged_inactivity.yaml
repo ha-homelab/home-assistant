@@ -1,0 +1,32 @@
+# Kitchen: Turn off the table lamp after prolonged inactivity.
+# Stable entity: automation.table_lamp_motion_off_40.
+- id: ha_homelab_kitchen_turn_off_the_table_lamp_after_prolonged_inactivity
+  alias: 'Kitchen: Turn off the table lamp after prolonged inactivity'
+  description: Turn off after a new motion cycle or genuine unknown/unavailable recovery. Preserve later manual
+    ON states; recheck all original timeout, presence and override guards for each device and retry.
+  mode: parallel
+  trace:
+    stored_traces: 5
+  use_blueprint:
+    path: ha_homelab/motion_light_off.yaml
+    input:
+      motion_triggers:
+      - entity_id: group.kitchen_motion
+        platform: state
+        to: 'off'
+        for:
+          minutes: 40
+      target_entities:
+      - light.kitchen_lamp_m
+      guards:
+      - condition: template
+        value_template: '{{ state_attr("sun.sun", "elevation") < 0.10 }}'
+      - condition: state
+        entity_id: input_boolean.kitchen_sticky
+        state: 'off'
+      after_actions:
+      - service: script.notify_mqtt_log
+        data:
+          message: Kitchen table lamp off after 40 minutes {{ as_timestamp(now()) | timestamp_custom('%H:%M', true)
+            }}
+        continue_on_error: true

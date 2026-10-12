@@ -1,0 +1,70 @@
+# Self-consumption: Select controllable loads from grid power.
+# Stable entity: automation.power.
+- id: '1234567890123'
+  alias: 'Self-consumption: Select controllable loads from grid power'
+  description: Select controllable loads from grid power. Responds to the repeating schedule (seconds=/2). Runs
+    only when all configured guards pass.
+  triggers:
+  - platform: time_pattern
+    seconds: /2
+  conditions:
+  - condition: state
+    entity_id: input_boolean.modern_self_consuming
+    state: 'on'
+  actions:
+  - variables:
+      sensor_val: '{{ (states(''sensor.home_123_1s'') | float(0)) - (states(''sensor.battery_w'') | float(0)) +
+        200 | float }}'
+      watt_map: "{\n  \"switch.switch06\": 750,\n  \"switch.air_purifier_living\": 235,\n  \"\
+        switch.bath_fan_1st_floor\": 60,\n  \"light.dining_lights_dimmer_l\": 90,\n  \"switch.living_room_light_l\"\
+        : 90,\n  \"switch.dining_wall_light_2\": 20,\n  \"light.garage\": 55,\n\
+        \  \"switch.garage_floodlight\": 108,\n  \"switch.tea_table\": 35\n}\n"
+      md: '{{ ''turn_off'' if sensor_val >= 0 else ''turn_on'' }}'
+  - service: python_script.select_devices
+    data:
+      sensor_value: '{{ states(''sensor.home_123_1s'') | float -  states(''sensor.battery_w'') | float }}'
+      devices: '{{ watt_map }}'
+      action: '{{ md }}'
+      tolerance: 30
+    response_variable: select_result
+  - variables:
+      selected_entities: '{{ select_result.entities if ''entities'' in select_result else [] }}'
+  - service: script.notify_mqtt
+    data:
+      message: 'Self-consuming:  {{ states(''sensor.home_123_1s'') }};  {{ md }}: {{ selected_entities | join('',
+        '') }}'
+    continue_on_error: true
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ selected_entities | length > 0 }}'
+      sequence:
+      - repeat:
+          for_each: '{{ selected_entities }}'
+          sequence:
+          - choose:
+            - conditions:
+              - condition: template
+                value_template: '{{ repeat.item[0].startswith(''switch.'') }}'
+              sequence:
+              - service: switch.{{ md }}
+                data:
+                  entity_id: '{{ repeat.item[0] }}'
+                continue_on_error: true
+            - conditions:
+              - condition: template
+                value_template: '{{ repeat.item[0].startswith(''light.'') }}'
+              sequence:
+              - service: light.{{ md }}
+                data: >-
+                  {{ dict(entity_id=repeat.item[0], brightness=100)
+                     if md == 'turn_on' else dict(entity_id=repeat.item[0]) }}
+                continue_on_error: true
+          - service: script.notify_mqtt
+            data:
+              message: '{{ md }}: {{ repeat.item[0] }} ({{ repeat.item[1] }} Вт)'
+            continue_on_error: true
+  - delay: 00:00:05
+  mode: single
+  trace:
+    stored_traces: 5

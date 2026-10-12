@@ -1,0 +1,8 @@
+# Existing camera composition. Camera integrations and authentication remain in runtime storage.
+- platform: combined
+  base_address: !secret home_assistant_external_url
+  entities:
+    - camera.in_camera
+    - camera.garage_camera
+    - camera.backdoor_camera
+    - camera.front_camera

@@ -1,0 +1,164 @@
+# Fast RF start with an independent Wi-Fi fallback for each living-room motor.
+# Learned identifiers live only in the installation's private secrets.yaml.
+script:
+  living_curtain_send_rf:
+    alias: "Curtains: Send one living-room RF command"
+    description: >-
+      Serialize learned Dooya commands and leave two seconds between requests.
+      An absent or failing RF service does not prevent the caller's Wi-Fi fallback.
+    icon: mdi:radio-tower
+    mode: queued
+    max: 10
+    fields:
+      curtain:
+        name: Curtain
+        required: true
+        selector:
+          select:
+            options: [main, sheer]
+      command:
+        name: Command
+        required: true
+        selector:
+          select:
+            options: [open, close]
+    sequence:
+      - if:
+          - condition: template
+            value_template: >-
+              {{ curtain | default('') not in ['main', 'sheer']
+                 or command | default('') not in ['open', 'close'] }}
+        then:
+          - stop: "Expected main/sheer curtain and open/close command."
+            error: true
+      - condition: state
+        entity_id: input_boolean.curtains_sticky
+        state: 'off'
+      # A missing native service is not suppressible by continue_on_error in
+      # HA. A background transport isolates that error from the Wi-Fi fallback.
+      - action: script.turn_on
+        target:
+          entity_id: script.living_curtain_rf_transport
+        data:
+          variables:
+            curtain: "{{ curtain }}"
+            command: "{{ command }}"
+        continue_on_error: true
+      - delay:
+          seconds: 2
+
+  living_curtain_rf_transport:
+    alias: "Curtains: Dispatch living-room RF transport"
+    description: >-
+      Internal transport started by the queued RF wrapper. Native service
+      errors remain here so that the caller can still use its Wi-Fi fallback.
+    icon: mdi:radio-tower
+    mode: parallel
+    max: 10
+    variables:
+      rf_profiles:
+        main:
+          remote_id: !secret living_main_curtain_rf_remote_id
+          channel: !secret living_main_curtain_rf_channel
+        sheer:
+          remote_id: !secret living_sheer_curtain_rf_remote_id
+          channel: !secret living_sheer_curtain_rf_channel
+    sequence:
+      - condition: template
+        value_template: >-
+          {{ curtain | default('') in ['main', 'sheer']
+             and command | default('') in ['open', 'close'] }}
+      - condition: state
+        entity_id: input_boolean.curtains_sticky
+        state: 'off'
+      - action: esphome.rf_send_dooya_code
+        data:
+          remote_id: "{{ rf_profiles[curtain]['remote_id'] | int }}"
+          channel: "{{ rf_profiles[curtain]['channel'] | int }}"
+          button: "{{ 1 if command == 'open' else 3 }}"
+          check: "{{ 1 if command == 'open' else 3 }}"
+          repeats: 3
+        continue_on_error: true
+
+  living_curtains_move:
+    alias: "Curtains: Move living-room curtains with RF and Wi-Fi fallback"
+    description: >-
+      Power the shared socket, wait three seconds, send every requested RF
+      command, then independently wait up to three minutes for each Wi-Fi motor
+      and repeat the same target command. Recheck the manual override throughout.
+    icon: mdi:curtains
+    mode: parallel
+    max: 4
+    fields:
+      curtain:
+        name: Curtain
+        default: both
+        selector:
+          select:
+            options: [both, main, sheer]
+      command:
+        name: Command
+        required: true
+        selector:
+          select:
+            options: [open, close]
+    sequence:
+      - if:
+          - condition: template
+            value_template: >-
+              {{ curtain | default('both') not in ['both', 'main', 'sheer']
+                 or command | default('') not in ['open', 'close'] }}
+        then:
+          - stop: "Expected both/main/sheer curtain and open/close command."
+            error: true
+      - condition: state
+        entity_id: input_boolean.curtains_sticky
+        state: 'off'
+      - action: switch.turn_on
+        target:
+          entity_id: switch.living_guard
+        continue_on_error: true
+      - delay:
+          seconds: 3
+      - repeat:
+          for_each: >-
+            {{ ['main', 'sheer'] if curtain | default('both') == 'both' else [curtain] }}
+          sequence:
+            - action: script.living_curtain_send_rf
+              data:
+                curtain: "{{ repeat.item }}"
+                command: "{{ command }}"
+              continue_on_error: true
+      - parallel:
+          - sequence:
+              - condition: template
+                value_template: "{{ curtain | default('both') in ['both', 'main'] }}"
+              - wait_template: >-
+                  {{ has_value('cover.living_curtains_l')
+                     or is_state('input_boolean.curtains_sticky', 'on') }}
+                timeout:
+                  seconds: 180
+                continue_on_timeout: false
+              - condition: state
+                entity_id: input_boolean.curtains_sticky
+                state: 'off'
+              - action: "{{ 'cover.open_cover' if command == 'open' else 'cover.close_cover' }}"
+                target:
+                  entity_id: cover.living_curtains_l
+                continue_on_error: true
+          - sequence:
+              - condition: template
+                value_template: "{{ curtain | default('both') in ['both', 'sheer'] }}"
+              - wait_template: >-
+                  {{ has_value('cover.living_light_curtains_l')
+                     or is_state('input_boolean.curtains_sticky', 'on') }}
+                timeout:
+                  seconds: 180
+                continue_on_timeout: false
+              - condition: state
+                entity_id: input_boolean.curtains_sticky
+                state: 'off'
+              - action: "{{ 'cover.open_cover' if command == 'open' else 'cover.close_cover' }}"
+                target:
+                  entity_id: cover.living_light_curtains_l
+                continue_on_error: true

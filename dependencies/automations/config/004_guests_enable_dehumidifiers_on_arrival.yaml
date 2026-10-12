@@ -1,0 +1,24 @@
+# Guests: Enable dehumidifiers on arrival.
+# Stable entity: automation.airbnb_back_home.
+- id: ha_homelab_guests_enable_dehumidifiers_on_arrival
+  alias: 'Guests: Enable dehumidifiers on arrival'
+  description: Enable dehumidifiers on arrival. Responds to device_tracker.airbnb changing to home. Runs
+    only when all configured guards pass.
+  initial_state: 'on'
+  triggers:
+  - platform: state
+    to: home
+    entity_id: device_tracker.airbnb
+  conditions:
+  - condition: state
+    entity_id: group.family
+    state: home
+  - condition: time
+    after: '10:00:00'
+    before: '23:30:00'
+  actions:
+    service: scene.turn_on
+    entity_id: scene.dehumidifiers_on
+  mode: single
+  trace:
+    stored_traces: 5

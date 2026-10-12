@@ -1,0 +1,107 @@
+# Keep all snapshot writers in one queue so a capture cannot race history rotation.
+shell_command:
+  camera_alert_prepare: python3 /config/housekeeping/camera_alert.py prepare {{ camera_key }}
+  camera_alert_fetch: python3 /config/housekeeping/camera_alert.py fetch {{ camera_key }}
+  camera_alert_commit: python3 /config/housekeeping/camera_alert.py commit {{ camera_key }}
+
+script:
+  capture_camera_alert:
+    alias: 'Cameras: capture and preserve motion snapshots'
+    description: Validate a fresh JPEG before replacing the last snapshot and rotating its three predecessors.
+    icon: mdi:camera-burst
+    mode: queued
+    max: 30
+    fields:
+      camera_key:
+        required: true
+        selector:
+          select:
+            options: [front, backdoor, garage, porch, ring]
+    sequence:
+      - variables:
+          cameras:
+            front: camera.front_camera
+            backdoor: camera.backdoor_camera
+            garage: camera.garage_camera
+            porch: camera.porch_camera
+            ring: camera.front_door_snapshot
+      - if:
+          - condition: template
+            value_template: '{{ camera_key not in cameras }}'
+        then:
+          - stop: 'Unknown camera key'
+            error: true
+      - if:
+          - condition: template
+            value_template: >-
+              {{ camera_key == 'ring' and as_timestamp(now()) -
+                 (state_attr('camera.front_door_snapshot', 'timestamp') | float(0)) > 15 }}
+        then:
+          - variables:
+              previous_ring_snapshot: "{{ state_attr('camera.front_door_snapshot', 'timestamp') }}"
+          - action: button.press
+            target:
+              entity_id: button.front_door_take_snapshot
+          - wait_template: >-
+              {{ state_attr('camera.front_door_snapshot', 'timestamp') != previous_ring_snapshot }}
+            timeout: '00:00:20'
+            continue_on_timeout: false
+      - action: shell_command.camera_alert_prepare
+        data:
+          camera_key: '{{ camera_key }}'
+        response_variable: prepared
+      - if:
+          - condition: template
+            value_template: '{{ prepared.returncode != 0 }}'
+        then:
+          - stop: 'Could not prepare camera snapshot'
+            error: true
+      - if:
+          - condition: template
+            value_template: "{{ camera_key in ['garage', 'backdoor'] }}"
+        then:
+          - action: shell_command.camera_alert_fetch
+            data:
+              camera_key: '{{ camera_key }}'
+            response_variable: fetched
+          - if:
+              - condition: template
+                value_template: '{{ fetched.returncode != 0 }}'
+            then:
+              - stop: 'Kerberos snapshot unavailable; previous snapshots preserved'
+                error: true
+        else:
+          - action: camera.snapshot
+            target:
+              entity_id: '{{ cameras[camera_key] }}'
+            data:
+              filename: '/config/www/.{{ camera_key }}_camera_alert.pending.jpg'
+      - action: shell_command.camera_alert_commit
+        data:
+          camera_key: '{{ camera_key }}'
+        response_variable: committed
+      - if:
+          - condition: template
+            value_template: '{{ committed.returncode != 0 }}'
+        then:
+          - stop: 'Camera image invalid; previous snapshots preserved'
+            error: true
+
+# Native agents can publish motion for every frame; gate each camera independently.
+timer:
+  camera_motion_front:
+    name: Front motion notification cooldown
+    duration: "00:00:30"
+    restore: true
+  camera_motion_backdoor:
+    name: Backdoor motion notification cooldown
+    duration: "00:00:30"
+    restore: true
+  camera_motion_garage:
+    name: Garage motion notification cooldown
+    duration: "00:00:30"
+    restore: true
+  camera_motion_porch:
+    name: Porch motion notification cooldown
+    duration: "00:00:30"
+    restore: true

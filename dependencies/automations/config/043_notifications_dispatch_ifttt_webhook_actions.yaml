@@ -1,0 +1,17 @@
+# Notifications: Dispatch IFTTT webhook actions.
+# Stable entity: automation.ifttt_trigger.
+- id: ha_homelab_notifications_dispatch_ifttt_webhook_actions
+  alias: 'Notifications: Dispatch IFTTT webhook actions'
+  description: Dispatch IFTTT webhook actions. Responds to the ifttt_webhook_received event.
+  triggers:
+    platform: event
+    event_type: ifttt_webhook_received
+    event_data:
+      action: call_service
+  actions:
+    service_template: '{{ trigger.event.data.service }}'
+    data_template:
+      entity_id: '{{ trigger.event.data.entity_id }}'
+  mode: single
+  trace:
+    stored_traces: 5

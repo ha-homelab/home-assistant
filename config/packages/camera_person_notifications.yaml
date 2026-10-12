@@ -1,0 +1,97 @@
+# The active-person count excludes Frigate's stationary objects and other labels.
+# Require a known zero before positive activity: no replay after a reconnect/reload.
+shell_command:
+  ring_notification_video_ready: python3 /config/housekeeping/ring_video_ready.py
+
+automation:
+  - id: ha_homelab_phone_frigate_person_video
+    alias: 'Security: person video on Vitaly iPhone Air'
+    description: >-
+      Notify once when Frigate starts seeing moving people in Garage or Porch.
+      Increasing counts during the same activity and generic motion do not notify.
+      Attach the matching live camera for iPhone and Apple Watch; phone only.
+    triggers:
+      - trigger: state
+        entity_id:
+          - sensor.garage_person_active_count_2
+          - sensor.porch_person_active_count_2
+        from: '0'
+    conditions:
+      - condition: template
+        value_template: '{{ trigger.to_state is not none and trigger.to_state.state | float(0) > 0 }}'
+      - condition: state
+        entity_id: input_boolean.notifications_off
+        state: 'off'
+    actions:
+      - variables:
+          sources:
+            sensor.garage_person_active_count_2:
+              camera: camera.garage_camera_notifications
+              name: Garage
+              tag: frigate-person-garage
+            sensor.porch_person_active_count_2:
+              camera: camera.porch_camera_notifications
+              name: Porch
+              tag: frigate-person-porch
+      - action: script.notify_optional
+        data:
+          notify_service: notify.mobile_app_als_iphone_89310
+          notification_category: camera_person
+          notify_data:
+            title: '{{ sources[trigger.entity_id].name }}: person detected'
+            message: 'Frigate detected a moving person. Expand to view the live camera.'
+            data:
+              entity_id: '{{ sources[trigger.entity_id].camera }}'
+              tag: '{{ sources[trigger.entity_id].tag }}'
+              url: /lovelace/2
+              push:
+                category: camera
+    mode: parallel
+    max: 10
+    trace:
+      stored_traces: 5
+
+  - id: ha_homelab_phone_ring_motion_video
+    alias: 'Security: Ring Front Door video on Vitaly iPhone Air'
+    description: >-
+      Send Ring MQTT motion directly to the phone, independently of browser
+      snapshot capture. Preserve the existing Ring notification hours and mute.
+      Briefly prepare the cloud stream so iPhone and Watch can open live video.
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.front_door_motion_2
+        from: 'off'
+        to: 'on'
+    conditions:
+      - condition: time
+        after: '09:05:00'
+        before: '23:20:00'
+      - condition: state
+        entity_id: input_boolean.notifications_off
+        state: 'off'
+    actions:
+      - action: shell_command.ring_notification_video_ready
+        response_variable: video
+        continue_on_error: true
+      # A slow/offline camera must not suppress the motion alert itself.
+      - condition: state
+        entity_id: input_boolean.notifications_off
+        state: 'off'
+      - action: script.notify_optional
+        data:
+          notify_service: notify.mobile_app_als_iphone_89310
+          notify_data:
+            title: 'Ring Front Door: motion detected'
+            message: >-
+              {{ 'Motion at the front door. Expand to view the live camera.'
+                 if video is defined and video.returncode == 0
+                 else 'Motion at the front door. Live video may be unavailable.' }}
+            data:
+              entity_id: camera.ring_camera_notifications
+              tag: ring-front-door-motion
+              url: /lovelace/2
+              push:
+                category: camera
+    mode: single
+    trace:
+      stored_traces: 5

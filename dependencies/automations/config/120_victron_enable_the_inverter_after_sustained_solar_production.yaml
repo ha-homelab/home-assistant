@@ -1,0 +1,44 @@
+# Victron: Enable the inverter after sustained solar production.
+# Stable entity: automation.producing_on_pv_more_than_800w_for_two_minutes_with_victron_off.
+- id: ha_homelab_victron_enable_the_inverter_after_sustained_solar_production
+  alias: 'Victron: Enable the inverter after sustained solar production'
+  description: Enable the inverter after sustained solar production. Responds to sensor.current_solar_production
+    above 800 for 2 minutes; or sensor.ppv1_w above 300 for 2 minutes; or sensor.ppv2_w above 300 for 2 minutes;
+    or sensor.ppv3_w above 300 for 2 minutes. Runs only when all configured guards pass.
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.current_solar_production
+    above: 800
+    for:
+      minutes: 2
+  - platform: numeric_state
+    entity_id: sensor.ppv1_w
+    above: 300
+    for:
+      minutes: 2
+  - platform: numeric_state
+    entity_id: sensor.ppv2_w
+    above: 300
+    for:
+      minutes: 2
+  - platform: numeric_state
+    entity_id: sensor.ppv3_w
+    above: 300
+    for:
+      minutes: 2
+  conditions:
+  - condition: state
+    entity_id: switch.victron_quattro
+    state: 'off'
+    for:
+      minutes: 10
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.victron_quattro
+  - service: script.notify
+    data:
+      message: Producing to pv more than 800W for two minutes with Victron off
+    continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

@@ -1,0 +1,14 @@
+# Stable entity: script.run_playlist_on_plex
+# Play the Mult Plex playlist on the living room display with shuffle enabled.
+run_playlist_on_plex:
+  alias: 'Living room display: play Mult playlist'
+  description: Play the Mult Plex playlist on the living room display with shuffle enabled.
+  icon: mdi:playlist-play
+  mode: single
+  sequence:
+    - service: media_player.play_media
+      data:
+        media_content_id: 'plex://{ "playlist_name": "Mult", "shuffle": "1" }'
+        media_content_type: PLAYLIST
+      target:
+        entity_id: media_player.living_room_display

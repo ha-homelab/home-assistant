@@ -1,0 +1,14 @@
+# Stable entity: script.kkk
+# Play the radio selector value on the player selected by input_select.player using the existing TUNEIN media type.
+kkk:
+  alias: 'Radio: play selected TuneIn station'
+  description: Play the radio selector value on the player selected by input_select.player using the existing TUNEIN
+    media type.
+  icon: mdi:radio
+  mode: single
+  sequence:
+    - service: media_player.play_media
+      data_template:
+        entity_id: media_player.{{ states.input_select.player.state | string }}
+        media_content_id: '{{ states.input_select.radio.state | string }}'
+        media_content_type: TUNEIN

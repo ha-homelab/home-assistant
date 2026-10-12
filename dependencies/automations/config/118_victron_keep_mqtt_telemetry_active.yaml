@@ -1,0 +1,56 @@
+# Victron: Keep MQTT telemetry active.
+# Stable entity: automation.victron_mqtt_keep_alive.
+- id: '1608310266736'
+  alias: 'Victron: Keep MQTT telemetry active'
+  description: >-
+    Keep Venus telemetry active every five seconds without repeated full-tree
+    publications. Refresh the two expiring safety inputs with exact reads and
+    request the complete tree once when Home Assistant connects to MQTT.
+  triggers:
+  - platform: time_pattern
+    seconds: /5
+    id: heartbeat
+  - platform: mqtt
+    topic: homeassistant/status
+    payload: online
+    id: mqtt_connected
+  conditions:
+  - condition: or
+    conditions:
+    - condition: trigger
+      id: mqtt_connected
+    - condition: template
+      value_template: "{{ (state_attr(this.entity_id, 'current') | int(0)) == 0 }}"
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: mqtt_connected
+      sequence:
+      # Only connection bootstrap requests the full tree. The legacy Serial
+      # request also renews the streaming lease and returns the exact value.
+      - service: mqtt.publish
+        data:
+          topic: victron/R/b827ebea1ece/system/0/Serial
+          payload: '{}'
+    default:
+    - service: mqtt.publish
+      data:
+        topic: victron/R/b827ebea1ece/system/0/Serial
+        payload: '{"keepalive-options":["suppress-republish"]}'
+  # These HA sensors expire after 90 seconds, even when their values do not
+  # change. Exact reads refresh real observations without replaying every item.
+  - repeat:
+      for_each:
+      - victron/R/b827ebea1ece/vebus/290/Ac/ActiveIn/Connected
+      - victron/R/b827ebea1ece/system/0/Dc/Battery/Voltage
+      sequence:
+      - service: mqtt.publish
+        data:
+          topic: '{{ repeat.item }}'
+          payload: '{}'
+  # Skip overlapping periodic ticks, reserving the second slot for MQTT birth.
+  mode: queued
+  max: 2
+  trace:
+    stored_traces: 5

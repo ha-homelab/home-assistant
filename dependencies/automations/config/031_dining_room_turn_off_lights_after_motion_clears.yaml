@@ -1,0 +1,39 @@
+# Dining room: Turn off lights after motion clears.
+# Stable entity: automation.dinning_motion_off.
+- id: ha_homelab_dining_room_turn_off_lights_after_motion_clears
+  alias: 'Dining room: Turn off lights after motion clears'
+  description: Turn off after a new motion cycle or genuine unknown/unavailable recovery. Preserve later manual
+    ON states; recheck all original timeout, presence and override guards for each device and retry.
+  mode: parallel
+  trace:
+    stored_traces: 5
+  use_blueprint:
+    path: ha_homelab/motion_light_off.yaml
+    input:
+      motion_triggers:
+      - platform: state
+        to: 'off'
+        for:
+          minutes: 5
+        entity_id:
+        - binary_sensor.rf_dinner_motion
+        - binary_sensor.rf_dinner_two_motion
+      target_entities:
+      - switch.dining_wall_light_2
+      - switch.dining_arc_lamp
+      - light.adining_lamp_m
+      - light.dining_lights_dimmer_l
+      guards:
+      - condition: template
+        value_template: '{{ state_attr("sun.sun", "elevation") < 0.10 }}'
+      - condition: state
+        entity_id: input_boolean.dining_room_sticky
+        state: 'off'
+      entity_off_data:
+        light.dining_lights_dimmer_l:
+          transition: 2
+      after_actions:
+      - service: script.notify_mqtt_log
+        data:
+          message: Dining automation motion off {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+        continue_on_error: true

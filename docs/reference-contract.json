@@ -1,0 +1,105 @@
+{
+  "source_date": "2026-09-14",
+  "reference_locations": {
+    "script.run_playlist_on_plex_hub": [
+      "automations/button.yaml",
+      ".storage/lovelace.lovelace"
+    ],
+    "script.notify_mqtt_log": [
+      "automations/dinning_motion_off.yaml",
+      "automations/dinning_motion_triggered.yaml",
+      "automations/hallway_motion_triggered.yaml",
+      "automations/kitchen.yaml"
+    ],
+    "script.notify_mqtt": [
+      "automations/garage_motion.yaml",
+      "automations/motion_notification.yaml",
+      "automations/ping_notifications.yaml",
+      "automations/porch_motion.yaml",
+      "automations/power2.yaml",
+      "automations/ring_motion.yaml",
+      "automations.yaml"
+    ],
+    "script.notify": [
+      "automations/power_less_than.yaml",
+      "automations/power_more_than.yaml",
+      "automations/thermostat_climate_heater.yaml",
+      "automations/victron.yaml",
+      "automations.yaml"
+    ],
+    "script.notifymax": [
+      "automations/water_level.yaml"
+    ],
+    "script.run_playlist_on_plex_hubold": [
+      "automations.yaml"
+    ],
+    "script.igw_announce_alarms": [
+      "packages/igw_google_link.yaml"
+    ],
+    "script.igw_google_battery": [
+      "packages/igw_google_link.yaml"
+    ],
+    "script.igw_google_energy_dispatch": [
+      "packages/igw_google_link.yaml",
+      "packages/igw_google_voice.yaml"
+    ],
+    "script.igw_google_solar": [
+      "packages/igw_google_link.yaml"
+    ],
+    "script.igw_google_solar_today": [
+      "packages/igw_google_link.yaml"
+    ],
+    "script.igw_google_status": [
+      "packages/igw_google_link.yaml"
+    ],
+    "automation.off_lights": [
+      ".storage/lovelace.lovelace"
+    ],
+    "automation.off_lights_except_living_room": [
+      ".storage/lovelace.lovelace"
+    ],
+    "script.kk": [
+      ".storage/lovelace.lovelace"
+    ],
+    "script.kkk": [
+      ".storage/lovelace.lovelace"
+    ],
+    "script.living_room_display_2_temperature": [
+      ".storage/lovelace.lovelace"
+    ],
+    "script.random_on_an2": [
+      ".storage/lovelace.lovelace"
+    ],
+    "script.random_on_inew": [
+      ".storage/lovelace.lovelace"
+    ],
+    "script.run_playlist_on_plex": [
+      ".storage/lovelace.lovelace"
+    ],
+    "script.run_playlist_on_plex_bathroom_ants": [
+      ".storage/lovelace.lovelace"
+    ],
+    "script.run_playlist_on_plex_mobile_ants": [
+      ".storage/lovelace.lovelace"
+    ],
+    "script.turn_off_lg2_tv_screen": [
+      ".storage/lovelace.lovelace"
+    ],
+    "script.turn_off_living_room": [
+      ".storage/lovelace.lovelace"
+    ],
+    "script.turn_on_lg2_tv_screen": [
+      ".storage/lovelace.lovelace"
+    ],
+    "script.tv_random_channel": [
+      ".storage/lovelace.lovelace"
+    ],
+    "automation.zero_grid___smart_battery_management": [
+      ".storage/lovelace.zero_grid"
+    ]
+  },
+  "preexisting_unresolved": [
+    "automation.zero_grid___smart_battery_management"
+  ],
+  "migration_policy": "Preserve existing entity IDs, so valid references require no replacement."
+}

@@ -1,0 +1,9 @@
+# Home Assistant configuration; retain stable entity identifiers.
+- name: Away Devices On
+  entities:
+    switch.bathroom_warmer: true
+    switch.0120020960019453437a: true
+- name: Away Devices Off
+  entities:
+    switch.bathroom_warmer: false
+    switch.0120020960019453437a: false

@@ -1,0 +1,11 @@
+# Stable entity: script.volume_down
+volume_down:
+  alias: 'Media: set household volume presets'
+  description: Set the retained Echo volume preset to 20 percent.
+  icon: mdi:volume-medium
+  mode: single
+  sequence:
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.vitaly_s_echo
+      volume_level: 0.2

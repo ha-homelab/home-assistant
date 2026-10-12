@@ -1,0 +1,85 @@
+# Native Roomba retries remain enabled. This only accelerates recovery once Wi-Fi returns.
+# Ping entries are installed through HA's config flow; see docs/roomba-network-recovery.md.
+input_datetime:
+  roomba_last_recovery:
+    name: Roomba last connection recovery
+    has_date: true
+    has_time: true
+  roombaryan_last_recovery:
+    name: RoombaRyan last connection recovery
+    has_date: true
+    has_time: true
+  i7_last_recovery:
+    name: i7 last connection recovery
+    has_date: true
+    has_time: true
+  roombaalex_last_recovery:
+    name: RoombaAlex last connection recovery
+    has_date: true
+    has_time: true
+  roomba9_last_recovery:
+    name: Roomba9 last connection recovery
+    has_date: true
+    has_time: true
+
+automation:
+  - id: ha_homelab_roomba_network_recovery
+    alias: 'Roomba: recover connection after Wi-Fi returns'
+    description: >-
+      Check once a minute. Reload only an unavailable Roomba whose ping has been
+      online for a minute, at most once per robot every 15 minutes.
+      Native retries, credentials and manual integration disabling are preserved.
+    mode: single
+    max_exceeded: silent
+    triggers:
+      - trigger: time_pattern
+        minutes: /1
+    variables:
+      robots:
+        - vacuum: vacuum.roomba
+          ping: binary_sensor.roomba_network
+          cooldown: input_datetime.roomba_last_recovery
+        - vacuum: vacuum.roombaryan
+          ping: binary_sensor.roombaryan_network
+          cooldown: input_datetime.roombaryan_last_recovery
+        - vacuum: vacuum.i7
+          ping: binary_sensor.i7_network
+          cooldown: input_datetime.i7_last_recovery
+        - vacuum: vacuum.roombaalex
+          ping: binary_sensor.roombaalex_network
+          cooldown: input_datetime.roombaalex_last_recovery
+        - vacuum: vacuum.roomba9
+          ping: binary_sensor.roomba9_network
+          cooldown: input_datetime.roomba9_last_recovery
+    actions:
+      - repeat:
+          for_each: '{{ robots }}'
+          sequence:
+            - variables:
+                entry: '{{ config_entry_id(repeat.item.vacuum) }}'
+            - if:
+                - condition: template
+                  value_template: >-
+                    {{ entry is string
+                       and config_entry_attr(entry, 'domain') == 'roomba'
+                       and config_entry_attr(entry, 'disabled_by') is none
+                       and config_entry_attr(entry, 'state') in ['loaded', 'setup_retry']
+                       and is_state(repeat.item.ping, 'on')
+                       and (as_timestamp(now()) - as_timestamp(states[repeat.item.ping].last_changed)) >= 60
+                       and states(repeat.item.vacuum) in ['unavailable', 'unknown']
+                       and states[repeat.item.vacuum] is not none
+                       and (as_timestamp(now()) - as_timestamp(states[repeat.item.vacuum].last_changed)) >= 120
+                       and has_value(repeat.item.cooldown)
+                       and (as_timestamp(now()) - (state_attr(repeat.item.cooldown, 'timestamp') | float(0))) >= 900 }}
+              then:
+                # Record failed attempts too. Without initial: these helpers restore across restarts.
+                # A failed helper write stops this run rather than bypassing the rate limit.
+                - action: input_datetime.set_datetime
+                  target:
+                    entity_id: '{{ repeat.item.cooldown }}'
+                  data:
+                    timestamp: '{{ as_timestamp(now()) }}'
+                - action: homeassistant.reload_config_entry
+                  continue_on_error: true
+                  data:
+                    entry_id: '{{ entry }}'

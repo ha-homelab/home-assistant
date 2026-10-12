@@ -1,0 +1,16 @@
+# Stable entity: script.run_playlist_on_plex_hubold
+# Play the existing Caboomers Sailor track selection from the Plex Music library on the Family Hub with shuffle enabled.
+run_playlist_on_plex_hubold:
+  alias: 'Family Hub: play Sailor directly from Plex'
+  description: Play the existing Caboomers Sailor track selection from the Plex Music library on the Family Hub
+    with shuffle enabled.
+  icon: mdi:playlist-play
+  mode: single
+  sequence:
+    - service: media_player.play_media
+      data:
+        media_content_type: music
+        media_content_id: 'plex://{"library_name": "Music", "artist_name": "Caboomers", "track_name": "Sailor went
+          to Sea Sea Sea", "shuffle": "1"}'
+      target:
+        entity_id: media_player.vitaly_s_family_hub

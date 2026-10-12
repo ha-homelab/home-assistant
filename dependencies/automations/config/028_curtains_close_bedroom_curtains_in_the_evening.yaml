@@ -1,0 +1,31 @@
+# Curtains: Close bedroom curtains in the evening.
+# Stable entity: automation.close_bedrooms_curtains_in_the_evening.
+- id: ha_homelab_curtains_close_bedroom_curtains_in_the_evening
+  alias: 'Curtains: Close bedroom curtains in the evening'
+  description: Close bedroom curtains in the evening. Responds to sun.sun below 0.1. Runs only when all
+    configured guards pass.
+  triggers:
+  - platform: numeric_state
+    entity_id: sun.sun
+    value_template: '{{ state_attr(''sun.sun'', ''elevation'') }}'
+    below: 0.1
+  conditions:
+  - condition: state
+    entity_id: input_boolean.curtains_sticky
+    state: 'off'
+  actions:
+  - service: cover.close_cover
+    entity_id: cover.mishka_curtains_one_l
+  - service: switch.turn_on
+    entity_id: switch.bedroom_guard
+  - delay: 00:01:30
+  - service: cover.close_cover
+    entity_id: cover.mishka_curtains_two_l
+  - service: cover.close_cover
+    entity_id: cover.bedroom_curtains_l
+  - delay: 01:00:00
+  - service: switch.turn_off
+    entity_id: switch.bedroom_guard
+  mode: single
+  trace:
+    stored_traces: 5

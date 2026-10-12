@@ -1,0 +1,13 @@
+# Stable entity: script.run_playlist_on_plex_bathroom_ants
+# Play the Ants Plex playlist on the bathroom speaker with repeat-all enabled.
+run_playlist_on_plex_bathroom_ants:
+  alias: 'Bathroom: play Ants playlist'
+  description: Play the Ants Plex playlist on the bathroom speaker with repeat-all enabled.
+  icon: mdi:playlist-play
+  mode: single
+  sequence:
+    - service: media_player.play_media
+      data:
+        entity_id: media_player.bathroom_speaker
+        media_content_type: PLAYLIST
+        media_content_id: 'plex://{ "playlist_name": "Ants", "repeatall": "1" }'

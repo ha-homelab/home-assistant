@@ -1,0 +1,154 @@
+# Template covers use HA positions: 0 closed, 100 open.
+- unique_id: living_light_curtains_r
+  name: Living light curtains R
+  device_class: curtain
+  availability: >-
+    {{ has_value('cover.living_light_curtains_l') and state_attr('cover.living_light_curtains_l', 'current_position') is number }}
+  position: >-
+    {{ [[(state_attr('cover.living_light_curtains_l', 'current_position') | float(0)), 0] | max, 100] | min }}
+  open_cover:
+    action: cover.open_cover
+    target:
+      entity_id: cover.living_light_curtains_l
+  close_cover:
+    action: cover.close_cover
+    target:
+      entity_id: cover.living_light_curtains_l
+  stop_cover:
+    action: cover.stop_cover
+    target:
+      entity_id: cover.living_light_curtains_l
+  set_cover_position:
+    action: cover.set_cover_position
+    data:
+      position: '{{ position }}'
+    target:
+      entity_id: cover.living_light_curtains_l
+- unique_id: living_curtains_r
+  name: Living curtains R
+  device_class: curtain
+  availability: >-
+    {{ has_value('cover.living_curtains_l') and state_attr('cover.living_curtains_l', 'current_position') is number }}
+  position: >-
+    {{ [[(100 - (state_attr('cover.living_curtains_l', 'current_position') | float(0))), 0] | max, 100] | min }}
+  open_cover:
+    action: cover.open_cover
+    target:
+      entity_id: cover.living_curtains_l
+  close_cover:
+    action: cover.close_cover
+    target:
+      entity_id: cover.living_curtains_l
+  stop_cover:
+    action: cover.stop_cover
+    target:
+      entity_id: cover.living_curtains_l
+  set_cover_position:
+    action: cover.set_cover_position
+    data:
+      position: '{{ 100 - position }}'
+    target:
+      entity_id: cover.living_curtains_l
+- unique_id: dining_curtains_r
+  name: Dining curtains R
+  device_class: curtain
+  availability: >-
+    {{ has_value('cover.dining_curtains_l') and state_attr('cover.dining_curtains_l', 'current_position') is number }}
+  position: >-
+    {{ [[(100 - (state_attr('cover.dining_curtains_l', 'current_position') | float(0))), 0] | max, 100] | min }}
+  open_cover:
+    action: cover.open_cover
+    target:
+      entity_id: cover.dining_curtains_l
+  close_cover:
+    action: cover.close_cover
+    target:
+      entity_id: cover.dining_curtains_l
+  stop_cover:
+    action: cover.stop_cover
+    target:
+      entity_id: cover.dining_curtains_l
+  set_cover_position:
+    action: cover.set_cover_position
+    data:
+      position: '{{ 100 - position }}'
+    target:
+      entity_id: cover.dining_curtains_l
+- unique_id: kitchen_curtains_r
+  name: Kitchen curtains R
+  device_class: curtain
+  availability: >-
+    {{ has_value('cover.kitchen_curtains_l') and state_attr('cover.kitchen_curtains_l', 'current_position') is number }}
+  position: >-
+    {{ [[(state_attr('cover.kitchen_curtains_l', 'current_position') | float(0)), 0] | max, 100] | min }}
+  open_cover:
+    action: cover.open_cover
+    target:
+      entity_id: cover.kitchen_curtains_l
+  close_cover:
+    action: cover.close_cover
+    target:
+      entity_id: cover.kitchen_curtains_l
+  stop_cover:
+    action: cover.stop_cover
+    target:
+      entity_id: cover.kitchen_curtains_l
+  set_cover_position:
+    action: cover.set_cover_position
+    data:
+      position: '{{ position }}'
+    target:
+      entity_id: cover.kitchen_curtains_l
+- unique_id: bedroom_curtains_r
+  name: Bedroom curtains R
+  device_class: curtain
+  availability: >-
+    {{ has_value('cover.bedroom_curtains_l') and state_attr('cover.bedroom_curtains_l', 'current_position') is number }}
+  position: >-
+    {{ [[(100 - (state_attr('cover.bedroom_curtains_l', 'current_position') | float(0))), 0] | max, 100] | min }}
+  open_cover:
+    action: cover.open_cover
+    target:
+      entity_id: cover.bedroom_curtains_l
+  close_cover:
+    action: cover.close_cover
+    target:
+      entity_id: cover.bedroom_curtains_l
+  stop_cover:
+    action: cover.stop_cover
+    target:
+      entity_id: cover.bedroom_curtains_l
+  set_cover_position:
+    action: cover.set_cover_position
+    data:
+      position: '{{ 100 - position }}'
+    target:
+      entity_id: cover.bedroom_curtains_l
+- unique_id: office_curtains_r
+  name: Office Curtains R
+  device_class: curtain
+  availability: >-
+    {{ states('cover.office_curtains_office_curtains') != 'unavailable'
+       and not state_attr('cover.office_curtains_office_curtains', 'restored')
+       and state_attr('cover.office_curtains_office_curtains', 'raw_state') in ['open', 'close', 'stop', 'continue'] }}
+  position: >-
+    {% set actual = state_attr('cover.office_curtains_office_curtains', 'current_position') %}
+    {{ [[100 - actual, 0] | max, 100] | min if actual is number else none }}
+  open_cover:
+    action: cover.close_cover
+    target:
+      entity_id: cover.office_curtains_office_curtains
+  close_cover:
+    action: cover.open_cover
+    target:
+      entity_id: cover.office_curtains_office_curtains
+  stop_cover:
+    action: cover.stop_cover
+    target:
+      entity_id: cover.office_curtains_office_curtains
+  set_cover_position:
+    action: cover.set_cover_position
+    data:
+      position: '{{ 100 - position }}'
+    target:
+      entity_id: cover.office_curtains_office_curtains

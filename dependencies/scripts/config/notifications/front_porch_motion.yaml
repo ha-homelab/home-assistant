@@ -1,0 +1,15 @@
+# Stable entity: script.blinkmotion
+blinkmotion:
+  alias: 'Front porch: notify about motion'
+  description: Send the existing Chrome motion notification.
+  icon: mdi:motion-sensor
+  mode: single
+  sequence:
+  - action: script.notify_optional
+    data:
+      notify_service: html5.send_message
+      notify_data:
+        message: Front Porch Motion
+        entity_id: notify.chrome
+        data:
+          url: /

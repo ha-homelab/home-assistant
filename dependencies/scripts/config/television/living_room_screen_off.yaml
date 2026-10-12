@@ -1,0 +1,13 @@
+# Stable entity: script.turn_off_lg_tv_screen
+# Send the webOS screen-off command to the living room 77-inch TV without changing the existing power behavior.
+turn_off_lg_tv_screen:
+  alias: 'Living room TV: turn screen off'
+  description: Send the webOS screen-off command to the living room 77-inch TV without changing the existing power
+    behavior.
+  icon: mdi:television-off
+  mode: single
+  sequence:
+    - service: webostv.command
+      data:
+        entity_id: media_player.living_room_tv_77
+        command: com.webos.service.tvpower/power/turnOffScreen

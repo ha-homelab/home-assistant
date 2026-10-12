@@ -1,0 +1,47 @@
+# Curtains: Open living-room curtains in the morning.
+# Stable entity: automation.open_living_curtains_in_the_morning.
+- id: ha_homelab_curtains_open_living_room_curtains_in_the_morning
+  alias: 'Curtains: Open living-room curtains in the morning'
+  description: At 06:30 power both living-room curtain motors through Living guard 1, keep the
+    90-second warm-up, then open each available motor independently. Preserve the manual override.
+  triggers:
+    platform: time
+    at: 06:30:00
+  conditions:
+  - condition: state
+    entity_id: input_boolean.curtains_sticky
+    state: 'off'
+  actions:
+  - action: switch.turn_on
+    target:
+      entity_id: switch.living_guard_1
+    continue_on_error: true
+  - delay: 00:01:30
+  - parallel:
+    - sequence:
+      - wait_template: >-
+          {{ has_value('cover.living_curtains_l') or is_state('input_boolean.curtains_sticky', 'on') }}
+        timeout: 00:03:00
+        continue_on_timeout: false
+      - condition: state
+        entity_id: input_boolean.curtains_sticky
+        state: 'off'
+      - action: cover.open_cover
+        target:
+          entity_id: cover.living_curtains_l
+        continue_on_error: true
+    - sequence:
+      - wait_template: >-
+          {{ has_value('cover.living_light_curtains_l') or is_state('input_boolean.curtains_sticky', 'on') }}
+        timeout: 00:03:00
+        continue_on_timeout: false
+      - condition: state
+        entity_id: input_boolean.curtains_sticky
+        state: 'off'
+      - action: cover.open_cover
+        target:
+          entity_id: cover.living_light_curtains_l
+        continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

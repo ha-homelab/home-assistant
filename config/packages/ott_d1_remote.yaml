@@ -1,0 +1,123 @@
+# RM433 rows: up/left, down/right, unused/unused, back/OK.
+# MQTT discovery already filters unrelated formats and learned RF codes.
+# Existing REST logger policy is defined in igw_google_voice.yaml.
+rest_command:
+  ott_d1_presence:
+    url: !secret ott_control_devices_url
+    method: GET
+    timeout: 3
+    headers:
+      Authorization: !secret ott_control_authorization
+      User-Agent: ottplay-cli/1.0
+      Accept: application/json
+      Cache-Control: no-store
+  ott_d1_input:
+    url: !secret ott_control_d1_input_url
+    method: POST
+    timeout: 3
+    headers:
+      Authorization: !secret ott_control_authorization
+      User-Agent: ottplay-cli/1.0
+    content_type: application/json
+    payload: >-
+      {{ {'action': 'input', 'params': {'key': key}} | to_json }}
+
+automation:
+  - id: ott_d1_rm433_channels
+    alias: "OTT d1: RM433 navigation"
+    description: >-
+      Rows: up/left, down/right, unused/unused, back/OK.
+      Wait briefly for d1 to become idle; discard presses older than two seconds.
+    mode: queued
+    max: 4
+    max_exceeded: silent
+    # Automation variables render at trigger time, before entering the script queue.
+    variables:
+      input_deadline: "{{ as_timestamp(now()) + 2 }}"
+    triggers:
+      - trigger: device
+        domain: mqtt
+        device_id: 8ac1a57250698f6b441439e5a6e9c5a0
+        type: button_short_press
+        subtype: button_1
+        id: up
+      - trigger: device
+        domain: mqtt
+        device_id: 8ac1a57250698f6b441439e5a6e9c5a0
+        type: button_short_press
+        subtype: button_2
+        id: left
+      - trigger: device
+        domain: mqtt
+        device_id: 8ac1a57250698f6b441439e5a6e9c5a0
+        type: button_short_press
+        subtype: button_3
+        id: down
+      - trigger: device
+        domain: mqtt
+        device_id: 8ac1a57250698f6b441439e5a6e9c5a0
+        type: button_short_press
+        subtype: button_4
+        id: right
+      - trigger: device
+        domain: mqtt
+        device_id: 8ac1a57250698f6b441439e5a6e9c5a0
+        type: button_short_press
+        subtype: button_7
+        id: back
+      - trigger: device
+        domain: mqtt
+        device_id: 8ac1a57250698f6b441439e5a6e9c5a0
+        type: button_short_press
+        subtype: button_8
+        id: ok
+    actions:
+      - condition: template
+        value_template: "{{ trigger is defined and trigger.id in ['up', 'down', 'left', 'right', 'back', 'ok'] }}"
+      - variables:
+          ready: false
+      - repeat:
+          while: "{{ not ready and as_timestamp(now()) < input_deadline }}"
+          sequence:
+            # A failed GET must not reuse a response from the previous attempt.
+            - variables:
+                presence: {}
+            - action: rest_command.ott_d1_presence
+              response_variable: presence
+              continue_on_error: true
+            - variables:
+                ready: >-
+                  {% set body = presence.get('content') if presence is mapping else none %}
+                  {% set devices = body.get('devices') if body is mapping else none %}
+                  {% set found = namespace(devices=[]) %}
+                  {% if devices is sequence and devices is not string and devices is not mapping %}
+                    {% for device in devices if device is mapping
+                         and device.get('id') == 'dev_c0b414dd92b2b5a36fffde703a6968f5' %}
+                      {% set found.devices = found.devices + [device] %}
+                    {% endfor %}
+                  {% endif %}
+                  {% set device = found.devices[0] if found.devices | count == 1 else {} %}
+                  {% set seen = as_timestamp(device.get('last_seen'), none)
+                     if device.get('last_seen') is string else none %}
+                  {{ presence is mapping and presence.get('status') == 200
+                     and seen is number and 0 <= as_timestamp(now()) - seen <= 3
+                     and device.get('pending') is integer and device.get('pending') == 0 }}
+            - if: "{{ not ready and as_timestamp(now()) < input_deadline }}"
+              then:
+                - delay:
+                    milliseconds: 150
+      # Check again after GET: a slow response cannot extend the key's lifetime.
+      - condition: template
+        value_template: "{{ ready and as_timestamp(now()) < input_deadline }}"
+      - action: rest_command.ott_d1_input
+        data:
+          key: "{{ trigger.id }}"
+        response_variable: submitted
+      - if:
+          - condition: template
+            value_template: "{{ submitted is not mapping or submitted.get('status') != 202 }}"
+        then:
+          - stop: "OTT d1 did not accept the navigation request. No retry was made."
+            error: true
+    trace:
+      stored_traces: 12

@@ -1,0 +1,20 @@
+# Stable entity: script.tv_random_channel2
+# Send four independently generated digits using the original exclusive range bounds and 0.1-second Harmony delay.
+# Jinja range upper bounds are exclusive: the first digit is always 1; the other ranges remain exactly as deployed.
+tv_random_channel2:
+  alias: 'Living room TV: send random channel digits'
+  description: Send four independently generated digits using the original exclusive range bounds and 0.1-second
+    Harmony delay.
+  icon: mdi:shuffle-variant
+  mode: single
+  sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.harmonyhub
+        command:
+          - '{{(range(1, 2)|random|int)}}'
+          - '{{(range(0, 4)|random|int)}}'
+          - '{{(range(0, 9)|random|int)}}'
+          - '{{(range(0, 9)|random|int)}}'
+        device: LG TV
+        delay_secs: 0.1

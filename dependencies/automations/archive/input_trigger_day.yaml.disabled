@@ -1,0 +1,9 @@
+  trigger:
+    platform: sun
+    event: sunset
+    offset: "-00:45:00"
+  action:
+    entity_id: input_number.nighttime
+    service: input_number.set_value
+    data:
+      value: 1

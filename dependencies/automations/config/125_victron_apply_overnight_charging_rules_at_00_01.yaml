@@ -1,0 +1,79 @@
+# Victron: Apply overnight charging rules at 00:01.
+# Stable entity: automation.daily_at_0_01_am_set_charging_states_and_ensure_victron_off.
+- id: ha_homelab_victron_apply_overnight_charging_rules_at_00_01
+  alias: 'Victron: Apply overnight charging rules at 00:01'
+  description: At 00:01, turn off in Winter when Off-grid mode is off. Otherwise retain
+    the non-Summer below-52-V overnight policy. Off-grid mode blocks all inverter and charging commands.
+    The operator mode controls island operation; missing grid telemetry does not veto Winter.
+  triggers:
+  - platform: time
+    at: '00:01:00'
+  conditions: []
+  actions:
+  - variables:
+      decision_reason: >-
+        {% set mode = states('input_boolean.off_grid_mode') %}
+        {% set v = states('sensor.battery_voltage') | float(none) %}
+        {% if mode == 'on' %}skipped: Off-grid mode on
+        {% elif mode != 'off' %}skipped: Off-grid mode unavailable
+        {% elif is_state('switch.victron_quattro', 'off') %}skipped: inverter already off
+        {% elif not is_state('switch.victron_quattro', 'on') %}skipped: inverter unavailable
+        {% elif is_state('input_boolean.winter', 'on') %}attempting: Winter shutdown
+        {% elif not is_state('input_boolean.summer', 'off') %}skipped: Summer/unknown season
+        {% elif v is none or not is_number(v) or not 0 < v <= 70 %}skipped: battery telemetry invalid
+        {% elif v < 52 %}attempting: low-reserve shutdown
+        {% else %}skipped: battery at least 52 V
+        {% endif %}
+      decision_context: >-
+        off_grid={{ states('input_boolean.off_grid_mode') }};
+        winter={{ states('input_boolean.winter') }};
+        battery={{ states('sensor.battery_voltage') }} V
+  - service: input_text.set_value
+    target:
+      entity_id: input_text.victron_last_overnight_decision
+    data:
+      value: "{{ (now().strftime('%Y-%m-%d %H:%M:%S %Z') ~ ' | ' ~ decision_reason | trim ~ ' | ' ~ decision_context | trim)[:255] }}"
+    continue_on_error: true
+  # A skipped snapshot never becomes a command if the mode changes while logging.
+  - condition: template
+    value_template: "{{ (decision_reason | trim).startswith('attempting:') }}"
+  - condition: state
+    entity_id: input_boolean.off_grid_mode
+    state: 'off'
+  - condition: state
+    entity_id: switch.victron_quattro
+    state: 'on'
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: input_boolean.winter
+      state: 'on'
+    - condition: and
+      conditions:
+      - condition: state
+        entity_id: input_boolean.summer
+        state: 'off'
+      - condition: template
+        value_template: >-
+          {% set v = states('sensor.battery_voltage') | float(none) %}
+          {{ v is not none and is_number(v) and 0 < v < 52 }}
+  - service: switch.turn_off
+    target:
+      entity_id: switch.victron_quattro
+  - service: switch.turn_on
+    data:
+      entity_id:
+      - switch.inverter_do_not_supply_ev
+  - service: switch.turn_on
+    data:
+      entity_id:
+      - switch.inverter_only_charging
+  - service: input_text.set_value
+    target:
+      entity_id: input_text.victron_last_overnight_decision
+    data:
+      value: "{{ (now().strftime('%Y-%m-%d %H:%M:%S %Z') ~ ' | ' ~ (decision_reason | trim | replace('attempting:', 'requested:')) ~ ' | ' ~ decision_context | trim)[:255] }}"
+    continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

@@ -1,0 +1,15 @@
+# Stable entity: script.receiver_surroundmodelogic7
+# Send the existing SurroundModeLogic7 command to the Pioneer AV Receiver through Harmony.
+receiver_surroundmodelogic7:
+  alias: 'Receiver: select Logic 7 mode'
+  description: Send the existing SurroundModeLogic7 command to the Pioneer AV Receiver through Harmony.
+  icon: mdi:surround-sound
+  mode: single
+  sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.harmonyhub
+        command:
+          - SurroundModeLogic7
+        device: Pioneer AV Receiver
+        delay_secs: 0.6

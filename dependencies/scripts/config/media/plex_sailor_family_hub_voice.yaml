@@ -1,0 +1,14 @@
+# Stable entity: script.run_playlist_on_plex_hub
+# Send the existing custom Alexa request for the Caboomers Sailor track to the Family Hub.
+run_playlist_on_plex_hub:
+  alias: 'Family Hub: request Sailor through Alexa'
+  description: Send the existing custom Alexa request for the Caboomers Sailor track to the Family Hub.
+  icon: mdi:account-voice
+  mode: single
+  sequence:
+    - service: media_player.play_media
+      metadata: {}
+      data:
+        entity_id: media_player.vitaly_s_family_hub
+        media_content_id: alexa, ask plex to play sailor went to sea sea sea by caboomers
+        media_content_type: custom

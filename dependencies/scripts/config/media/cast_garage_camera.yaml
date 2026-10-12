@@ -1,0 +1,13 @@
+# Stable entity: script.cast_porch_to_chromecast
+# Stream the garage camera to the Chromecast; the legacy script key still contains porch.
+# The public script key is retained for callers; the actual source is camera.garage_camera.
+cast_porch_to_chromecast:
+  alias: 'Chromecast: show garage camera'
+  description: Stream the garage camera to the Chromecast; the legacy script key still contains porch.
+  icon: mdi:cctv
+  mode: single
+  sequence:
+    - service: camera.play_stream
+      data:
+        entity_id: camera.garage_camera
+        media_player: media_player.chromecast

@@ -1,0 +1,58 @@
+# Keep selective Recorder maintenance with the root Recorder policy.
+# Exact entity scope only: no domains/globs, no startup-triggered purge, no repack.
+# Daily execution retains roughly seven to eight days; skipped runs extend this window.
+automation:
+  - id: ha_homelab_recorder_jbd_cell_retention
+    alias: 'Recorder: retain seven days of JBD cell detail'
+    description: Daily at 07:30 Home Assistant local time, enqueue removal of raw history older than seven days
+      for only the 32 reviewed JBD cell entities. Keep the entities recorded and preserve their statistics. The
+      service returns before the background purge finishes; trace completion means the request was queued. Skip
+      this run while backup status is not idle; the next daily schedule retries.
+    mode: single
+    max_exceeded: warning
+    trace:
+      stored_traces: 5
+    triggers:
+      - trigger: time
+        at: 07:30:00
+    conditions:
+      - condition: state
+        entity_id: sensor.backup_backup_manager_state
+        state: idle
+    actions:
+      - action: recorder.purge_entities
+        data:
+          entity_id:
+            - sensor.jbd_chain2_monitor_voltage_cell1_bms1
+            - sensor.jbd_chain2_monitor_voltage_cell1_bms1_2
+            - sensor.jbd_chain2_monitor_voltage_cell1_bms2
+            - sensor.jbd_chain2_monitor_voltage_cell1_bms2_2
+            - sensor.jbd_chain2_monitor_voltage_cell1_bms3
+            - sensor.jbd_chain2_monitor_voltage_cell1_bms3_2
+            - sensor.jbd_chain2_monitor_voltage_cell1_bms4
+            - sensor.jbd_chain2_monitor_voltage_cell1_bms4_2
+            - sensor.jbd_chain2_monitor_voltage_cell2_bms1
+            - sensor.jbd_chain2_monitor_voltage_cell2_bms1_2
+            - sensor.jbd_chain2_monitor_voltage_cell2_bms2
+            - sensor.jbd_chain2_monitor_voltage_cell2_bms2_2
+            - sensor.jbd_chain2_monitor_voltage_cell2_bms3
+            - sensor.jbd_chain2_monitor_voltage_cell2_bms3_2
+            - sensor.jbd_chain2_monitor_voltage_cell2_bms4
+            - sensor.jbd_chain2_monitor_voltage_cell2_bms4_2
+            - sensor.jbd_chain2_monitor_voltage_cell3_bms1
+            - sensor.jbd_chain2_monitor_voltage_cell3_bms1_2
+            - sensor.jbd_chain2_monitor_voltage_cell3_bms2
+            - sensor.jbd_chain2_monitor_voltage_cell3_bms2_2
+            - sensor.jbd_chain2_monitor_voltage_cell3_bms3
+            - sensor.jbd_chain2_monitor_voltage_cell3_bms3_2
+            - sensor.jbd_chain2_monitor_voltage_cell3_bms4
+            - sensor.jbd_chain2_monitor_voltage_cell3_bms4_2
+            - sensor.jbd_chain2_monitor_voltage_cell4_bms1
+            - sensor.jbd_chain2_monitor_voltage_cell4_bms1_2
+            - sensor.jbd_chain2_monitor_voltage_cell4_bms2
+            - sensor.jbd_chain2_monitor_voltage_cell4_bms2_2
+            - sensor.jbd_chain2_monitor_voltage_cell4_bms3
+            - sensor.jbd_chain2_monitor_voltage_cell4_bms3_2
+            - sensor.jbd_chain2_monitor_voltage_cell4_bms4
+            - sensor.jbd_chain2_monitor_voltage_cell4_bms4_2
+          keep_days: 7

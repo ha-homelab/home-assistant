@@ -1,0 +1,23 @@
+# Stable entity: script.mediaoff
+mediaoff:
+  alias: 'Media: turn off household players'
+  description: Turn off the eight retained household media players in sequence, continuing when an individual player
+    fails.
+  icon: mdi:speaker-off
+  mode: single
+  sequence:
+  - repeat:
+      for_each:
+      - media_player.bathroom_echo_dot
+      - media_player.living_room_echo
+      - media_player.bathroom_speaker
+      - media_player.kitchen_speaker_2
+      - media_player.family_room_speaker_2
+      - media_player.dinning_room_google_mini
+      - media_player.mishka_bedroom_google_mini
+      - media_player.living_room_google_home
+      sequence:
+      - action: media_player.turn_off
+        target:
+          entity_id: '{{ repeat.item }}'
+        continue_on_error: true

@@ -1,0 +1,1051 @@
+{
+  "approved_on": "2026-09-29",
+  "entity_count": 171,
+  "groups": {
+    "frigate": [
+      {
+        "entity_id": "binary_sensor.backdoor_all_occupancy",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:occupancy_sensor:backdoor_all",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "binary_sensor.backdoor_motion",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:motion_sensor:backdoor",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "binary_sensor.backdoor_person_occupancy",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:occupancy_sensor:backdoor_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "binary_sensor.front_all_occupancy",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:occupancy_sensor:front_all",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "binary_sensor.front_motion",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:motion_sensor:front",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "binary_sensor.front_person_occupancy",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:occupancy_sensor:front_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "binary_sensor.garage_all_occupancy",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:occupancy_sensor:garage_all",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "binary_sensor.garage_motion",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:motion_sensor:garage",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "binary_sensor.garage_person_occupancy",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:occupancy_sensor:garage_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "binary_sensor.porch_all_occupancy",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:occupancy_sensor:porch_all",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "binary_sensor.porch_motion",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:motion_sensor:porch",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "binary_sensor.porch_person_occupancy",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:occupancy_sensor:porch_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "camera.backdoor",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:camera:backdoor",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "camera.front",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:camera:front",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "camera.garage",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:camera:garage",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "camera.porch",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:camera:porch",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "image.backdoor_person",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:image_best_snapshot:backdoor_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "image.front_person",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:image_best_snapshot:front_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "image.garage_person",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:image_best_snapshot:garage_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "image.porch_person",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:image_best_snapshot:porch_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "number.backdoor_contour_area",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:number:backdoor_contour_area",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "number.backdoor_threshold",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:number:backdoor_threshold",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "number.front_contour_area",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:number:front_contour_area",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "number.front_threshold",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:number:front_threshold",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "number.garage_contour_area",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:number:garage_contour_area",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "number.garage_threshold",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:number:garage_threshold",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "number.porch_contour_area",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:number:porch_contour_area",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "number.porch_threshold",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:number:porch_threshold",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.backdoor_all_active_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_active_object_count:backdoor_all",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.backdoor_all_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_object_count:backdoor_all",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.backdoor_camera_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:backdoor_camera",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.backdoor_capture_cpu_usage",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:capture_cpu_usage:backdoor",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.backdoor_detect_cpu_usage",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:detect_cpu_usage:backdoor",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.backdoor_detection_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:backdoor_detection",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.backdoor_ffmpeg_cpu_usage",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:ffmpeg_cpu_usage:backdoor",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.backdoor_person_active_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_active_object_count:backdoor_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.backdoor_person_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_object_count:backdoor_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.backdoor_process_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:backdoor_process",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.backdoor_review_status",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_review_status:backdoor",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.backdoor_skipped_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:backdoor_skipped",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.frigate_camera_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:camera",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.frigate_cpu1_inference_speed",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_detector_speed:cpu1",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.frigate_cpu2_inference_speed",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_detector_speed:cpu2",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.frigate_detection_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:detection",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.frigate_process_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:process",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.frigate_skipped_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:skipped",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.frigate_status",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_status:frigate",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.frigate_uptime",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:uptime:frigate",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.front_all_active_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_active_object_count:front_all",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.front_all_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_object_count:front_all",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.front_camera_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:front_camera",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.front_capture_cpu_usage",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:capture_cpu_usage:front",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.front_detect_cpu_usage",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:detect_cpu_usage:front",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.front_detection_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:front_detection",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.front_ffmpeg_cpu_usage",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:ffmpeg_cpu_usage:front",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.front_person_active_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_active_object_count:front_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.front_person_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_object_count:front_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.front_process_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:front_process",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.front_review_status",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_review_status:front",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.front_skipped_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:front_skipped",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.garage_all_active_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_active_object_count:garage_all",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.garage_all_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_object_count:garage_all",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.garage_camera_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:garage_camera",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.garage_capture_cpu_usage",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:capture_cpu_usage:garage",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.garage_detect_cpu_usage",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:detect_cpu_usage:garage",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.garage_detection_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:garage_detection",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.garage_ffmpeg_cpu_usage",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:ffmpeg_cpu_usage:garage",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.garage_person_active_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_active_object_count:garage_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.garage_person_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_object_count:garage_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.garage_process_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:garage_process",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.garage_review_status",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_review_status:garage",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.garage_skipped_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:garage_skipped",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.porch_all_active_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_active_object_count:porch_all",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.porch_all_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_object_count:porch_all",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.porch_camera_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:porch_camera",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.porch_capture_cpu_usage",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:capture_cpu_usage:porch",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.porch_detect_cpu_usage",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:detect_cpu_usage:porch",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.porch_detection_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:porch_detection",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.porch_ffmpeg_cpu_usage",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:ffmpeg_cpu_usage:porch",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.porch_person_active_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_active_object_count:porch_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.porch_person_count",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_object_count:porch_person",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.porch_process_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:porch_process",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.porch_review_status",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_review_status:porch",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "sensor.porch_skipped_fps",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:sensor_fps:porch_skipped",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.backdoor_detect",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:backdoor_detect",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.backdoor_improve_contrast",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:backdoor_improve_contrast",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.backdoor_motion",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:backdoor_motion",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.backdoor_object_descriptions",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:backdoor_object_descriptions",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.backdoor_recordings",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:backdoor_recordings",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.backdoor_review_alerts",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:backdoor_review_alerts",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.backdoor_review_descriptions",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:backdoor_review_descriptions",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.backdoor_review_detections",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:backdoor_review_detections",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.backdoor_snapshots",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:backdoor_snapshots",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.front_detect",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:front_detect",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.front_improve_contrast",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:front_improve_contrast",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.front_motion",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:front_motion",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.front_object_descriptions",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:front_object_descriptions",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.front_recordings",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:front_recordings",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.front_review_alerts",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:front_review_alerts",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.front_review_descriptions",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:front_review_descriptions",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.front_review_detections",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:front_review_detections",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.front_snapshots",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:front_snapshots",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.garage_detect",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:garage_detect",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.garage_improve_contrast",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:garage_improve_contrast",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.garage_motion",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:garage_motion",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.garage_object_descriptions",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:garage_object_descriptions",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.garage_recordings",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:garage_recordings",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.garage_review_alerts",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:garage_review_alerts",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.garage_review_descriptions",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:garage_review_descriptions",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.garage_review_detections",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:garage_review_detections",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.garage_snapshots",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:garage_snapshots",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.porch_detect",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:porch_detect",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.porch_improve_contrast",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:porch_improve_contrast",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.porch_motion",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:porch_motion",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.porch_object_descriptions",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:porch_object_descriptions",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.porch_recordings",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:porch_recordings",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.porch_review_alerts",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:porch_review_alerts",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.porch_review_descriptions",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:porch_review_descriptions",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.porch_review_detections",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:porch_review_detections",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "switch.porch_snapshots",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:switch:porch_snapshots",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      },
+      {
+        "entity_id": "update.frigate_server",
+        "platform": "frigate",
+        "unique_id": "be937b1f311cc478b5a5cf1a88335601:update:frigate_server",
+        "config_entry_id": "be937b1f311cc478b5a5cf1a88335601"
+      }
+    ],
+    "legacy": [
+      {
+        "entity_id": "automation.notify_powerball_win",
+        "platform": "automation",
+        "unique_id": "1577941963380",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "binary_sensor.updater",
+        "platform": "updater",
+        "unique_id": "updater",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "input_datetime.my_powerball_end_date",
+        "platform": "input_datetime",
+        "unique_id": "my_powerball_end_date",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "input_text.my_powerball_numbers",
+        "platform": "input_text",
+        "unique_id": "my_powerball_numbers",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "script.helper_multi_service",
+        "platform": "script",
+        "unique_id": "helper_multi_service",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "script.receiver_surroundstereo",
+        "platform": "script",
+        "unique_id": "receiver_surroundstereo",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "script.receiver_surrstereo",
+        "platform": "script",
+        "unique_id": "receiver_surrstereo",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.corrected_battery_soc_2",
+        "platform": "template",
+        "unique_id": "corrected_battery_soc2",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.network_throughput_in_brairbnb",
+        "platform": "systemmonitor",
+        "unique_id": "throughput_network_in_brairbnb",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.network_throughput_in_brhome",
+        "platform": "systemmonitor",
+        "unique_id": "throughput_network_in_brhome",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.network_throughput_in_eth0_4",
+        "platform": "systemmonitor",
+        "unique_id": "throughput_network_in_eth0_4",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.network_throughput_in_tun0",
+        "platform": "systemmonitor",
+        "unique_id": "throughput_network_in_tun0",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.network_throughput_in_tun1",
+        "platform": "systemmonitor",
+        "unique_id": "throughput_network_in_tun1",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.network_throughput_in_tun2",
+        "platform": "systemmonitor",
+        "unique_id": "throughput_network_in_tun2",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.network_throughput_out_brairbnb",
+        "platform": "systemmonitor",
+        "unique_id": "throughput_network_out_brairbnb",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.network_throughput_out_brhome",
+        "platform": "systemmonitor",
+        "unique_id": "throughput_network_out_brhome",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.network_throughput_out_eth0_4",
+        "platform": "systemmonitor",
+        "unique_id": "throughput_network_out_eth0_4",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.network_throughput_out_tun0",
+        "platform": "systemmonitor",
+        "unique_id": "throughput_network_out_tun0",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.network_throughput_out_tun1",
+        "platform": "systemmonitor",
+        "unique_id": "throughput_network_out_tun1",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.network_throughput_out_tun2",
+        "platform": "systemmonitor",
+        "unique_id": "throughput_network_out_tun2",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.ohmconnect_status",
+        "platform": "ohmconnect",
+        "unique_id": "k20N5mxz",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.san_francisco_intl",
+        "platform": "faastatus",
+        "unique_id": "SFO_status",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.sensor_inewswitch_inewswitch_total_daily_energy_integral",
+        "platform": "integration",
+        "unique_id": "solar1_total_power",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.u_s_air_pollution_level_2",
+        "platform": "airvisual",
+        "unique_id": "San Francisco,California,US_us_air_pollution_level",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.u_s_air_quality_index",
+        "platform": "airvisual",
+        "unique_id": "San Francisco,California,USA_us_air_quality_index",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.u_s_air_quality_index_2",
+        "platform": "airvisual",
+        "unique_id": "San Francisco,California,US_us_air_quality_index",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.u_s_main_pollutant",
+        "platform": "airvisual",
+        "unique_id": "San Francisco,California,USA_us_main_pollutant",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.u_s_main_pollutant_2",
+        "platform": "airvisual",
+        "unique_id": "San Francisco,California,US_us_main_pollutant",
+        "config_entry_id": null
+      },
+      {
+        "entity_id": "sensor.zestimate_778_40th_ave",
+        "platform": "zestimate",
+        "unique_id": "15096977",
+        "config_entry_id": null
+      }
+    ],
+    "hacs": [
+      {
+        "entity_id": "switch.auto_backup_pre_release",
+        "platform": "hacs",
+        "unique_id": "221855213",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "switch.blitzortung_org_lightning_detector_pre_release",
+        "platform": "hacs",
+        "unique_id": "272094506",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "switch.coway_iocare_pre_release",
+        "platform": "hacs",
+        "unique_id": "219433276",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "switch.mercedesme_2020_pre_release",
+        "platform": "hacs",
+        "unique_id": "325755578",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "switch.personal_capital_pre_release",
+        "platform": "hacs",
+        "unique_id": "145777833",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "switch.redpocket_mobile_pre_release",
+        "platform": "hacs",
+        "unique_id": "363468409",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "switch.samsungtv_encrypted_pre_release",
+        "platform": "hacs",
+        "unique_id": "248046910",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "switch.samsungtv_tizen_pre_release",
+        "platform": "hacs",
+        "unique_id": "223541049",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "switch.zha_toolkit_service_for_advanced_zigbee_usage_pre_release",
+        "platform": "hacs",
+        "unique_id": "448980525",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "update.auto_backup_update",
+        "platform": "hacs",
+        "unique_id": "221855213",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "update.blitzortung_org_lightning_detector_update",
+        "platform": "hacs",
+        "unique_id": "272094506",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "update.coway_iocare_update",
+        "platform": "hacs",
+        "unique_id": "219433276",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "update.light_entity_row_update",
+        "platform": "hacs",
+        "unique_id": "151318225",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "update.mercedesme_2020_update",
+        "platform": "hacs",
+        "unique_id": "325755578",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "update.personal_capital_update",
+        "platform": "hacs",
+        "unique_id": "145777833",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "update.redpocket_mobile_update",
+        "platform": "hacs",
+        "unique_id": "363468409",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "update.samsungtv_encrypted_update",
+        "platform": "hacs",
+        "unique_id": "248046910",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "update.samsungtv_tizen_update",
+        "platform": "hacs",
+        "unique_id": "223541049",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      },
+      {
+        "entity_id": "update.zha_toolkit_service_for_advanced_zigbee_usage_update",
+        "platform": "hacs",
+        "unique_id": "448980525",
+        "config_entry_id": "f365de6814cc37a16798d165ecef38dd"
+      }
+    ],
+    "ios": [
+      {
+        "entity_id": "sensor.al_s_ip_4_battery_level",
+        "platform": "ios",
+        "unique_id": "level_als_ip",
+        "config_entry_id": "5e65dd432b7e445db931e54d6f93189f"
+      },
+      {
+        "entity_id": "sensor.al_s_ip_4_battery_state",
+        "platform": "ios",
+        "unique_id": "state_als_ip",
+        "config_entry_id": "5e65dd432b7e445db931e54d6f93189f"
+      }
+    ]
+  },
+  "native_frigate_renames": {
+    "sensor.garage_all_count_2": "sensor.garage_all_count",
+    "sensor.backdoor_all_count_2": "sensor.backdoor_all_count",
+    "sensor.garage_person_count_2": "sensor.garage_person_count",
+    "sensor.front_all_count_2": "sensor.front_all_count",
+    "sensor.backdoor_person_count_2": "sensor.backdoor_person_count",
+    "sensor.porch_all_count_2": "sensor.porch_all_count",
+    "sensor.porch_person_count_2": "sensor.porch_person_count",
+    "sensor.front_person_count_2": "sensor.front_person_count"
+  },
+  "identity_warning": "Retirement is scoped by platform, unique_id and config_entry_id. After retirement Frigate reused eight vacated entity IDs for its current object-count sensors; those current identities must be preserved."
+}

@@ -1,0 +1,36 @@
+# Home Assistant configuration; retain stable entity identifiers.
+- platform: kodi
+  name: h3
+  host: 192.168.160.1
+- platform: kodi
+  name: roomba
+  host: 192.168.161.65
+- platform: kodi
+  name: almini
+  host: 192.168.161.65
+- platform: kodi
+  name: iNew
+  host: 192.168.161.67
+- platform: kodi
+  name: imac21
+  host: 192.168.161.67
+- platform: kodi
+  name: alair
+  host: 192.168.160.7
+- platform: kodi
+  name: alombp
+  host: 192.168.151.133
+- platform: kodi
+  name: almbpo
+  host: 192.168.151.36
+- name: toall
+  platform: group
+  services:
+    - service: roomba
+      data:
+        displaytime: 20000
+        icon: warning
+    - service: imac21
+      data:
+        displaytime: 20000
+        icon: warning

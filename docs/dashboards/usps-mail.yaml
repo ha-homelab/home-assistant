@@ -1,0 +1,23 @@
+# Storage-mode Overview/Home card. Apply with the Lovelace API or manual editor.
+# Camera entity follows the daily randomized filename and refreshes its image.
+type: vertical-stack
+cards:
+  - type: entities
+    title: USPS Mail — Maria
+    show_header_toggle: false
+    entities:
+      - entity: sensor.imap_gmail_com_mail_usps_mail
+        name: Mail previews
+      - entity: sensor.imap_gmail_com_mail_usps_packages
+        name: Tracked packages
+      - entity: sensor.imap_gmail_com_mail_updated
+        name: Last successful check
+  - type: picture-entity
+    entity: camera.imap_gmail_com_mail_usps_camera
+    name: Today's envelope previews
+    camera_view: auto
+    show_name: true
+    show_state: false
+    fit_mode: contain
+    tap_action:
+      action: more-info

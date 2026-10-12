@@ -1,0 +1,656 @@
+{
+  "format_version": 1,
+  "change": "2026-09-22 runtime resilience audit; 2026-09-23 owner retired the LocalTuya TV power switch; 2026-09-23 validated camera snapshot capture; 2026-09-24 confirmed entity references; 2026-09-25 owner-retired lights; 2026-10-02 owner moved the Home Assistant public origin from h2 to h7; 2026-10-07 owner renamed five ZHA garage bulbs and included the fifth in household shutdown; 2026-10-10 Bath2 migrated from the old Tuya light to the ESPHome relay; 2026-10-10 owner retired the former Studio wall-lamp role after moving the controller to Dining Arc lamp; remove only its old household shutdown target; 2026-10-10 Kitchen ESPHome migration: retain both lighting targets using their switch entities and generic homeassistant.turn_off for the mixed list; preserve the remaining sequence. 2026-10-10: add the relocated Matter Bedroom Lamp to household shutdown; preserve every other target and the iNew shutdown helper. 2026-10-10: the owner repurposed the second KMC audio output as Living lamp; retain it in household shutdown using switch.living_lamp, leaving all other targets and failure handling unchanged. 2026-10-10: remove only the first KMC former Fireplace and Stage LED targets from household shutdown after reassignment to water equipment power and Laundry; do not substitute the new power controls. 2026-10-11: owner retired Sockets behind fireplace two; remove its three obsolete shutdown targets, preserving all other targets, error handling and host shutdown. Public source migration: tv_pic uses the configured input_text.base_url; historical URL samples use example.invalid.",
+  "scripts": {
+    "tv_pic2": {
+      "alias": "Living room TV: notify with front-camera snapshot",
+      "description": "Send the front-camera message and snapshot icon through the registered living-room LG TV notifier.",
+      "icon": "mdi:cctv",
+      "mode": "single",
+      "sequence": [
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "notify.lg_webos_tv_oled77c5pua_dusqljr",
+            "also_chrome": true,
+            "chrome_image": "/local/front_camera_alert.jpg?{{ as_timestamp(now()) }}",
+            "notify_data": {
+              "data": {
+                "icon": "/config/www/front_camera_alert.jpg"
+              },
+              "message": "Someone at the Front Camera"
+            }
+          }
+        }
+      ]
+    },
+    "turn_off_living_room": {
+      "alias": "Household: turn off lights and media power",
+      "description": "Turn off the original multi-room light and switch lists, then invoke the iNew host shutdown helper.",
+      "icon": "mdi:home-lightbulb-outline",
+      "mode": "single",
+      "sequence": [
+        {
+          "service": "homeassistant.turn_off",
+          "entity_id": [
+            "light.bedroom_light_dimmer_l",
+            "light.bedroom_lamp",
+            "light.hall_1_m",
+            "light.hall_2_m",
+            "switch.tea_table",
+            "switch.led_under_cabinet",
+            "light.kitchen_lamp_m",
+            "light.fireplace_led_ll",
+            "light.bathroom_mirror_light",
+            "light.dining_lights_dimmer_l",
+            "light.balcony",
+            "light.porch_one",
+            "light.porch_two",
+            "light.garage_one",
+            "light.garage_two",
+            "light.garage_three",
+            "light.backdoor_porch",
+            "light.living_wall_dimmer_l",
+            "light.garage_bulb_one",
+            "light.garage_bulb_two",
+            "light.garage_bulb_three",
+            "light.garage_bulb_four",
+            "light.garage_bulb_five",
+            "light.bedroom_five"
+          ],
+          "continue_on_error": true
+        },
+        {
+          "service": "switch.turn_off",
+          "entity_id": [
+            "switch.bath2",
+            "switch.fireplace_led_ll",
+            "switch.tv_backlight_l",
+            "switch.mishka_bedroom_desk_lamp_l",
+            "switch.dining_wall_lights_l",
+            "switch.living_room_light_l",
+            "switch.living_lamp",
+            "switch.audiosystem_l"
+          ],
+          "continue_on_error": true
+        },
+        {
+          "service": "shell_command.shutdown_inew"
+        }
+      ]
+    },
+    "notify_mqtt": {
+      "alias": "Notifications: publish retained MQTT message",
+      "description": "Publish a correctly escaped JSON message to the existing retained MQTT notification topic; queue simultaneous calls.",
+      "icon": "mdi:message-text",
+      "fields": {
+        "message": {
+          "name": "Message",
+          "description": "Message text forwarded using the existing notification template.",
+          "required": true,
+          "selector": {
+            "text": {
+              "multiline": true
+            }
+          }
+        }
+      },
+      "mode": "queued",
+      "sequence": [
+        {
+          "service": "mqtt.publish",
+          "data_template": {
+            "payload": "{{ {\"title\": \"Info\", \"message\": message | string} | to_json }}",
+            "topic": "living_room/notifications",
+            "retain": true
+          }
+        }
+      ],
+      "max": 100
+    },
+    "garagemotion": {
+      "alias": "Garage camera: send motion notifications",
+      "description": "Take a garage-camera snapshot and notify desktops; send browser notifications between 09:05 and 23:00.",
+      "icon": "mdi:cctv",
+      "mode": "single",
+      "sequence": [
+        {
+          "action": "script.capture_camera_alert",
+          "data": {
+            "camera_key": "garage"
+          }
+        },
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "notify.roomba",
+            "notify_data": {
+              "title": "Garage",
+              "message": "Motion detected",
+              "data": {
+                "displaytime": 20000,
+                "icon": "warning"
+              }
+            }
+          }
+        },
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "notify.imac21",
+            "notify_data": {
+              "title": "Garage",
+              "message": "Motion detected",
+              "data": {
+                "displaytime": 20000,
+                "icon": "warning"
+              }
+            }
+          }
+        },
+        {
+          "condition": "time",
+          "after": "09:05:00",
+          "before": "23:00:00"
+        },
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "html5.send_message",
+            "notify_data": {
+              "message": "garage Motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+              "entity_id": "notify.chrome",
+              "icon": "/local/garage_camera_alert.jpg?{{ as_timestamp(now()) }}",
+              "image": "/local/garage_camera_alert.jpg?{{ as_timestamp(now()) }}",
+              "data": {
+                "url": "/local/garage_camera_alert.jpg?{{ as_timestamp(now()) }}"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "notifymax": {
+      "alias": "Notifications: send desktop and persistent message",
+      "description": "Send a timestamped message to the Roomba, iMac and Chrome targets and create a persistent Home Assistant notification.",
+      "icon": "mdi:message-alert",
+      "fields": {
+        "message": {
+          "name": "Message",
+          "description": "Message text forwarded using the existing notification template.",
+          "required": true,
+          "selector": {
+            "text": {
+              "multiline": true
+            }
+          }
+        }
+      },
+      "mode": "single",
+      "sequence": [
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "notify.roomba",
+            "also_chrome": true,
+            "notify_data": {
+              "title": "{{ message }}",
+              "message": "{{ message }} {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+              "data": {
+                "displaytime": 20000,
+                "icon": "warning"
+              }
+            }
+          }
+        },
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "notify.imac21",
+            "notify_data": {
+              "title": "{{ message }}",
+              "message": "{{ message }} {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+              "data": {
+                "displaytime": 20000,
+                "icon": "warning"
+              }
+            }
+          }
+        },
+        {
+          "service": "persistent_notification.create",
+          "data_template": {
+            "title": "{{ message }}",
+            "message": "{{ message }} {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}"
+          }
+        }
+      ]
+    },
+    "backdoormotion": {
+      "alias": "Backdoor: notify and pulse porch light",
+      "description": "Take a backdoor snapshot and notify desktops; between 20:30 and 22:00, also repeat the browser notification and run the existing porch-light fade.",
+      "icon": "mdi:motion-sensor",
+      "mode": "single",
+      "sequence": [
+        {
+          "action": "script.capture_camera_alert",
+          "data": {
+            "camera_key": "backdoor"
+          }
+        },
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "html5.send_message",
+            "notify_data": {
+              "message": "backdoor Motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+              "entity_id": "notify.chrome",
+              "icon": "/local/backdoor_camera_alert.jpg?{{ as_timestamp(now()) }}",
+              "image": "/local/backdoor_camera_alert.jpg?{{ as_timestamp(now()) }}",
+              "data": {
+                "url": "/local/backdoor_camera_alert.jpg?{{ as_timestamp(now()) }}"
+              }
+            }
+          }
+        },
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "notify.roomba",
+            "notify_data": {
+              "title": "Backdoor Camera",
+              "message": "Motion detected",
+              "data": {
+                "displaytime": 20000,
+                "icon": "warning"
+              }
+            }
+          }
+        },
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "notify.imac21",
+            "notify_data": {
+              "title": "Backdoor Camera",
+              "message": "Motion detected",
+              "data": {
+                "displaytime": 20000,
+                "icon": "warning"
+              }
+            }
+          }
+        },
+        {
+          "condition": "time",
+          "after": "20:30:00",
+          "before": "22:00:00"
+        },
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "html5.send_message",
+            "notify_data": {
+              "message": "Backdoor Motion",
+              "entity_id": "notify.chrome",
+              "data": {
+                "url": "/"
+              }
+            }
+          }
+        },
+        {
+          "service": "light.turn_on",
+          "entity_id": "light.backdoor_porch",
+          "data": {
+            "brightness": 117
+          }
+        },
+        {
+          "delay": "00:00:10"
+        },
+        {
+          "repeat": {
+            "for_each": [
+              90,
+              78,
+              66,
+              54,
+              42
+            ],
+            "sequence": [
+              {
+                "action": "light.turn_on",
+                "target": {
+                  "entity_id": "light.backdoor_porch"
+                },
+                "data": {
+                  "brightness": "{{ repeat.item }}"
+                }
+              },
+              {
+                "delay": "00:00:01"
+              }
+            ]
+          }
+        },
+        {
+          "service": "light.turn_on",
+          "entity_id": "light.backdoor_porch",
+          "data": {
+            "brightness": 30
+          }
+        },
+        {
+          "delay": "00:00:05"
+        },
+        {
+          "service": "light.turn_off",
+          "entity_id": "light.backdoor_porch"
+        }
+      ]
+    },
+    "notify": {
+      "alias": "Notifications: send desktop message",
+      "description": "Send a timestamped message to the Roomba, iMac and Chrome notification targets.",
+      "icon": "mdi:message-text",
+      "fields": {
+        "message": {
+          "name": "Message",
+          "description": "Message text forwarded using the existing notification template.",
+          "required": true,
+          "selector": {
+            "text": {
+              "multiline": true
+            }
+          }
+        }
+      },
+      "mode": "single",
+      "sequence": [
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "notify.roomba",
+            "also_chrome": true,
+            "notify_data": {
+              "title": "{{ message }}",
+              "message": "{{ message }} {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+              "data": {
+                "displaytime": 20000,
+                "icon": "warning"
+              }
+            }
+          }
+        },
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "notify.imac21",
+            "notify_data": {
+              "title": "{{ message }}",
+              "message": "{{ message }} {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+              "data": {
+                "displaytime": 20000,
+                "icon": "warning"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "notify_mqtt_log": {
+      "alias": "Notifications: publish retained MQTT switch log",
+      "description": "Publish the supplied message to living_room/switch_log with retention enabled.",
+      "icon": "mdi:text-box-outline",
+      "fields": {
+        "message": {
+          "name": "Message",
+          "description": "Message text forwarded using the existing notification template.",
+          "required": true,
+          "selector": {
+            "text": {
+              "multiline": true
+            }
+          }
+        }
+      },
+      "mode": "queued",
+      "sequence": [
+        {
+          "service": "mqtt.publish",
+          "data_template": {
+            "payload": "{{ message }}",
+            "topic": "living_room/switch_log",
+            "retain": true
+          }
+        }
+      ],
+      "max": 100
+    },
+    "frontmotion": {
+      "alias": "Front camera: send motion notifications",
+      "description": "Take a front-camera snapshot and notify desktops; send browser notifications between 09:05 and 23:00.",
+      "icon": "mdi:cctv",
+      "mode": "single",
+      "sequence": [
+        {
+          "action": "script.capture_camera_alert",
+          "data": {
+            "camera_key": "front"
+          }
+        },
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "notify.roomba",
+            "notify_data": {
+              "title": "Front Camera",
+              "message": "Motion detected",
+              "data": {
+                "displaytime": 20000,
+                "icon": "warning"
+              }
+            }
+          }
+        },
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "notify.imac21",
+            "notify_data": {
+              "title": "Front Camera",
+              "message": "Motion detected",
+              "data": {
+                "displaytime": 20000,
+                "icon": "warning"
+              }
+            }
+          }
+        },
+        {
+          "condition": "time",
+          "after": "9:05:00",
+          "before": "23:00:00"
+        },
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "html5.send_message",
+            "notify_data": {
+              "message": "Front Motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+              "entity_id": "notify.chrome",
+              "icon": "/local/front_camera_alert.jpg?{{ as_timestamp(now()) }}",
+              "image": "/local/front_camera_alert.jpg?{{ as_timestamp(now()) }}",
+              "data": {
+                "url": "/local/front_camera_alert.jpg?{{ as_timestamp(now()) }}"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "blinkmotion": {
+      "alias": "Front porch: notify about motion",
+      "description": "Send the existing Chrome motion notification.",
+      "icon": "mdi:motion-sensor",
+      "mode": "single",
+      "sequence": [
+        {
+          "action": "script.notify_optional",
+          "data": {
+            "notify_service": "html5.send_message",
+            "notify_data": {
+              "message": "Front Porch Motion",
+              "entity_id": "notify.chrome",
+              "data": {
+                "url": "/"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "mediaoff": {
+      "alias": "Media: turn off household players",
+      "description": "Turn off the eight retained household media players in sequence, continuing when an individual player fails.",
+      "icon": "mdi:speaker-off",
+      "mode": "single",
+      "sequence": [
+        {
+          "repeat": {
+            "for_each": [
+              "media_player.bathroom_echo_dot",
+              "media_player.living_room_echo",
+              "media_player.bathroom_speaker",
+              "media_player.kitchen_speaker_2",
+              "media_player.family_room_speaker_2",
+              "media_player.dinning_room_google_mini",
+              "media_player.mishka_bedroom_google_mini",
+              "media_player.living_room_google_home"
+            ],
+            "sequence": [
+              {
+                "action": "media_player.turn_off",
+                "target": {
+                  "entity_id": "{{ repeat.item }}"
+                },
+                "continue_on_error": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "volume_down": {
+      "alias": "Media: set household volume presets",
+      "description": "Set the retained Echo volume preset to 20 percent.",
+      "icon": "mdi:volume-medium",
+      "mode": "single",
+      "sequence": [
+        {
+          "service": "media_player.volume_set",
+          "data": {
+            "entity_id": "media_player.vitaly_s_echo",
+            "volume_level": 0.2
+          }
+        }
+      ]
+    },
+    "tv_type2": {
+      "alias": "Living room TV: insert legacy test text",
+      "description": "Insert the literal text 123 through the existing webOS input-method command with replace set to zero.",
+      "icon": "mdi:keyboard",
+      "mode": "single",
+      "sequence": [
+        {
+          "service": "webostv.command",
+          "target": {
+            "entity_id": "media_player.living_room_tv_77"
+          },
+          "data": {
+            "command": "com.webos.service.ime/insertText",
+            "payload": {
+              "text": "123",
+              "replace": 0
+            }
+          }
+        }
+      ]
+    },
+    "tv_pic": {
+      "alias": "Living room TV: open front-camera snapshot",
+      "description": "Open the front-camera snapshot URL with the webOS launcher.",
+      "icon": "mdi:cctv",
+      "mode": "single",
+      "sequence": [
+        {
+          "service": "webostv.command",
+          "target": {
+            "entity_id": "media_player.living_room_tv_77"
+          },
+          "data": {
+            "command": "system.launcher/open",
+            "payload": {
+              "target": "{{ states('input_text.base_url') }}/local/front_camera_alert.jpg?{{ as_timestamp(now()) }}"
+            }
+          }
+        }
+      ]
+    },
+    "tv_pic4": {
+      "alias": "Living room TV: play channel 1",
+      "description": "Play channel identifier 1 on the living room TV.",
+      "icon": "mdi:television-play",
+      "mode": "single",
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "target": {
+            "entity_id": "media_player.living_room_tv_77"
+          },
+          "data": {
+            "media_content_id": "1",
+            "media_content_type": "channel"
+          }
+        }
+      ]
+    },
+    "tv_pic3": {
+      "alias": "Living room TV: play REN channel",
+      "description": "Play the existing REN channel name on the living room TV, preserving the provider-facing Cyrillic identifier.",
+      "icon": "mdi:television-play",
+      "mode": "single",
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "target": {
+            "entity_id": "media_player.living_room_tv_77"
+          },
+          "data": {
+            "media_content_id": "РЕН",
+            "media_content_type": "channel"
+          }
+        }
+      ]
+    }
+  },
+  "retired_scripts": {
+    "play_kodi_channel": {
+      "date": "2026-09-22",
+      "reason": "Owner retired the unsupported Kodi channel selection chain."
+    },
+    "your_kodi_script": {
+      "date": "2026-09-22",
+      "reason": "Owner retired the unsupported Kodi channel selection chain."
+    },
+    "resetcreebulb": {
+      "date": "2026-09-22",
+      "reason": "Owner retired the missing cloud Tuya reset switch."
+    },
+    "flash": {
+      "date": "2026-09-25",
+      "reason": "Owner retired the arc lamp; the flash script controls only that light."
+    }
+  }
+}

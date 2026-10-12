@@ -1,0 +1,13 @@
+# Stable entity: script.cast_downstairs_on_kitchen
+# Cast the default Lovelace view to the kitchen display.
+cast_downstairs_on_kitchen:
+  alias: 'Kitchen display: show default dashboard'
+  description: Cast the default Lovelace view to the kitchen display.
+  icon: mdi:view-dashboard
+  mode: single
+  sequence:
+    - data:
+        dashboard_path: lovelace
+        entity_id: media_player.kitchen_display
+        view_path: default_view
+      service: cast.show_lovelace_view

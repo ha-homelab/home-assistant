@@ -1,0 +1,10 @@
+# Stable entity: script.stopplexplaylist
+# Stop media playback on the living room Echo.
+stopplexplaylist:
+  alias: 'Living room Echo: stop playback'
+  description: Stop media playback on the living room Echo.
+  icon: mdi:stop-circle-outline
+  mode: single
+  sequence:
+    - service: media_player.media_stop
+      entity_id: media_player.living_room_echo_2

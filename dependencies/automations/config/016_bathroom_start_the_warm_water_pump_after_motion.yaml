@@ -1,0 +1,16 @@
+# Bathroom: Start the warm-water pump after motion.
+# Stable entity: automation.bathroom_motion_triggered_warm_water_pump_starting.
+- id: ha_homelab_bathroom_start_the_warm_water_pump_after_motion
+  alias: 'Bathroom: Start the warm-water pump after motion'
+  description: Start the warm-water pump after motion. Responds to binary_sensor.rf_restroom_one_motion
+    changing to on.
+  triggers:
+  - entity_id: binary_sensor.rf_restroom_one_motion
+    platform: state
+    to: 'on'
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.smart_toilet_2
+  mode: single
+  trace:
+    stored_traces: 5

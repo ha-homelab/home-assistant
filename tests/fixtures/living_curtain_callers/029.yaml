@@ -1,0 +1,26 @@
+# Curtains: Close sheer curtains in the evening.
+# Stable entity: automation.close_light_curtains_in_the_evening.
+- id: ha_homelab_curtains_close_sheer_curtains_in_the_evening
+  alias: 'Curtains: Close sheer curtains in the evening'
+  description: Close sheer curtains when the sun enters the 0 to 0.6 degree elevation range while
+    descending in the evening. Skip sunrise and respect the manual curtain override.
+  triggers:
+  - platform: numeric_state
+    entity_id: sun.sun
+    value_template: '{{ state_attr(''sun.sun'', ''elevation'') }}'
+    below: 0.6
+    above: 0
+  conditions:
+  - condition: state
+    entity_id: sun.sun
+    attribute: rising
+    state: false
+  - condition: state
+    entity_id: input_boolean.curtains_sticky
+    state: 'off'
+  actions:
+  - service: cover.close_cover
+    entity_id: cover.living_light_curtains_l
+  mode: single
+  trace:
+    stored_traces: 5

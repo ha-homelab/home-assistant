@@ -1,0 +1,13 @@
+# Home Assistant configuration; retain stable entity identifiers.
+- platform: group
+  name: Kitchen
+  entities:
+    - light.kitchen_table_lamp_2
+- platform: group
+  name: Garage
+  entities:
+    - light.garage_bulb_one
+    - light.garage_bulb_two
+    - light.garage_bulb_three
+    - light.garage_bulb_four
+    - light.garage_bulb_five

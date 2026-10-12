@@ -1,0 +1,16 @@
+# Hallway: Turn off lights in the morning.
+# Stable entity: automation.hallway_off_in_the_morning.
+- id: ha_homelab_hallway_turn_off_lights_in_the_morning
+  alias: 'Hallway: Turn off lights in the morning'
+  description: Turn off lights in the morning. Responds to the daily schedule at 07:00:00.
+  triggers:
+    platform: time
+    at: 07:00:00
+  actions:
+  - service: light.turn_off
+    entity_id: light.hall_1_m
+  - service: light.turn_off
+    entity_id: light.hall_2_m
+  mode: single
+  trace:
+    stored_traces: 5

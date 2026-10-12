@@ -1,0 +1,437 @@
+{
+  "format_version": 1,
+  "scripts": {
+    "backdoormotion": {
+      "entity_id": "script.backdoormotion",
+      "source_file": "scripts/backdoormotion.yaml",
+      "file": "config/notifications/backdoor_motion.yaml",
+      "alias": "Backdoor: notify and pulse porch light",
+      "icon": "mdi:motion-sensor",
+      "description": "Take a backdoor snapshot and notify desktops; between 20:30 and 22:00, also repeat the browser notification and run the existing porch-light fade."
+    },
+    "blinkmotion": {
+      "entity_id": "script.blinkmotion",
+      "source_file": "scripts/blinkmotion.yaml",
+      "file": "config/notifications/front_porch_motion.yaml",
+      "alias": "Front porch: notify about motion",
+      "icon": "mdi:motion-sensor",
+      "description": "Send the existing Chrome motion notification."
+    },
+    "cast_plex_to_chromecast": {
+      "entity_id": "script.cast_plex_to_chromecast",
+      "source_file": "scripts/cast.yaml",
+      "file": "config/media/cast_plex_movie.yaml",
+      "alias": "Chromecast: play 2012 from Plex",
+      "icon": "mdi:cast",
+      "description": "Play the movie 2012 from the Movies library on the Chromecast."
+    },
+    "cast_porch_to_chromecast": {
+      "entity_id": "script.cast_porch_to_chromecast",
+      "source_file": "scripts/cast.yaml",
+      "file": "config/media/cast_garage_camera.yaml",
+      "alias": "Chromecast: show garage camera",
+      "icon": "mdi:cctv",
+      "description": "Stream the garage camera to the Chromecast; the legacy script key still contains porch."
+    },
+    "cast_downstairs_on_kitchen": {
+      "entity_id": "script.cast_downstairs_on_kitchen",
+      "source_file": "scripts/cast.yaml",
+      "file": "config/media/cast_dashboard_to_kitchen.yaml",
+      "alias": "Kitchen display: show default dashboard",
+      "icon": "mdi:view-dashboard",
+      "description": "Cast the default Lovelace view to the kitchen display."
+    },
+    "flash": {
+      "entity_id": "script.flash",
+      "source_file": "scripts/flash.yaml",
+      "file": "config/lighting/flash_arc_lamp.yaml",
+      "alias": "Arc lamp: run ten-second flash",
+      "icon": "mdi:lightbulb-on",
+      "description": "Turn the arc lamp on, wait ten seconds, then send its existing turn-off command with a short flash."
+    },
+    "frontmotion": {
+      "entity_id": "script.frontmotion",
+      "source_file": "scripts/frontmotion.yaml",
+      "file": "config/notifications/front_camera_motion.yaml",
+      "alias": "Front camera: send motion notifications",
+      "icon": "mdi:cctv",
+      "description": "Take a front-camera snapshot and notify desktops; send browser notifications between 09:05 and 23:00."
+    },
+    "garagemotion": {
+      "entity_id": "script.garagemotion",
+      "source_file": "scripts/garagemotion.yaml",
+      "file": "config/notifications/garage_camera_motion.yaml",
+      "alias": "Garage camera: send motion notifications",
+      "icon": "mdi:cctv",
+      "description": "Take a garage-camera snapshot and notify desktops; send browser notifications between 09:05 and 23:00."
+    },
+    "kk": {
+      "entity_id": "script.kk",
+      "source_file": "scripts/kk.yaml",
+      "file": "config/media/run_selected_radio_shell_command.yaml",
+      "alias": "Radio: run selected shell command",
+      "icon": "mdi:radio",
+      "description": "Call shell_command.kk with the existing crossed selector mapping: pla receives input_select.sta and sta receives input_select.pla."
+    },
+    "kkk": {
+      "entity_id": "script.kkk",
+      "source_file": "scripts/kkk.yaml",
+      "file": "config/media/play_selected_tunein_station.yaml",
+      "alias": "Radio: play selected TuneIn station",
+      "icon": "mdi:radio",
+      "description": "Play the radio selector value on the player selected by input_select.player using the existing TUNEIN media type."
+    },
+    "turn_off_lg_tv_screen": {
+      "entity_id": "script.turn_off_lg_tv_screen",
+      "source_file": "scripts/lg.yaml",
+      "file": "config/television/living_room_screen_off.yaml",
+      "alias": "Living room TV: turn screen off",
+      "icon": "mdi:television-off",
+      "description": "Send the webOS screen-off command to the living room 77-inch TV without changing the existing power behavior."
+    },
+    "turn_on_lg_tv_screen": {
+      "entity_id": "script.turn_on_lg_tv_screen",
+      "source_file": "scripts/lg.yaml",
+      "file": "config/television/living_room_screen_on.yaml",
+      "alias": "Living room TV: turn screen on",
+      "icon": "mdi:television",
+      "description": "Send the webOS screen-on command to the living room 77-inch TV."
+    },
+    "turn_off_lg2_tv_screen": {
+      "entity_id": "script.turn_off_lg2_tv_screen",
+      "source_file": "scripts/lg.yaml",
+      "file": "config/television/lg2_screen_off.yaml",
+      "alias": "LG2 TV: turn screen off",
+      "icon": "mdi:television-off",
+      "description": "Send the webOS screen-off command to the LG2 TV."
+    },
+    "turn_on_lg2_tv_screen": {
+      "entity_id": "script.turn_on_lg2_tv_screen",
+      "source_file": "scripts/lg.yaml",
+      "file": "config/television/lg2_screen_on.yaml",
+      "alias": "LG2 TV: turn screen on",
+      "icon": "mdi:television",
+      "description": "Send the webOS screen-on command to the LG2 TV."
+    },
+    "living_room_tv_picture_energy_saving": {
+      "entity_id": "script.living_room_tv_picture_energy_saving",
+      "source_file": "scripts/lg.yaml",
+      "file": "config/television/living_room_energy_saving.yaml",
+      "alias": "Living room TV: request energy-saving setting",
+      "icon": "mdi:leaf",
+      "description": "Show the existing webOS confirmation alert whose OK button applies the supplied energy-saving setting."
+    },
+    "mediaoff": {
+      "entity_id": "script.mediaoff",
+      "source_file": "scripts/mediaoff.yaml",
+      "file": "config/media/stop_household_players.yaml",
+      "alias": "Media: turn off household players",
+      "icon": "mdi:speaker-off",
+      "description": "Turn off the eight retained household media players in sequence, continuing when an individual player fails."
+    },
+    "notify": {
+      "entity_id": "script.notify",
+      "source_file": "scripts/notify.yaml",
+      "file": "config/notifications/desktop_message.yaml",
+      "alias": "Notifications: send desktop message",
+      "icon": "mdi:message-text",
+      "description": "Send a timestamped message to the Roomba, iMac and Chrome notification targets."
+    },
+    "notifymax": {
+      "entity_id": "script.notifymax",
+      "source_file": "scripts/notify.yaml",
+      "file": "config/notifications/persistent_desktop_message.yaml",
+      "alias": "Notifications: send desktop and persistent message",
+      "icon": "mdi:message-alert",
+      "description": "Send a timestamped message to the Roomba, iMac and Chrome targets and create a persistent Home Assistant notification."
+    },
+    "notify_mqtt": {
+      "entity_id": "script.notify_mqtt",
+      "source_file": "scripts/notify_mqtt.yaml",
+      "file": "config/notifications/mqtt_message.yaml",
+      "alias": "Notifications: publish retained MQTT message",
+      "icon": "mdi:message-text",
+      "description": "Publish a correctly escaped JSON message to the existing retained MQTT notification topic; queue simultaneous calls."
+    },
+    "notify_mqtt_log": {
+      "entity_id": "script.notify_mqtt_log",
+      "source_file": "scripts/notify_mqtt_log.yaml",
+      "file": "config/notifications/mqtt_switch_log.yaml",
+      "alias": "Notifications: publish retained MQTT switch log",
+      "icon": "mdi:text-box-outline",
+      "description": "Publish the supplied message to living_room/switch_log with retention enabled."
+    },
+    "playplexplaylist": {
+      "entity_id": "script.playplexplaylist",
+      "source_file": "scripts/play_plex_playlist_on_alexa.yaml",
+      "file": "config/media/play_amazon_music_album.yaml",
+      "alias": "Living room Echo: play Dark Side of the Moon",
+      "icon": "mdi:album",
+      "description": "Request the Dark Side of the Moon album through AMAZON_MUSIC on the living room Echo; this script has no playback timeout."
+    },
+    "run_playlist_on_plex_ants": {
+      "entity_id": "script.run_playlist_on_plex_ants",
+      "source_file": "scripts/play_plex_playlist_on_alexa.yaml",
+      "file": "config/media/plex_ants_android_tv.yaml",
+      "alias": "Android TV: play Ants playlist",
+      "icon": "mdi:playlist-play",
+      "description": "Play the Ants Plex playlist on the Android TV Chromecast with repeat-all enabled."
+    },
+    "run_playlist_on_plex_mobile_ants": {
+      "entity_id": "script.run_playlist_on_plex_mobile_ants",
+      "source_file": "scripts/play_plex_playlist_on_alexa.yaml",
+      "file": "config/media/plex_ants_dining_room.yaml",
+      "alias": "Dining room: play Ants playlist",
+      "icon": "mdi:playlist-play",
+      "description": "Play the Ants Plex playlist on the dining room speaker with repeat-all enabled."
+    },
+    "run_playlist_on_plex_bathroom_ants": {
+      "entity_id": "script.run_playlist_on_plex_bathroom_ants",
+      "source_file": "scripts/play_plex_playlist_on_alexa.yaml",
+      "file": "config/media/plex_ants_bathroom.yaml",
+      "alias": "Bathroom: play Ants playlist",
+      "icon": "mdi:playlist-play",
+      "description": "Play the Ants Plex playlist on the bathroom speaker with repeat-all enabled."
+    },
+    "stopplexplaylist": {
+      "entity_id": "script.stopplexplaylist",
+      "source_file": "scripts/play_plex_playlist_on_alexa.yaml",
+      "file": "config/media/stop_living_room_echo.yaml",
+      "alias": "Living room Echo: stop playback",
+      "icon": "mdi:stop-circle-outline",
+      "description": "Stop media playback on the living room Echo."
+    },
+    "random_on_an2": {
+      "entity_id": "script.random_on_an2",
+      "source_file": "scripts/random_on_an2.yaml",
+      "file": "config/system/random_on_an2.yaml",
+      "alias": "AN2: run random playback command",
+      "icon": "mdi:shuffle",
+      "description": "Invoke the existing shell_command.random_on_an2 helper; its implementation remains in the main configuration."
+    },
+    "random_on_inew": {
+      "entity_id": "script.random_on_inew",
+      "source_file": "scripts/random_on_inew.yaml",
+      "file": "config/system/random_on_inew.yaml",
+      "alias": "iNew: run random playback command",
+      "icon": "mdi:shuffle",
+      "description": "Invoke the existing shell_command.random_on_inew helper; its implementation remains in the main configuration."
+    },
+    "receiver_turn_off": {
+      "entity_id": "script.receiver_turn_off",
+      "source_file": "scripts/receiver_turn_off.yaml",
+      "file": "config/receiver/power_off.yaml",
+      "alias": "Receiver: power off",
+      "icon": "mdi:audio-video-off",
+      "description": "Send PowerOff to the Pioneer AV Receiver through Harmony with the original 0.6-second command delay."
+    },
+    "receiver_turn_on": {
+      "entity_id": "script.receiver_turn_on",
+      "source_file": "scripts/receiver_turn_on.yaml",
+      "file": "config/receiver/power_on_cd.yaml",
+      "alias": "Receiver: power on and select CD",
+      "icon": "mdi:audio-video",
+      "description": "Send PowerOn followed by InputCd to the Pioneer AV Receiver through Harmony with the original 0.6-second command delay."
+    },
+    "receiver_surround": {
+      "entity_id": "script.receiver_surround",
+      "source_file": "scripts/receiver_turn_on.yaml",
+      "file": "config/receiver/surround.yaml",
+      "alias": "Receiver: send SR+ command",
+      "icon": "mdi:surround-sound",
+      "description": "Send the existing SR+ command to the Pioneer AV Receiver through Harmony."
+    },
+    "receiver_surrmodestereo": {
+      "entity_id": "script.receiver_surrmodestereo",
+      "source_file": "scripts/receiver_turn_on.yaml",
+      "file": "config/receiver/stereo.yaml",
+      "alias": "Receiver: select stereo mode",
+      "icon": "mdi:surround-sound",
+      "description": "Send the existing Stereo command to the Pioneer AV Receiver through Harmony."
+    },
+    "receiver_surroundmodelogic7": {
+      "entity_id": "script.receiver_surroundmodelogic7",
+      "source_file": "scripts/receiver_turn_on.yaml",
+      "file": "config/receiver/logic7.yaml",
+      "alias": "Receiver: select Logic 7 mode",
+      "icon": "mdi:surround-sound",
+      "description": "Send the existing SurroundModeLogic7 command to the Pioneer AV Receiver through Harmony."
+    },
+    "receiver_inputtuner": {
+      "entity_id": "script.receiver_inputtuner",
+      "source_file": "scripts/receiver_turn_on.yaml",
+      "file": "config/receiver/input_tuner.yaml",
+      "alias": "Receiver: select tuner input",
+      "icon": "mdi:radio",
+      "description": "Send InputTuner to the Pioneer AV Receiver through Harmony."
+    },
+    "receiver_inputcd": {
+      "entity_id": "script.receiver_inputcd",
+      "source_file": "scripts/receiver_turn_on.yaml",
+      "file": "config/receiver/input_cd.yaml",
+      "alias": "Receiver: select CD input",
+      "icon": "mdi:disc",
+      "description": "Send InputCd to the Pioneer AV Receiver through Harmony."
+    },
+    "receiver_inputtape": {
+      "entity_id": "script.receiver_inputtape",
+      "source_file": "scripts/receiver_turn_on.yaml",
+      "file": "config/receiver/input_tape.yaml",
+      "alias": "Receiver: select tape input",
+      "icon": "mdi:cassette",
+      "description": "Send InputTape to the Pioneer AV Receiver through Harmony."
+    },
+    "tv_pic": {
+      "entity_id": "script.tv_pic",
+      "source_file": "scripts/receiver_turn_on.yaml",
+      "file": "config/television/open_front_snapshot.yaml",
+      "alias": "Living room TV: open front-camera snapshot",
+      "icon": "mdi:cctv",
+      "description": "Open the front-camera snapshot URL with the webOS launcher."
+    },
+    "tv_pic2": {
+      "entity_id": "script.tv_pic2",
+      "source_file": "scripts/receiver_turn_on.yaml",
+      "file": "config/television/notify_front_snapshot.yaml",
+      "alias": "Living room TV: notify with front-camera snapshot",
+      "icon": "mdi:cctv",
+      "description": "Send the front-camera message and snapshot icon through the registered living-room LG TV notifier."
+    },
+    "tv_pic3": {
+      "entity_id": "script.tv_pic3",
+      "source_file": "scripts/receiver_turn_on.yaml",
+      "file": "config/television/play_ren_channel.yaml",
+      "alias": "Living room TV: play REN channel",
+      "icon": "mdi:television-play",
+      "description": "Play the existing REN channel name on the living room TV, preserving the provider-facing Cyrillic identifier."
+    },
+    "tv_pic4": {
+      "entity_id": "script.tv_pic4",
+      "source_file": "scripts/receiver_turn_on.yaml",
+      "file": "config/television/play_channel_one.yaml",
+      "alias": "Living room TV: play channel 1",
+      "icon": "mdi:television-play",
+      "description": "Play channel identifier 1 on the living room TV."
+    },
+    "resetcreebulb": {
+      "entity_id": "script.resetcreebulb",
+      "source_file": "scripts/resetcreebulb.yaml",
+      "file": "config/lighting/reset_cree_bulb.yaml",
+      "alias": "Cree bulb: run power-cycle reset",
+      "icon": "mdi:lightbulb-alert",
+      "description": "Run the existing six-on/five-off power-cycle sequence and timings on the reset switch, leaving it on."
+    },
+    "run_playlist_on_plex": {
+      "entity_id": "script.run_playlist_on_plex",
+      "source_file": "scripts/run_playlist_on_plex.yaml",
+      "file": "config/media/plex_mult_living_room.yaml",
+      "alias": "Living room display: play Mult playlist",
+      "icon": "mdi:playlist-play",
+      "description": "Play the Mult Plex playlist on the living room display with shuffle enabled."
+    },
+    "run_playlist_on_plex_hub": {
+      "entity_id": "script.run_playlist_on_plex_hub",
+      "source_file": "scripts/run_playlist_on_plex.yaml",
+      "file": "config/media/plex_sailor_family_hub_voice.yaml",
+      "alias": "Family Hub: request Sailor through Alexa",
+      "icon": "mdi:account-voice",
+      "description": "Send the existing custom Alexa request for the Caboomers Sailor track to the Family Hub."
+    },
+    "run_playlist_on_plex_hubold": {
+      "entity_id": "script.run_playlist_on_plex_hubold",
+      "source_file": "scripts/run_playlist_on_plex.yaml",
+      "file": "config/media/plex_sailor_family_hub_direct.yaml",
+      "alias": "Family Hub: play Sailor directly from Plex",
+      "icon": "mdi:playlist-play",
+      "description": "Play the existing Caboomers Sailor track selection from the Plex Music library on the Family Hub with shuffle enabled."
+    },
+    "shutdown_inew": {
+      "entity_id": "script.shutdown_inew",
+      "source_file": "scripts/shutdown_inew.yaml",
+      "file": "config/system/shutdown_inew.yaml",
+      "alias": "iNew: shut down host",
+      "icon": "mdi:power",
+      "description": "Invoke the existing shell_command.shutdown_inew helper to shut down its configured host."
+    },
+    "living_room_display_2_temperature": {
+      "entity_id": "script.living_room_display_2_temperature",
+      "source_file": "scripts/temperature.yaml",
+      "file": "config/media/ask_porch_temperature.yaml",
+      "alias": "Living room display 2: ask porch temperature",
+      "icon": "mdi:thermometer",
+      "description": "Send the existing custom Google voice request for the porch temperature to living room display 2."
+    },
+    "turn_off_living_room": {
+      "entity_id": "script.turn_off_living_room",
+      "source_file": "scripts/turn_off_living_room.yaml",
+      "file": "config/lighting/household_lights_and_media_off.yaml",
+      "alias": "Household: turn off lights and media power",
+      "icon": "mdi:home-lightbulb-outline",
+      "description": "Turn off the original multi-room light and switch lists, then invoke the iNew host shutdown helper."
+    },
+    "tv_random_channel": {
+      "entity_id": "script.tv_random_channel",
+      "source_file": "scripts/tv_random_channel.yaml",
+      "file": "config/television/random_channel_30_1214.yaml",
+      "alias": "Living room TV: choose channel 30-1214",
+      "icon": "mdi:shuffle-variant",
+      "description": "Send digits for a random channel from 30 through 1214 to the LG TV through Harmony with a 0.4-second delay."
+    },
+    "tv_random_channel_p": {
+      "entity_id": "script.tv_random_channel_p",
+      "source_file": "scripts/tv_random_channel.yaml",
+      "file": "config/television/random_channel_1216_1399.yaml",
+      "alias": "Living room TV: choose channel 1216-1399",
+      "icon": "mdi:shuffle-variant",
+      "description": "Send digits for a random channel from 1216 through 1399 to the LG TV through Harmony with a 0.4-second delay."
+    },
+    "tv_random_channel2": {
+      "entity_id": "script.tv_random_channel2",
+      "source_file": "scripts/tv_random_channel.yaml",
+      "file": "config/television/random_channel_digits.yaml",
+      "alias": "Living room TV: send random channel digits",
+      "icon": "mdi:shuffle-variant",
+      "description": "Send four independently generated digits using the original exclusive range bounds and 0.1-second Harmony delay."
+    },
+    "tv_type": {
+      "entity_id": "script.tv_type",
+      "source_file": "scripts/tv_random_channel.yaml",
+      "file": "config/television/send_harmony_test_keys.yaml",
+      "alias": "Living room TV: send legacy test keys",
+      "icon": "mdi:keyboard",
+      "description": "Send the fixed Harmony key sequence 1, A, S, D, A to the LG TV."
+    },
+    "tv_type2": {
+      "entity_id": "script.tv_type2",
+      "source_file": "scripts/tv_random_channel.yaml",
+      "file": "config/television/insert_webos_test_text.yaml",
+      "alias": "Living room TV: insert legacy test text",
+      "icon": "mdi:keyboard",
+      "description": "Insert the literal text 123 through the existing webOS input-method command with replace set to zero."
+    },
+    "volume_down": {
+      "entity_id": "script.volume_down",
+      "source_file": "scripts/volume_down.yaml",
+      "file": "config/media/set_household_volume_presets.yaml",
+      "alias": "Media: set household volume presets",
+      "icon": "mdi:volume-medium",
+      "description": "Set the retained Echo volume preset to 20 percent."
+    },
+    "play_kodi_channel": {
+      "entity_id": "script.play_kodi_channel",
+      "source_file": "scripts/your_kodi_script.yaml",
+      "file": "config/media/play_selected_kodi_channel.yaml",
+      "alias": "Kodi: play selected channel using legacy lookup",
+      "icon": "mdi:television-play",
+      "description": "Resolve the selected channel against the JSON channel catalogue; stop without playback if the catalogue is missing or the selection is ambiguous."
+    },
+    "your_kodi_script": {
+      "entity_id": "script.your_kodi_script",
+      "source_file": "scripts/your_kodi_script.yaml",
+      "file": "config/media/play_kodi_channel_id.yaml",
+      "alias": "Kodi: play supplied channel identifier",
+      "icon": "mdi:television-play",
+      "description": "Forward the supplied channel ID unchanged to the existing Kodi player."
+    }
+  }
+}

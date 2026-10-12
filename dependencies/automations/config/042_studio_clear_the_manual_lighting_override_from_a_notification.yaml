@@ -1,0 +1,22 @@
+# Studio: Clear the manual lighting override from a notification.
+# Stable entity: automation.html5_push_notification_action_button_clicked_studio_unsticky.
+- id: ha_homelab_studio_clear_the_manual_lighting_override_from_a_notification
+  alias: 'Studio: Clear the manual lighting override from a notification'
+  description: Clear the manual lighting override from a notification button. Uses HTML5 browser event entities.
+  triggers:
+  - trigger: event.received
+    target:
+      entity_id:
+      - event.chrome
+    options:
+      event_type:
+      - clicked
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.to_state.attributes.get(''action'') == ''studio_unsticky'' }}'
+  actions:
+  - service: input_boolean.turn_off
+    entity_id: input_boolean.studio_sticky
+  mode: single
+  trace:
+    stored_traces: 5

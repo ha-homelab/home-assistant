@@ -1,0 +1,28 @@
+# Victron: Enable the inverter after sustained grid export.
+# Stable entity: automation.producing_to_grid_more_than_60w_for_two_minutes_with_victron_off.
+- id: ha_homelab_victron_enable_the_inverter_after_sustained_grid_export
+  alias: 'Victron: Enable the inverter after sustained grid export'
+  description: Enable the inverter after sustained grid export. Responds to sensor.home_123_1s below -60 for 2 minutes.
+    Runs only when all configured guards pass.
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    below: -60
+    for:
+      minutes: 2
+  conditions:
+  - condition: state
+    entity_id: switch.victron_quattro
+    state: 'off'
+    for:
+      minutes: 10
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.victron_quattro
+  - service: script.notify
+    data:
+      message: Producing to grid more than 60W for two minutes with Victron off
+    continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

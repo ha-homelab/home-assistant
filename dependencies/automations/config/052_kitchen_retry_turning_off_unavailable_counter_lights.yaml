@@ -1,0 +1,13 @@
+# Kitchen: Retry turning off unavailable counter lights.
+# Stable entity: automation.counter_motion_off_led_unknown_recovery_check.
+- id: ha_homelab_kitchen_retry_turning_off_unavailable_counter_lights
+  alias: 'Kitchen: Retry turning off unavailable counter lights'
+  description: Superseded by the shared motion-light timeout blueprint in automation.counter_motion_off. Kept disabled
+    to preserve its registered entity ID.
+  triggers: []
+  conditions: []
+  actions: []
+  mode: single
+  trace:
+    stored_traces: 5
+  initial_state: false

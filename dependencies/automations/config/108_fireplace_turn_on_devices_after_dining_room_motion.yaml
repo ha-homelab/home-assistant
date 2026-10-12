@@ -1,0 +1,29 @@
+# Fireplace: Turn on devices after dining-room motion.
+# Stable entity: automation.turn_on_fireplace_when_motion_detected.
+- id: ha_homelab_fireplace_turn_on_devices_after_dining_room_motion
+  alias: 'Fireplace: Turn on devices after dining-room motion'
+  description: Turn on devices after dining-room motion. Responds to binary_sensor.rf_dinner_motion changing
+    to on; or binary_sensor.rf_dinner_two_motion changing to on. Runs only when all configured guards
+    pass.
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.rf_dinner_motion
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.rf_dinner_two_motion
+    to: 'on'
+  conditions:
+  - condition: state
+    entity_id: input_boolean.living_room_sticky
+    state: 'off'
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.dining_media_guard
+    continue_on_error: true
+  - service: switch.turn_on
+    entity_id: switch.fireplace_switch
+  - service: switch.turn_on
+    entity_id: switch.living_guard2
+  mode: single
+  trace:
+    stored_traces: 5

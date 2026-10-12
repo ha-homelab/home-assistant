@@ -1,0 +1,34 @@
+# Kitchen: Dim the table lamp after motion clears.
+# Stable entity: automation.table_lamp_motion_dim.
+- id: ha_homelab_kitchen_dim_the_table_lamp_after_motion_clears
+  alias: 'Kitchen: Dim the table lamp after motion clears'
+  description: Dim the table lamp after motion clears. Responds to group.kitchen_motion changing to off for 18 minutes.
+    Runs only when all configured guards pass.
+  triggers:
+  - entity_id: group.kitchen_motion
+    platform: state
+    to: 'off'
+    for:
+      minutes: 18
+  conditions:
+  - condition: template
+    value_template: '{{ state_attr("sun.sun", "elevation") < 0.80 }}'
+  - condition: state
+    entity_id: input_boolean.kitchen_sticky
+    state: 'off'
+  - condition: state
+    entity_id: light.kitchen_lamp_m
+    state: 'on'
+  actions:
+  - service: script.notify_mqtt_log
+    data:
+      message: Kitchen table lamp dim {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+    continue_on_error: true
+  - service: light.turn_on
+    entity_id: light.kitchen_lamp_m
+    data_template:
+      brightness: '{{ 60 if trigger.from_state.state == "off" else 180 }}'
+      transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'
+  mode: single
+  trace:
+    stored_traces: 5

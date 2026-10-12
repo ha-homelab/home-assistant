@@ -1,0 +1,8 @@
+# Only this helper was active: the older duplicate input_number key was shadowed.
+nightime:
+  name: Nightime value
+  initial: 0
+  min: 0
+  max: 1
+  step: 1
+  mode: box

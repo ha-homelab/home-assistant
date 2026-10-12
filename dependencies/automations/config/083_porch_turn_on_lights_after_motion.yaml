@@ -1,0 +1,36 @@
+# Porch: Turn on lights after motion.
+# Stable entity: automation.porch_motion_triggered.
+- id: ha_homelab_porch_turn_on_lights_after_motion
+  alias: 'Porch: Turn on lights after motion'
+  description: Turn on lights after motion. Responds to binary_sensor.rf_porch_one_motion changing to
+    on; or binary_sensor.rf_porch_two_motion changing to on. Runs only when all configured
+    guards pass. Independent lighting commands continue if another device fails.
+  triggers:
+  - entity_id: binary_sensor.rf_porch_one_motion
+    platform: state
+    to: 'on'
+  - entity_id: binary_sensor.rf_porch_two_motion
+    platform: state
+    to: 'on'
+  conditions:
+  - condition: template
+    value_template: '{{ state_attr("sun.sun", "elevation") < 0.20 }}'
+  - condition: state
+    entity_id: input_boolean.porch_sticky
+    state: 'off'
+  actions:
+  - service: light.turn_on
+    entity_id: light.porch_one
+    continue_on_error: true
+    data_template:
+      brightness: '{{ 100 if now().strftime("%H")|int < 16 or now().strftime("%H")|int > 22 else 100 }}'
+      transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'
+  - service: light.turn_on
+    entity_id: light.porch_two
+    continue_on_error: true
+    data_template:
+      brightness: '{{ 100 if now().strftime("%H")|int < 16 or now().strftime("%H")|int > 22 else 100 }}'
+      transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'
+  mode: single
+  trace:
+    stored_traces: 5

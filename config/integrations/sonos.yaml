@@ -1,0 +1,7 @@
+# Existing speaker addresses. Preserve discovery and player identity.
+media_player:
+  hosts:
+    - 192.168.163.47
+    - 192.168.163.48
+    - 192.168.168.50
+    - 192.168.168.51

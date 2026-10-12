@@ -1,0 +1,29 @@
+# Kitchen: Turn off counter lights after motion clears.
+# Stable entity: automation.counter_motion_off.
+- id: ha_homelab_kitchen_turn_off_counter_lights_after_motion_clears
+  alias: 'Kitchen: Turn off counter lights after motion clears'
+  description: Turn off after a new motion cycle or genuine unknown/unavailable recovery. Preserve later manual
+    ON states; recheck all original timeout, presence and override guards for each device and retry.
+  mode: parallel
+  trace:
+    stored_traces: 5
+  use_blueprint:
+    path: ha_homelab/motion_light_off.yaml
+    input:
+      motion_triggers:
+      - entity_id: binary_sensor.rf_counter_motion
+        platform: state
+        to: 'off'
+        for:
+          minutes: 7
+      target_entities:
+      - switch.led_under_cabinet
+      guards:
+      - condition: state
+        entity_id: input_boolean.kitchen_sticky
+        state: 'off'
+      after_actions:
+      - service: script.notify_mqtt_log
+        data:
+          message: Counter motion off {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+        continue_on_error: true

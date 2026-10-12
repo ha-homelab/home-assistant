@@ -1,0 +1,27 @@
+# Self-consumption: Stop the large heater on grid import.
+# Stable entity: automation.power_above_725_heater_off.
+- id: ha_homelab_self_consumption_stop_the_large_heater_on_grid_import
+  alias: 'Self-consumption: Stop the large heater on grid import'
+  description: Stop the large heater on grid import. Responds to sensor.home_123_1s above 725. Runs only when all
+    configured guards pass.
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    above: 725
+  conditions:
+  - condition: state
+    entity_id: input_boolean.self_consuming
+    state: 'on'
+  - condition: state
+    entity_id: switch.switch06
+    state: 'on'
+  actions:
+  - service: switch.turn_off
+    entity_id: switch.switch06
+  - service: script.notify
+    data:
+      message: Power above 725 heater off
+    continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

@@ -1,0 +1,39 @@
+# Curtains: Open curtains in the morning.
+# Stable entity: automation.open_curtains_in_the_morning.
+- id: ha_homelab_curtains_open_curtains_in_the_morning
+  alias: 'Curtains: Open curtains in the morning'
+  description: Open kitchen and dining curtains at sunrise or 06:35, whichever is later.
+    Preserve the motor warm-up sequence and respect the manual override.
+  triggers:
+  - platform: time
+    at: 06:35:00
+  - platform: sun
+    event: sunrise
+  conditions:
+  - condition: state
+    entity_id: input_boolean.curtains_sticky
+    state: 'off'
+  - condition: time
+    after: 06:35:00
+    before: '12:00:00'
+  - condition: sun
+    after: sunrise
+    before: sunset
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.studio_guard
+  - service: switch.turn_on
+    entity_id: switch.dining_guard
+  - service: switch.turn_on
+    entity_id: switch.kitchen_guard
+  - delay: 00:01:30
+  - service: cover.open_cover
+    entity_id: cover.kitchen_curtains_l
+  - service: cover.open_cover
+    entity_id: cover.dining_curtains_l
+  - delay: 00:01:00
+  - service: switch.turn_off
+    entity_id: switch.dining_guard
+  mode: single
+  trace:
+    stored_traces: 5

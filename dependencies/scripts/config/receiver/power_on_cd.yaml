@@ -1,0 +1,17 @@
+# Stable entity: script.receiver_turn_on
+# Send PowerOn followed by InputCd to the Pioneer AV Receiver through Harmony with the original 0.6-second command delay.
+receiver_turn_on:
+  alias: 'Receiver: power on and select CD'
+  description: Send PowerOn followed by InputCd to the Pioneer AV Receiver through Harmony with the original 0.6-second
+    command delay.
+  icon: mdi:audio-video
+  mode: single
+  sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.harmonyhub
+        command:
+          - PowerOn
+          - InputCd
+        device: Pioneer AV Receiver
+        delay_secs: 0.6

@@ -1,0 +1,73 @@
+{
+  "format_version": 1,
+  "release_date": "2026-09-15",
+  "migration_started_at_utc": "2026-09-15T07:29:39.467544+00:00",
+  "deployment": {
+    "root_revision": "d906fbaa5a964e2f946f6bb9230b186393058f58",
+    "components": {
+      "automations": "7b367e0d7d023ad8b365cdb795842935c4c80955",
+      "scripts": "12185d408a6bbaa7557e720ef739c29bed1e6387"
+    },
+    "home_assistant_version": "2026.9.1",
+    "identity_seed": false
+  },
+  "target": {
+    "context": "k3s-heaven",
+    "namespace": "homeassistant",
+    "pod": "home-assistant-0",
+    "node": "h7"
+  },
+  "phases": {
+    "seed": {
+      "staging_check": {
+        "total_errors": 0,
+        "total_warnings": 0
+      },
+      "installed_check_exit_code": 0,
+      "promotion_scope": "overlay",
+      "on_volume_backup": "/config/.ha-homelab-backup-fza6tl6m"
+    },
+    "final": {
+      "staging_check": {
+        "total_errors": 0,
+        "total_warnings": 0
+      },
+      "installed_check_exit_code": 0,
+      "promotion_scope": "automations",
+      "on_volume_backup": "/config/.ha-homelab-backup-gspiysm6"
+    }
+  },
+  "verification": {
+    "managed_automations": 130,
+    "new_automation_unique_ids": 126,
+    "preserved_existing_automation_unique_ids": 4,
+    "preserved_automation_entity_ids": 130,
+    "enabled_automations": 129,
+    "disabled_automations": 1,
+    "preserved_folder_script_entity_ids": 54,
+    "preserved_available_package_script_entities": 6,
+    "script_icons_verified": 54,
+    "script_service_descriptions_verified": 54,
+    "script_parameter_fields_verified": 6,
+    "field_normalization": "HA text-selector default multiline=false and multiple=false applied before comparison",
+    "natural_automation_trigger_count_since_seed": 6,
+    "naturally_triggered_automation_entities": [
+      "automation.mqtt_publish_sensor_value",
+      "automation.mqtt_publish_sensor_value_home_totalusage_1s",
+      "automation.solar_on",
+      "automation.victron_mqtt_keep_alive",
+      "automation.water_level_less_than_18_centimeters",
+      "automation.water_level_more_than_19_centimeters"
+    ],
+    "manual_device_actions_invoked": false,
+    "limitation": "last_triggered proves an automation ran, not successful delivery to every physical target"
+  },
+  "limits": [
+    "Live snapshot backup is not an application-consistent database backup.",
+    "Reloads reattach automation triggers and reset pending for timers.",
+    "Device/provider actions were not manually exercised.",
+    "Original missing and unavailable references remain documented in runtime-dependencies.json.",
+    "The MQTT number control-range mismatch remains unchanged."
+  ],
+  "backup_sha256": "7cff3e1bfe6300e96c07dcbbeff0e885b3fab2fbd0de56681acbddb8db6d5ea9"
+}

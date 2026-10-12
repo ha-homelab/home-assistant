@@ -1,0 +1,21 @@
+# Decorative lights: Turn on the laser in the morning.
+# Stable entity: automation.laser_on_in_the_morning.
+- id: ha_homelab_decorative_lights_turn_on_the_laser_in_the_morning
+  alias: 'Decorative lights: Turn on the laser in the morning'
+  description: Turn on the laser in the morning. Responds to the daily schedule at 07:08:00. Runs only
+    when all configured guards pass.
+  triggers:
+    platform: time
+    at: 07:08:00
+  conditions:
+  - condition: state
+    entity_id: input_boolean.curtains_sticky
+    state: 'off'
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.mishka_guard
+  - service: switch.turn_on
+    entity_id: switch.bedroom_guard
+  mode: single
+  trace:
+    stored_traces: 5

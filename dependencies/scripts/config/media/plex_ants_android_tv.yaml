@@ -1,0 +1,13 @@
+# Stable entity: script.run_playlist_on_plex_ants
+# Play the Ants Plex playlist on the Android TV Chromecast with repeat-all enabled.
+run_playlist_on_plex_ants:
+  alias: 'Android TV: play Ants playlist'
+  description: Play the Ants Plex playlist on the Android TV Chromecast with repeat-all enabled.
+  icon: mdi:playlist-play
+  mode: single
+  sequence:
+    - service: media_player.play_media
+      data:
+        entity_id: media_player.plex_plex_for_android_tv_chromecast_google_tv_hd
+        media_content_type: PLAYLIST
+        media_content_id: 'plex://{ "playlist_name": "Ants", "repeatall": "1" }'

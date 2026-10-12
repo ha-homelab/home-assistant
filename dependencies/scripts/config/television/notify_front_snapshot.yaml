@@ -1,0 +1,17 @@
+# Stable entity: script.tv_pic2
+# Send the front-camera message and supported snapshot icon to the registered living-room LG TV.
+tv_pic2:
+  alias: 'Living room TV: notify with front-camera snapshot'
+  description: Send the front-camera message and snapshot icon through the registered living-room LG TV notifier.
+  icon: mdi:cctv
+  mode: single
+  sequence:
+  - action: script.notify_optional
+    data:
+      notify_service: notify.lg_webos_tv_oled77c5pua_dusqljr
+      also_chrome: true
+      chrome_image: /local/front_camera_alert.jpg?{{ as_timestamp(now()) }}
+      notify_data:
+        data:
+          icon: /config/www/front_camera_alert.jpg
+        message: Someone at the Front Camera

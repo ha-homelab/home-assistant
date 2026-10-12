@@ -1,0 +1,9 @@
+# Stable entity: script.random_on_an2
+# Invoke the existing shell_command.random_on_an2 helper; its implementation remains in the main configuration.
+random_on_an2:
+  alias: 'AN2: run random playback command'
+  description: Invoke the existing shell_command.random_on_an2 helper; its implementation remains in the main configuration.
+  icon: mdi:shuffle
+  mode: single
+  sequence:
+    - service: shell_command.random_on_an2

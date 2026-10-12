@@ -1,0 +1,22 @@
+# Kitchen: Turn on tea-area lights after motion.
+# Stable entity: automation.tea_motion_triggered.
+- id: ha_homelab_kitchen_turn_on_tea_area_lights_after_motion
+  alias: 'Kitchen: Turn on tea-area lights after motion'
+  description: Turn on tea-area lights after motion. Responds to binary_sensor.rf_tea_motion changing to on.
+    Runs only when all configured guards pass.
+  triggers:
+  - entity_id: binary_sensor.rf_tea_motion
+    platform: state
+    to: 'on'
+  conditions:
+  - condition: template
+    value_template: '{{ state_attr("sun.sun", "elevation") < 0.60 }}'
+  - condition: state
+    entity_id: input_boolean.kitchen_sticky
+    state: 'off'
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.tea_table
+  mode: single
+  trace:
+    stored_traces: 5

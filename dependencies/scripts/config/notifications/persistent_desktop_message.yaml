@@ -1,0 +1,40 @@
+# Stable entity: script.notifymax
+# Send a timestamped message to the Roomba, iMac and Chrome targets and create a persistent Home Assistant notification.
+notifymax:
+  alias: 'Notifications: send desktop and persistent message'
+  description: Send a timestamped message to the Roomba, iMac and Chrome targets and create a persistent Home Assistant
+    notification.
+  icon: mdi:message-alert
+  fields:
+    message:
+      name: Message
+      description: Message text forwarded using the existing notification template.
+      required: true
+      selector:
+        text:
+          multiline: true
+  mode: single
+  sequence:
+  - action: script.notify_optional
+    data:
+      notify_service: notify.roomba
+      also_chrome: true
+      notify_data:
+        title: '{{ message }}'
+        message: '{{ message }} {{ as_timestamp(now()) | timestamp_custom(''%H:%M'', true) }}'
+        data:
+          displaytime: 20000
+          icon: warning
+  - action: script.notify_optional
+    data:
+      notify_service: notify.imac21
+      notify_data:
+        title: '{{ message }}'
+        message: '{{ message }} {{ as_timestamp(now()) | timestamp_custom(''%H:%M'', true) }}'
+        data:
+          displaytime: 20000
+          icon: warning
+  - service: persistent_notification.create
+    data_template:
+      title: '{{ message }}'
+      message: '{{ message }} {{ as_timestamp(now()) | timestamp_custom(''%H:%M'', true) }}'

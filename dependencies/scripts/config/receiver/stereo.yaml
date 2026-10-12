@@ -1,0 +1,15 @@
+# Stable entity: script.receiver_surrmodestereo
+# Send the existing Stereo command to the Pioneer AV Receiver through Harmony.
+receiver_surrmodestereo:
+  alias: 'Receiver: select stereo mode'
+  description: Send the existing Stereo command to the Pioneer AV Receiver through Harmony.
+  icon: mdi:surround-sound
+  mode: single
+  sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.harmonyhub
+        command:
+          - Stereo
+        device: Pioneer AV Receiver
+        delay_secs: 0.6

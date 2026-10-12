@@ -1,0 +1,15 @@
+# Stable entity: script.receiver_turn_off
+# Send PowerOff to the Pioneer AV Receiver through Harmony with the original 0.6-second command delay.
+receiver_turn_off:
+  alias: 'Receiver: power off'
+  description: Send PowerOff to the Pioneer AV Receiver through Harmony with the original 0.6-second command delay.
+  icon: mdi:audio-video-off
+  mode: single
+  sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.harmonyhub
+        command:
+          - PowerOff
+        device: Pioneer AV Receiver
+        delay_secs: 0.6

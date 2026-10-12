@@ -1,0 +1,14 @@
+{
+  "conversation_engine": "conversation.homeway_sage_free_chatgpt_claude",
+  "conversation_language": "ru-RU",
+  "language": "ru",
+  "name": "Sage Russian",
+  "stt_engine": "stt.homeway_sage_free_assist_w_chatgpt_deepseek_google_ai_claude_and_more",
+  "stt_language": "ru-RU",
+  "tts_engine": "tts.homeway_sage_free_text_to_speech",
+  "tts_language": "ru-RU",
+  "tts_voice": "homeway-website-controlled",
+  "wake_word_entity": null,
+  "wake_word_id": null,
+  "prefer_local_intents": true
+}

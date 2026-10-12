@@ -1,0 +1,98 @@
+# RF Airbridge integration. Source: ha-homelab/rf-airbridge examples/home-assistant.yaml.
+# The UI/storage-owned counter.rf_received_example helper must exist before reload.
+# Counter setup: initial 0, step 1, restore enabled. Do not duplicate it in YAML.
+# The receive automation increments only this helper; existing motion rules remain intact.
+
+automation:
+  - id: rf_mqtt_received_example
+    alias: "RF: Count a received motion code"
+    description: >-
+      Count an exact Hallway Two Motion MQTT code match without controlling equipment.
+      Ignore repeats during the 750 ms interval after the first match.
+    triggers:
+      - trigger: mqtt
+        topic: rf/received
+        qos: 0
+    conditions:
+      - condition: template
+        value_template: >-
+          {% set packet = trigger.payload | from_json({}) %}
+          {{ packet is mapping
+             and packet.get('source') == 'rf'
+             and packet.get('origin') == 'radio'
+             and packet.get('format') == 'rc_switch'
+             and packet.get('protocol') is integer
+             and packet.get('protocol') == 1
+             and packet.get('bits') is integer
+             and packet.get('bits') == 24
+             and packet.get('code') == '110010101000101011101100' }}
+    actions:
+      - action: counter.increment
+        target:
+          entity_id: counter.rf_received_example
+      - delay:
+          milliseconds: 750
+    mode: single
+    max_exceeded: silent
+    trace:
+      stored_traces: 5
+
+script:
+  rf_send_code:
+    alias: "RF: Send code"
+    description: >-
+      Transmit one chosen RC-Switch code through the RF ESPHome node.
+      No transmission occurs until this script is called with valid inputs.
+      A completed action does not confirm reception by the target device.
+    icon: mdi:radio-tower
+    mode: single
+    fields:
+      code:
+        name: Binary code
+        description: "8 to 64 binary digits. Preserve all leading zeroes."
+        required: true
+        selector:
+          text:
+            multiline: false
+      protocol:
+        name: RC-Switch protocol
+        description: "The protocol number reported in the received MQTT event."
+        required: true
+        selector:
+          number:
+            min: 1
+            max: 8
+            step: 1
+            mode: box
+      repeats:
+        name: Repeats
+        description: "Number of copies of this code to transmit; defaults to 3."
+        default: 3
+        selector:
+          number:
+            min: 1
+            max: 10
+            step: 1
+            mode: box
+    sequence:
+      - if:
+          - condition: template
+            value_template: >-
+              {% set c = code | default(none) %}
+              {% set p = protocol | default(none) %}
+              {% set r = repeats | default(3) %}
+              {{ not (c is string and c | regex_match('^[01]{8,64}\\Z')
+                      and p is not boolean and p | float(-1) == p | int(-1)
+                      and 1 <= p | int(-1) <= 8
+                      and r is not boolean and r | float(-1) == r | int(-1)
+                      and 1 <= r | int(-1) <= 10) }}
+        then:
+          - stop: "Expected a binary code of 8–64 digits, protocol 1–8, repeats 1–10."
+            error: true
+      # ESPHome prefixes the action with the node name, here `rf`.
+      # If the node was renamed, use the registered action shown in HA.
+      - action: esphome.rf_send_rf_code
+        data:
+          code: "{{ code }}"
+          protocol: "{{ protocol | int }}"
+          repeats: "{{ repeats | default(3) | int }}"

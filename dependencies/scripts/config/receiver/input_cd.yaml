@@ -1,0 +1,15 @@
+# Stable entity: script.receiver_inputcd
+# Send InputCd to the Pioneer AV Receiver through Harmony.
+receiver_inputcd:
+  alias: 'Receiver: select CD input'
+  description: Send InputCd to the Pioneer AV Receiver through Harmony.
+  icon: mdi:disc
+  mode: single
+  sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.harmonyhub
+        command:
+          - InputCd
+        device: Pioneer AV Receiver
+        delay_secs: 0.6

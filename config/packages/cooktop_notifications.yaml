@@ -1,0 +1,38 @@
+# SmartThings exposes one aggregate cooktop state, separate from the oven.
+# A known off -> on edge avoids replay when HA or the cloud connection recovers.
+automation:
+  - id: ha_homelab_cooktop_started_notifications
+    alias: 'Kitchen: notify when the cooktop starts'
+    description: >-
+      Report a confirmed cooktop start to Chrome and Vitaly iPhone Air through
+      the shared notification router. Respect the household mute and suppress
+      rapid repeated starts for 60 seconds. The signal covers the whole cooktop;
+      individual burners and oven operation are not inferred from it.
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.range_operating_state
+        from: 'off'
+        to: 'on'
+    conditions:
+      - condition: state
+        entity_id: input_boolean.notifications_off
+        state: 'off'
+      - condition: template
+        value_template: >-
+          {% set last = this.attributes.get('last_triggered') %}
+          {{ last is none or (as_timestamp(now()) - as_timestamp(last)) >= 60 }}
+    actions:
+      - action: script.notify_optional
+        data:
+          notify_service: html5.send_message
+          notification_category: cooktop
+          notify_data:
+            entity_id: notify.chrome
+            title: 'Kitchen: cooktop on'
+            message: 'At least one cooktop burner is on.'
+            data:
+              url: /
+    mode: single
+    max_exceeded: silent
+    trace:
+      stored_traces: 5

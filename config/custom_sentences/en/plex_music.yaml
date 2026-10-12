@@ -1,0 +1,18 @@
+language: en
+intents:
+  EchoPlexPlayMusic:
+    data:
+      - sentences:
+          - "[please] play [some] music [from plex] [on [the] echo]"
+  EchoPlexPauseMusic:
+    data:
+      - sentences:
+          - "[please] (stop|pause) [the] music [on [the] echo]"
+  EchoPlexResumeMusic:
+    data:
+      - sentences:
+          - "[please] resume [the] music [on [the] echo]"
+  EchoPlexNextTrack:
+    data:
+      - sentences:
+          - "[please] [play] [the] next (track|song) [on [the] echo]"

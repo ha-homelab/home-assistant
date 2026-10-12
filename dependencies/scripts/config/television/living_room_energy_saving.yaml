@@ -1,0 +1,36 @@
+# Stable entity: script.living_room_tv_picture_energy_saving
+# Show the existing webOS confirmation alert whose OK button applies the supplied energy-saving setting.
+# This uses the TV confirmation-button callback. Preserve the firmware-specific payload and string-valued energySavingModified.
+living_room_tv_picture_energy_saving:
+  alias: 'Living room TV: request energy-saving setting'
+  description: Show the existing webOS confirmation alert whose OK button applies the supplied energy-saving setting.
+  icon: mdi:leaf
+  fields:
+    energy_saving:
+      name: Energy-saving value
+      description: Value accepted by this TV firmware; the existing alert applies it after confirmation.
+      required: true
+      selector:
+        text: {}
+  mode: single
+  sequence:
+    - service: webostv.command
+      data:
+        entity_id: media_player.living_room_tv_77
+        command: system.notifications/createAlert
+        payload:
+          title: Energy saving
+          message: '{{ energy_saving }}'
+          modal: false
+          buttons:
+            - label: ok
+              focus: true
+              buttonType: ok
+              onClick: luna://com.webos.settingsservice/setSystemSettings
+              params:
+                category: picture
+                settings:
+                  energySaving: '{{ energy_saving }}'
+                  energySavingModified: 'true'
+          type: confirm
+          isSysReq: true

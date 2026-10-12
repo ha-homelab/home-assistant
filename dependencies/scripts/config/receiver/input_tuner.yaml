@@ -1,0 +1,15 @@
+# Stable entity: script.receiver_inputtuner
+# Send InputTuner to the Pioneer AV Receiver through Harmony.
+receiver_inputtuner:
+  alias: 'Receiver: select tuner input'
+  description: Send InputTuner to the Pioneer AV Receiver through Harmony.
+  icon: mdi:radio
+  mode: single
+  sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.harmonyhub
+        command:
+          - InputTuner
+        device: Pioneer AV Receiver
+        delay_secs: 0.6

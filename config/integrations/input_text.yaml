@@ -1,0 +1,5 @@
+# Stable dashboard helper IDs. Keep existing values and control behavior.
+base_url:
+  name: Base URL for notifications
+  initial: !secret home_assistant_external_url
+  mode: text

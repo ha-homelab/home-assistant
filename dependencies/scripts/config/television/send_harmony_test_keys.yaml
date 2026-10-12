@@ -1,0 +1,19 @@
+# Stable entity: script.tv_type
+# Send the fixed Harmony key sequence 1, A, S, D, A to the LG TV.
+tv_type:
+  alias: 'Living room TV: send legacy test keys'
+  description: Send the fixed Harmony key sequence 1, A, S, D, A to the LG TV.
+  icon: mdi:keyboard
+  mode: single
+  sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.harmonyhub
+        command:
+          - '1'
+          - A
+          - S
+          - D
+          - A
+        device: LG TV
+        delay_secs: 0.1

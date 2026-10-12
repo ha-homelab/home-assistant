@@ -1,0 +1,24 @@
+# Kitchen: Turn on counter lights after motion.
+# Stable entity: automation.counter_motion_triggered.
+- id: ha_homelab_kitchen_turn_on_counter_lights_after_motion
+  alias: 'Kitchen: Turn on counter lights after motion'
+  description: Turn on counter lights after motion. Responds to binary_sensor.rf_counter_motion changing to on.
+    Runs only when all configured guards pass.
+  triggers:
+  - entity_id: binary_sensor.rf_counter_motion
+    platform: state
+    to: 'on'
+  conditions:
+  - condition: state
+    entity_id: input_boolean.kitchen_sticky
+    state: 'off'
+  actions:
+  - service: script.notify_mqtt_log
+    data:
+      message: Counter motion triggered {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+    continue_on_error: true
+  - service: switch.turn_on
+    entity_id: switch.led_under_cabinet
+  mode: single
+  trace:
+    stored_traces: 5

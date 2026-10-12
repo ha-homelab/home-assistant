@@ -1,0 +1,362 @@
+[
+  {
+    "topic": "homeassistant/event/sonoff_rm433_462be/button_1/config",
+    "payload": {
+      "name": "Button 1",
+      "unique_id": "sonoff_rm433_462be_button_1",
+      "default_entity_id": "event.sonoff_rm433_button_1",
+      "state_topic": "rf/received",
+      "event_types": [
+        "press"
+      ],
+      "device_class": "button",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      },
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111101000' %}{{ {'event_type': 'press', 'button': 1, 'radio_event_id': p.get('event_id')} | to_json }}{% else %}{}{% endif %}"
+    }
+  },
+  {
+    "topic": "homeassistant/device_automation/sonoff_rm433_462be/button_1/config",
+    "payload": {
+      "automation_type": "trigger",
+      "type": "button_short_press",
+      "subtype": "button_1",
+      "topic": "rf/received",
+      "payload": "button_1",
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111101000' %}button_1{% endif %}",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      }
+    }
+  },
+  {
+    "topic": "homeassistant/event/sonoff_rm433_462be/button_2/config",
+    "payload": {
+      "name": "Button 2",
+      "unique_id": "sonoff_rm433_462be_button_2",
+      "default_entity_id": "event.sonoff_rm433_button_2",
+      "state_topic": "rf/received",
+      "event_types": [
+        "press"
+      ],
+      "device_class": "button",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      },
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111101100' %}{{ {'event_type': 'press', 'button': 2, 'radio_event_id': p.get('event_id')} | to_json }}{% else %}{}{% endif %}"
+    }
+  },
+  {
+    "topic": "homeassistant/device_automation/sonoff_rm433_462be/button_2/config",
+    "payload": {
+      "automation_type": "trigger",
+      "type": "button_short_press",
+      "subtype": "button_2",
+      "topic": "rf/received",
+      "payload": "button_2",
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111101100' %}button_2{% endif %}",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      }
+    }
+  },
+  {
+    "topic": "homeassistant/event/sonoff_rm433_462be/button_3/config",
+    "payload": {
+      "name": "Button 3",
+      "unique_id": "sonoff_rm433_462be_button_3",
+      "default_entity_id": "event.sonoff_rm433_button_3",
+      "state_topic": "rf/received",
+      "event_types": [
+        "press"
+      ],
+      "device_class": "button",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      },
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111100100' %}{{ {'event_type': 'press', 'button': 3, 'radio_event_id': p.get('event_id')} | to_json }}{% else %}{}{% endif %}"
+    }
+  },
+  {
+    "topic": "homeassistant/device_automation/sonoff_rm433_462be/button_3/config",
+    "payload": {
+      "automation_type": "trigger",
+      "type": "button_short_press",
+      "subtype": "button_3",
+      "topic": "rf/received",
+      "payload": "button_3",
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111100100' %}button_3{% endif %}",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      }
+    }
+  },
+  {
+    "topic": "homeassistant/event/sonoff_rm433_462be/button_4/config",
+    "payload": {
+      "name": "Button 4",
+      "unique_id": "sonoff_rm433_462be_button_4",
+      "default_entity_id": "event.sonoff_rm433_button_4",
+      "state_topic": "rf/received",
+      "event_types": [
+        "press"
+      ],
+      "device_class": "button",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      },
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111101001' %}{{ {'event_type': 'press', 'button': 4, 'radio_event_id': p.get('event_id')} | to_json }}{% else %}{}{% endif %}"
+    }
+  },
+  {
+    "topic": "homeassistant/device_automation/sonoff_rm433_462be/button_4/config",
+    "payload": {
+      "automation_type": "trigger",
+      "type": "button_short_press",
+      "subtype": "button_4",
+      "topic": "rf/received",
+      "payload": "button_4",
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111101001' %}button_4{% endif %}",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      }
+    }
+  },
+  {
+    "topic": "homeassistant/event/sonoff_rm433_462be/button_5/config",
+    "payload": {
+      "name": "Button 5",
+      "unique_id": "sonoff_rm433_462be_button_5",
+      "default_entity_id": "event.sonoff_rm433_button_5",
+      "state_topic": "rf/received",
+      "event_types": [
+        "press"
+      ],
+      "device_class": "button",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      },
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111100010' %}{{ {'event_type': 'press', 'button': 5, 'radio_event_id': p.get('event_id')} | to_json }}{% else %}{}{% endif %}"
+    }
+  },
+  {
+    "topic": "homeassistant/device_automation/sonoff_rm433_462be/button_5/config",
+    "payload": {
+      "automation_type": "trigger",
+      "type": "button_short_press",
+      "subtype": "button_5",
+      "topic": "rf/received",
+      "payload": "button_5",
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111100010' %}button_5{% endif %}",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      }
+    }
+  },
+  {
+    "topic": "homeassistant/event/sonoff_rm433_462be/button_6/config",
+    "payload": {
+      "name": "Button 6",
+      "unique_id": "sonoff_rm433_462be_button_6",
+      "default_entity_id": "event.sonoff_rm433_button_6",
+      "state_topic": "rf/received",
+      "event_types": [
+        "press"
+      ],
+      "device_class": "button",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      },
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111100101' %}{{ {'event_type': 'press', 'button': 6, 'radio_event_id': p.get('event_id')} | to_json }}{% else %}{}{% endif %}"
+    }
+  },
+  {
+    "topic": "homeassistant/device_automation/sonoff_rm433_462be/button_6/config",
+    "payload": {
+      "automation_type": "trigger",
+      "type": "button_short_press",
+      "subtype": "button_6",
+      "topic": "rf/received",
+      "payload": "button_6",
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111100101' %}button_6{% endif %}",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      }
+    }
+  },
+  {
+    "topic": "homeassistant/event/sonoff_rm433_462be/button_7/config",
+    "payload": {
+      "name": "Button 7",
+      "unique_id": "sonoff_rm433_462be_button_7",
+      "default_entity_id": "event.sonoff_rm433_button_7",
+      "state_topic": "rf/received",
+      "event_types": [
+        "press"
+      ],
+      "device_class": "button",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      },
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111100001' %}{{ {'event_type': 'press', 'button': 7, 'radio_event_id': p.get('event_id')} | to_json }}{% else %}{}{% endif %}"
+    }
+  },
+  {
+    "topic": "homeassistant/device_automation/sonoff_rm433_462be/button_7/config",
+    "payload": {
+      "automation_type": "trigger",
+      "type": "button_short_press",
+      "subtype": "button_7",
+      "topic": "rf/received",
+      "payload": "button_7",
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111100001' %}button_7{% endif %}",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      }
+    }
+  },
+  {
+    "topic": "homeassistant/event/sonoff_rm433_462be/button_8/config",
+    "payload": {
+      "name": "Button 8",
+      "unique_id": "sonoff_rm433_462be_button_8",
+      "default_entity_id": "event.sonoff_rm433_button_8",
+      "state_topic": "rf/received",
+      "event_types": [
+        "press"
+      ],
+      "device_class": "button",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      },
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111100011' %}{{ {'event_type': 'press', 'button': 8, 'radio_event_id': p.get('event_id')} | to_json }}{% else %}{}{% endif %}"
+    }
+  },
+  {
+    "topic": "homeassistant/device_automation/sonoff_rm433_462be/button_8/config",
+    "payload": {
+      "automation_type": "trigger",
+      "type": "button_short_press",
+      "subtype": "button_8",
+      "topic": "rf/received",
+      "payload": "button_8",
+      "value_template": "{% set p = value | from_json({}) %}{% if p is mapping and p.get('source') == 'rf' and p.get('origin') == 'radio' and p.get('format') == 'rm433' and p.get('bits') == 24 and p.get('code') == '010001100010101111100011' %}button_8{% endif %}",
+      "qos": 0,
+      "device": {
+        "identifiers": [
+          "sonoff_rm433_462be"
+        ],
+        "name": "Sonoff RM433",
+        "manufacturer": "SONOFF",
+        "model": "RM433",
+        "via_device": "60019438f005"
+      }
+    }
+  }
+]

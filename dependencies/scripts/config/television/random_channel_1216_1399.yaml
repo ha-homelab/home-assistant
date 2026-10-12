@@ -1,0 +1,16 @@
+# Stable entity: script.tv_random_channel_p
+# Send digits for a random channel from 1216 through 1399 to the LG TV through Harmony with a 0.4-second delay.
+tv_random_channel_p:
+  alias: 'Living room TV: choose channel 1216-1399'
+  description: Send digits for a random channel from 1216 through 1399 to the LG TV through Harmony with a 0.4-second
+    delay.
+  icon: mdi:shuffle-variant
+  mode: single
+  sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.harmonyhub
+        device: LG TV
+        delay_secs: 0.4
+        command: |
+          {% set p = range(1216, 1400) | random | string %} {{ p | list }}

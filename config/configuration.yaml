@@ -1,0 +1,94 @@
+# ha-homelab Home Assistant Container configuration.
+# Build a complete /config overlay with tools/build.py; credentials and runtime storage stay local.
+# The automations and scripts directories come from pinned private repositories.
+# Existing entity IDs, schedules, thresholds and device actions are preserved.
+
+homeassistant:
+  name: Home
+  external_url: !secret home_assistant_external_url
+  # Private h7 address over IPSec; home DNS does not resolve h22 for LAN clients.
+  internal_url: http://10.0.0.58:8123
+  country: US
+  latitude: !secret 'home_latitude'
+  longitude: !secret 'home_longitude'
+  elevation: 46
+  unit_system: metric
+  time_zone: America/Los_Angeles
+  customize: !include 'customize.yaml'
+  packages: !include_dir_named 'packages'
+  allowlist_external_dirs:
+    - /config
+    - /share
+  media_dirs:
+    local: /share/ssd/Music
+    music: /share/ssd/Music
+    motion: /config/www/images/GarageCamera
+    baby: /config/www/images/BabyCamera
+energy: null
+mobile_app: null
+prometheus: !include 'integrations/prometheus.yaml'
+recorder: !include 'integrations/recorder.yaml'
+shell_command: !include 'integrations/shell_command.yaml'
+mqtt: !include 'mqtt.yaml'
+zeroconf: null
+my: null
+logger: !include 'integrations/logger.yaml'
+stream: null
+system_health: null
+notify: !include 'notify.yaml'
+camera: !include 'integrations/camera.yaml'
+media_player: null
+config: null
+light: !include 'lights.yaml'
+websocket_api: null
+conversation: null
+history: null
+logbook: null
+sun: null
+binary_sensor:
+  - platform: tod
+    name: Night
+    after: sunset
+    before: sunrise
+cloud: null
+frontend:
+  themes: !include_dir_merge_named 'themes'
+group: !include 'groups.yaml'
+automation: !include_dir_merge_list 'automations/'
+scene: !include_dir_merge_list 'scenes/'
+input_boolean: !include 'input_boolean.yaml'
+input_select: !include 'input_select.yaml'
+input_number: !include 'integrations/input_number.yaml'
+input_datetime: !include 'input_datetime.yaml'
+input_text: !include 'integrations/input_text.yaml'
+script: !include_dir_merge_named 'scripts'
+zha:
+  custom_quirks_path: /config/custom_zha_quirks/
+  zigpy_config:
+    ota:
+      extra_providers:
+        - type: z2m_local
+          index_file: /config/ota/tuya_ts0041/index.json
+sonos: !include 'integrations/sonos.yaml'
+tapo:
+  discovery: true
+default_config: null
+python_script: null
+template:
+  - cover: !include 'covers.yaml'
+  - sensor: !include 'template_sensors.yaml'
+  - binary_sensor:
+      - name: Dishwasher Running
+        unique_id: dishwasher_running_status
+        device_class: running
+        delay_off:
+          minutes: 5
+        state: '{{ (states(''sensor.dishwasher_and_bathroom_13_1s'') if is_number(states(''sensor.dishwasher_and_bathroom_13_1s''))
+          else 0) | float > 5 }}
+
+          '
+sensor: !include 'sensors.yaml'
+compensation: !include 'integrations/compensation.yaml'
+
+# Private authenticated 3D floorplan panel.
+home_floorplan: {}

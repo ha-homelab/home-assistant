@@ -1,0 +1,78 @@
+# Stable entity: script.backdoormotion
+# Take a backdoor snapshot and notify desktops; between 20:30 and 22:00, also repeat the browser notification and run the existing porch-light fade.
+# The time condition stops only the remaining browser/light actions; desktop notifications happen first. Preserve the fade sequence and final off state.
+backdoormotion:
+  alias: 'Backdoor: notify and pulse porch light'
+  description: Take a backdoor snapshot and notify desktops; between 20:30 and 22:00, also repeat the browser
+    notification and run the existing porch-light fade.
+  icon: mdi:motion-sensor
+  mode: single
+  sequence:
+  - action: script.capture_camera_alert
+    data:
+      camera_key: backdoor
+  - action: script.notify_optional
+    data:
+      notify_service: html5.send_message
+      notify_data:
+        message: backdoor Motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+        entity_id: notify.chrome
+        icon: /local/backdoor_camera_alert.jpg?{{ as_timestamp(now()) }}
+        image: /local/backdoor_camera_alert.jpg?{{ as_timestamp(now()) }}
+        data:
+          url: /local/backdoor_camera_alert.jpg?{{ as_timestamp(now()) }}
+  - action: script.notify_optional
+    data:
+      notify_service: notify.roomba
+      notify_data:
+        title: Backdoor Camera
+        message: Motion detected
+        data:
+          displaytime: 20000
+          icon: warning
+  - action: script.notify_optional
+    data:
+      notify_service: notify.imac21
+      notify_data:
+        title: Backdoor Camera
+        message: Motion detected
+        data:
+          displaytime: 20000
+          icon: warning
+  - condition: time
+    after: '20:30:00'
+    before: '22:00:00'
+  - action: script.notify_optional
+    data:
+      notify_service: html5.send_message
+      notify_data:
+        message: Backdoor Motion
+        entity_id: notify.chrome
+        data:
+          url: /
+  - service: light.turn_on
+    entity_id: light.backdoor_porch
+    data:
+      brightness: 117
+  - delay: 00:00:10
+  - repeat:
+      for_each:
+      - 90
+      - 78
+      - 66
+      - 54
+      - 42
+      sequence:
+      - action: light.turn_on
+        target:
+          entity_id: light.backdoor_porch
+        data:
+          brightness: '{{ repeat.item }}'
+      - delay: 00:00:01
+  - service: light.turn_on
+    entity_id: light.backdoor_porch
+    data:
+      brightness: 30
+  - delay: 00:00:05
+  - service: light.turn_off
+    entity_id: light.backdoor_porch

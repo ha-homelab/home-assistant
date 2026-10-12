@@ -1,0 +1,36 @@
+# HA runs in OCI. Emit the broadcast on the home LAN through a restricted SSH key.
+shell_command:
+  living_room_tv_wake: >-
+    /usr/bin/ssh -T -i /config/.ssh/living_room_tv_wol
+    -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes
+    -o UserKnownHostsFile=/config/.ssh/living_room_tv_wol_known_hosts
+    -o HostKeyAlias=living-room-tv-wol
+    -o ConnectTimeout=5 -o ConnectionAttempts=1
+    -o ServerAliveInterval=5 -o ServerAliveCountMax=1
+    alvit@syn wake-living-room-tv
+
+automation:
+  - id: living_room_tv_wake_on_lan
+    alias: Living room TV - wake over Ethernet
+    description: Turn-on requests wake the wired LG through the home LAN relay.
+    mode: single
+    max_exceeded: silent
+    triggers:
+      - trigger: webostv.turn_on
+        entity_id: media_player.living_room_tv_77
+    actions:
+      - action: shell_command.living_room_tv_wake
+        response_variable: wake_result
+      - if: "{{ wake_result.returncode != 0 }}"
+        then:
+          - stop: The home LAN Wake-on-LAN relay failed; inspect the shell command response.
+            error: true
+      - wait_template: >-
+          {{ states('media_player.living_room_tv_77') not in
+             ['off', 'unavailable', 'unknown'] }}
+        timeout: "00:00:45"
+        continue_on_timeout: true
+      - if: "{{ not wait.completed }}"
+        then:
+          - stop: The LG TV did not confirm power-on within 45 seconds.
+            error: true

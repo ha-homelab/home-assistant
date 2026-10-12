@@ -1,0 +1,500 @@
+"""Target-only ZHA quirk; enable mode 4 only with the patched runtime image.
+
+Derived from the pinned upstream generated quirk. Do not load alongside another
+custom quirk registering mrpevh8p / TS0041-TB. See docs/home-assistant.md.
+"""
+from typing import Final
+
+from zhaquirks import CustomCluster
+from zigpy.quirks.v2 import QuirkBuilder, ReportingConfig, SensorDeviceClass, EntityType
+from zigpy.zcl import ClusterType, foundation
+from zigpy.zcl.clusters.general import OnOffConfiguration, SwitchType, MultistateInput, OnOff, Basic
+from zigpy.zcl.clusters.closures import WindowCovering
+from zigpy.zcl.foundation import ZCLAttributeDef
+import zigpy.types as t
+
+class RelayMode(t.enum8):
+    Detached = 0x00
+    PressStart = 0x01
+    LongPress = 0x02
+    ShortPress = 0x03
+
+class BindedMode(t.enum8):
+    PressStart = 0x01
+    LongPress = 0x02
+    ShortPress = 0x03
+    ShortPressLongOff = 0x04
+
+class SwitchActions(t.enum8):
+    OnOff = 0x00
+    OffOn = 0x01
+    ToggleSimple = 0x02
+    ToggleSmartSync = 0x03
+    ToggleSmartOpposite = 0x04
+
+
+class SwitchType(t.enum8):
+    Toggle = 0x00
+    Momentary = 0x01
+    Momentary_NC = 0x02
+
+
+class CoverSwitchType(t.enum8):
+    Toggle = 0x00
+    Momentary = 0x01
+
+
+class CoverSwitchMode(t.enum8):
+    Immediate = 0x00
+    ShortPress = 0x01
+    LongPress = 0x02
+    Hybrid = 0x03
+
+
+class CustomOnOffConfigurationCluster(CustomCluster, OnOffConfiguration):
+
+    class AttributeDefs(OnOffConfiguration.AttributeDefs):
+        """Attribute Definitions."""
+
+        switch_mode = ZCLAttributeDef(
+            id=0xff00,
+            type=SwitchType,
+            access="rw",
+            is_manufacturer_specific=False,
+        )
+
+        relay_mode = ZCLAttributeDef(
+            id=0xff01,
+            type=RelayMode,
+            access="rw",
+            is_manufacturer_specific=False,
+        )
+
+        relay_index = ZCLAttributeDef(
+            id=0xff02,
+            type=t.uint8_t,
+            access="rw",
+            is_manufacturer_specific=False,
+        )
+
+        long_press_duration = ZCLAttributeDef(
+            id=0xff03,
+            type=t.uint16_t,
+            access="rw",
+            is_manufacturer_specific=False,
+        )
+
+        level_move_rate = ZCLAttributeDef(
+            id=0xff04,
+            type=t.uint8_t,
+            access="rw",
+            is_manufacturer_specific=False,
+        )
+
+        binded_mode = ZCLAttributeDef(
+            id=0xff05,
+            type=BindedMode,
+            access="rw",
+            is_manufacturer_specific=False,
+        )
+
+
+class CustomMultistateInputCluster(CustomCluster, MultistateInput):
+
+    class AttributeDefs(foundation.BaseAttributeDefs):
+        present_value: Final = ZCLAttributeDef(
+            id=0x0055, type=t.uint16_t, access="r*w", mandatory=True
+        )
+        cluster_revision: Final = foundation.ZCL_CLUSTER_REVISION_ATTR
+        reporting_status: Final = foundation.ZCL_REPORTING_STATUS_ATTR
+
+
+class CustomBasicCluster(CustomCluster, Basic):
+
+    class AttributeDefs(foundation.BaseAttributeDefs):
+
+        networkIndicator = ZCLAttributeDef(
+            id=0xff01,
+            type=t.Bool,
+            access="rw",
+            is_manufacturer_specific=False,
+        )
+
+        multi_press_reset_count = ZCLAttributeDef(
+            id=0xff02,
+            type=t.uint8_t,
+            access="rw",
+            is_manufacturer_specific=False,
+        )
+
+
+class RelayIndicatorMode(t.enum8):
+    Same = 0x00
+    Opposite = 0x01
+    Manual = 0x02
+
+
+class OnOffWithIndicatorCluster(CustomCluster, OnOff):
+
+    class AttributeDefs(OnOff.AttributeDefs):
+        led_mode: Final = ZCLAttributeDef(
+            id=0xff01,
+            type=RelayIndicatorMode,
+            access="rw",
+            is_manufacturer_specific=False,
+        )
+        led_state: Final = ZCLAttributeDef(
+            id=0xff02,
+            type=t.Bool,
+            access="rw",
+            is_manufacturer_specific=False,
+        )
+
+
+class CoverMoving(t.enum8):
+    Stopped = 0x00
+    Opening = 0x01
+    Closing = 0x02
+
+
+class CustomCoverSwitchCluster(CustomCluster):
+    cluster_id = 0xFC01
+
+    class AttributeDefs(foundation.BaseAttributeDefs):
+        switch_type = ZCLAttributeDef(
+            id=0x0000,
+            type=CoverSwitchType,
+            access="rw",
+            is_manufacturer_specific=True,
+        )
+
+        cover_index = ZCLAttributeDef(
+            id=0x0001,
+            type=t.uint8_t,
+            access="rw",
+            is_manufacturer_specific=True,
+        )
+
+        reversal = ZCLAttributeDef(
+            id=0x0002,
+            type=t.Bool,
+            access="rw",
+            is_manufacturer_specific=True,
+        )
+
+        local_mode = ZCLAttributeDef(
+            id=0x0003,
+            type=CoverSwitchMode,
+            access="rw",
+            is_manufacturer_specific=True,
+        )
+
+        binded_mode = ZCLAttributeDef(
+            id=0x0004,
+            type=CoverSwitchMode,
+            access="rw",
+            is_manufacturer_specific=True,
+        )
+
+        long_press_duration = ZCLAttributeDef(
+            id=0x0005,
+            type=t.uint16_t,
+            access="rw",
+            is_manufacturer_specific=True,
+        )
+
+        cluster_revision: Final = foundation.ZCL_CLUSTER_REVISION_ATTR
+        reporting_status: Final = foundation.ZCL_REPORTING_STATUS_ATTR
+
+
+class CustomWindowCoveringCluster(CustomCluster, WindowCovering):
+
+    class AttributeDefs(WindowCovering.AttributeDefs):
+        moving = ZCLAttributeDef(
+            id=0xff00,
+            type=CoverMoving,
+            access="r",
+            is_manufacturer_specific=False,
+        )
+
+        motor_reversal = ZCLAttributeDef(
+            id=0xff01,
+            type=t.Bool,
+            access="rw",
+            is_manufacturer_specific=False,
+        )
+
+# This deployment wrapper intentionally registers only the supported button.
+# Keep other upstream development registrations out of this runtime file.
+
+# Only this target implements the custom mode in the supported image.
+CONFIGS = ["mrpevh8p;TS0041-TB;BB4d;SB5u;ID2;BTB5;M;"]
+
+for config in CONFIGS:
+    zb_manufacturer, zb_model, *peripherals = config.rstrip(";").split(";")
+
+    relay_cnt = 0
+    switch_cnt = 0
+    indicators_cnt = 0
+    cover_switch_cnt = 0
+    cover_cnt = 0
+    has_dedicated_net_led = False
+    for peripheral in peripherals:
+        if peripheral == "SLP":
+            continue
+        if peripheral[0] == "R":
+            relay_cnt += 1
+        if peripheral[0] == 'S':
+            switch_cnt += 1
+        if peripheral[0] == 'X':
+            cover_switch_cnt += 1
+        if peripheral[0] == 'C':
+            cover_cnt += 1
+        if peripheral[0] == 'I':
+            indicators_cnt += 1
+        if peripheral[0] == 'L':
+            has_dedicated_net_led = True
+
+    builder =  QuirkBuilder(zb_manufacturer, zb_model)
+
+    for endpoint_id in range(1, switch_cnt + 1):
+        builder = (
+            builder
+            .removes(OnOffConfiguration.cluster_id, cluster_type=ClusterType.Client, endpoint_id=endpoint_id)
+            .adds(CustomOnOffConfigurationCluster, endpoint_id=endpoint_id)
+            .removes(MultistateInput.cluster_id, cluster_type=ClusterType.Client, endpoint_id=endpoint_id)
+            .adds(CustomMultistateInputCluster, endpoint_id=endpoint_id)
+            .enum(
+                CustomOnOffConfigurationCluster.AttributeDefs.switch_actions.name,
+                SwitchActions,
+                CustomOnOffConfigurationCluster.cluster_id,
+                translation_key="switch_actions_"+str(endpoint_id),
+                fallback_name="Switch actions "+str(endpoint_id),
+                endpoint_id=endpoint_id,
+                # Next is hack to force binding to make all attrs values visible.
+                # TODO: find a better approach
+                reporting_config=ReportingConfig(min_interval=0, max_interval=300, reportable_change=1),
+            )
+            .enum(
+                CustomOnOffConfigurationCluster.AttributeDefs.switch_mode.name,
+                SwitchType,
+                CustomOnOffConfigurationCluster.cluster_id,
+                translation_key="switch_mode_"+str(endpoint_id),
+                fallback_name="Switch mode "+str(endpoint_id),
+                endpoint_id=endpoint_id,
+            )
+            .enum(
+                CustomOnOffConfigurationCluster.AttributeDefs.relay_mode.name,
+                RelayMode,
+                CustomOnOffConfigurationCluster.cluster_id,
+                translation_key="relay_mode_"+str(endpoint_id),
+                fallback_name="Relay mode "+str(endpoint_id),
+                endpoint_id=endpoint_id,
+            )
+            .number(
+                CustomOnOffConfigurationCluster.AttributeDefs.relay_index.name,
+                CustomOnOffConfigurationCluster.cluster_id,
+                translation_key="relay_index_"+str(endpoint_id),
+                fallback_name="Relay index "+str(endpoint_id),
+                min_value=1,
+                max_value=relay_cnt,
+                step=1,
+                endpoint_id=endpoint_id,
+            )
+            .enum(
+                CustomOnOffConfigurationCluster.AttributeDefs.binded_mode.name,
+                BindedMode,
+                CustomOnOffConfigurationCluster.cluster_id,
+                translation_key="binded_mode_"+str(endpoint_id),
+                fallback_name="Binded mode "+str(endpoint_id),
+                endpoint_id=endpoint_id,
+            )
+            .number(
+                CustomOnOffConfigurationCluster.AttributeDefs.long_press_duration.name,
+                CustomOnOffConfigurationCluster.cluster_id,
+                translation_key="long_press_duration_"+str(endpoint_id),
+                fallback_name="Long press mode "+str(endpoint_id),
+                min_value=0,
+                max_value=5000,
+                step=1,
+                endpoint_id=endpoint_id,
+            )
+            .number(
+                CustomOnOffConfigurationCluster.AttributeDefs.level_move_rate.name,
+                CustomOnOffConfigurationCluster.cluster_id,
+                translation_key="level_move_rate_"+str(endpoint_id),
+                fallback_name="Level move rate "+str(endpoint_id),
+                min_value=1,
+                max_value=255,
+                step=1,
+                endpoint_id=endpoint_id,
+            )
+            .sensor(
+                MultistateInput.AttributeDefs.present_value.name,
+                MultistateInput.cluster_id,
+                translation_key="press_action_"+str(endpoint_id),
+                fallback_name="Press action "+str(endpoint_id),
+                endpoint_id=endpoint_id,
+                reporting_config=ReportingConfig(min_interval=0, max_interval=300, reportable_change=1),
+                device_class=SensorDeviceClass.ENUM,
+                attribute_converter = lambda x: {0: "released", 1: "press", 2: "long_press", 3: "position_on", 4: "position_off"}[int(x)]
+            )
+        )
+    for endpoint_id in range(switch_cnt + 1, switch_cnt + min(relay_cnt, indicators_cnt) + 1):
+        builder = (
+            builder
+            .removes(OnOff.cluster_id, cluster_type=ClusterType.Client, endpoint_id=endpoint_id)
+            .adds(OnOffWithIndicatorCluster, endpoint_id=endpoint_id)
+            .enum(
+                OnOffWithIndicatorCluster.AttributeDefs.led_mode.name,
+                RelayIndicatorMode,
+                OnOffWithIndicatorCluster.cluster_id,
+                translation_key="relay_led_mode_"+str(endpoint_id),
+                fallback_name="Relay Led mode "+str(endpoint_id),
+                endpoint_id=endpoint_id
+            )
+            .switch(
+                OnOffWithIndicatorCluster.AttributeDefs.led_state.name,
+                OnOffWithIndicatorCluster.cluster_id,
+                translation_key="relay_led_state_"+str(endpoint_id),
+                fallback_name="Relay led state "+str(endpoint_id),
+                endpoint_id=endpoint_id,
+                reporting_config=ReportingConfig(
+                    min_interval=0, max_interval=300, reportable_change=1
+                ),
+            )
+        )
+
+    for endpoint_id in range(switch_cnt + relay_cnt + 1, switch_cnt + relay_cnt + cover_switch_cnt + 1):
+        builder = (
+            builder
+            .adds(CustomCoverSwitchCluster, endpoint_id=endpoint_id)
+            .removes(MultistateInput.cluster_id, cluster_type=ClusterType.Client, endpoint_id=endpoint_id)
+            .adds(CustomMultistateInputCluster, endpoint_id=endpoint_id)
+            .enum(
+                CustomCoverSwitchCluster.AttributeDefs.switch_type.name,
+                CoverSwitchType,
+                CustomCoverSwitchCluster.cluster_id,
+                translation_key="cover_switch_type_"+str(endpoint_id),
+                fallback_name="Cover switch type "+str(endpoint_id),
+                endpoint_id=endpoint_id,
+                entity_type=EntityType.CONFIG,
+            )
+            .number(
+                CustomCoverSwitchCluster.AttributeDefs.cover_index.name,
+                CustomCoverSwitchCluster.cluster_id,
+                translation_key="cover_switch_cover_index_"+str(endpoint_id),
+                fallback_name="Cover switch cover index "+str(endpoint_id),
+                min_value=0,
+                max_value=cover_cnt,
+                step=1,
+                endpoint_id=endpoint_id,
+                entity_type=EntityType.CONFIG,
+            )
+            .switch(
+                CustomCoverSwitchCluster.AttributeDefs.reversal.name,
+                CustomCoverSwitchCluster.cluster_id,
+                translation_key="cover_switch_reversal_"+str(endpoint_id),
+                fallback_name="Cover switch reversal "+str(endpoint_id),
+                endpoint_id=endpoint_id,
+                entity_type=EntityType.CONFIG,
+            )
+            .enum(
+                CustomCoverSwitchCluster.AttributeDefs.local_mode.name,
+                CoverSwitchMode,
+                CustomCoverSwitchCluster.cluster_id,
+                translation_key="cover_switch_local_mode_"+str(endpoint_id),
+                fallback_name="Cover switch local mode "+str(endpoint_id),
+                endpoint_id=endpoint_id,
+                entity_type=EntityType.CONFIG,
+            )
+            .enum(
+                CustomCoverSwitchCluster.AttributeDefs.binded_mode.name,
+                CoverSwitchMode,
+                CustomCoverSwitchCluster.cluster_id,
+                translation_key="cover_switch_binded_mode_"+str(endpoint_id),
+                fallback_name="Cover switch binded mode "+str(endpoint_id),
+                endpoint_id=endpoint_id,
+                entity_type=EntityType.CONFIG,
+            )
+            .number(
+                CustomCoverSwitchCluster.AttributeDefs.long_press_duration.name,
+                CustomCoverSwitchCluster.cluster_id,
+                translation_key="cover_switch_long_press_duration_"+str(endpoint_id),
+                fallback_name="Cover switch long press duration "+str(endpoint_id),
+                min_value=0,
+                max_value=5000,
+                step=1,
+                endpoint_id=endpoint_id,
+                entity_type=EntityType.CONFIG,
+            )
+            .sensor(
+                MultistateInput.AttributeDefs.present_value.name,
+                MultistateInput.cluster_id,
+                translation_key="cover_switch_press_action_"+str(endpoint_id),
+                fallback_name="Cover switch press action "+str(endpoint_id),
+                endpoint_id=endpoint_id,
+                reporting_config=ReportingConfig(min_interval=0, max_interval=300, reportable_change=1),
+                device_class=SensorDeviceClass.ENUM,
+                attribute_converter = lambda x: {0: "released", 1: "open", 2: "close", 3: "stop", 4: "long_open", 5: "long_close"}[int(x)],
+                entity_type=EntityType.DIAGNOSTIC,
+            )
+        )
+
+    for endpoint_id in range(switch_cnt + relay_cnt + cover_switch_cnt + 1, switch_cnt + relay_cnt + cover_switch_cnt + cover_cnt + 1):
+        builder = (
+            builder
+            .removes(WindowCovering.cluster_id, cluster_type=ClusterType.Client, endpoint_id=endpoint_id)
+            .adds(CustomWindowCoveringCluster, endpoint_id=endpoint_id)
+            .sensor(
+                CustomWindowCoveringCluster.AttributeDefs.moving.name,
+                CustomWindowCoveringCluster.cluster_id,
+                translation_key="cover_moving_"+str(endpoint_id),
+                fallback_name="Cover moving "+str(endpoint_id),
+                endpoint_id=endpoint_id,
+                reporting_config=ReportingConfig(min_interval=0, max_interval=300, reportable_change=1),
+                device_class=SensorDeviceClass.ENUM,
+                attribute_converter = lambda x: {0: "stopped", 1: "opening", 2: "closing"}[int(x)],
+                entity_type=EntityType.DIAGNOSTIC,
+            )
+            .switch(
+                CustomWindowCoveringCluster.AttributeDefs.motor_reversal.name,
+                CustomWindowCoveringCluster.cluster_id,
+                translation_key="cover_motor_reversal_"+str(endpoint_id),
+                fallback_name="Cover motor reversal "+str(endpoint_id),
+                endpoint_id=endpoint_id,
+                entity_type=EntityType.CONFIG,
+            )
+        )
+
+    builder = (
+        builder
+        .removes(Basic.cluster_id, cluster_type=ClusterType.Client, endpoint_id=1)
+        .adds(CustomBasicCluster, endpoint_id=1)
+        .number(
+            CustomBasicCluster.AttributeDefs.multi_press_reset_count.name,
+            CustomBasicCluster.cluster_id,
+            translation_key="multi_press_reset_count",
+            fallback_name="Multi press reset count",
+            min_value=0,
+            max_value=255,
+            step=1,
+            endpoint_id=1,
+            entity_type=EntityType.CONFIG,
+        )
+    )
+
+    if has_dedicated_net_led:
+        builder = (
+            builder
+            .switch(
+                CustomBasicCluster.AttributeDefs.networkIndicator.name,
+                CustomBasicCluster.cluster_id,
+                translation_key="network_indicator",
+                fallback_name="Network indicator",
+                endpoint_id=1,
+                entity_type=EntityType.CONFIG,
+            )
+        )
+
+    builder.add_to_registry()

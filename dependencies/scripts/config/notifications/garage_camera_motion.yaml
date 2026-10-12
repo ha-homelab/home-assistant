@@ -1,0 +1,44 @@
+# Stable entity: script.garagemotion
+# Take a garage-camera snapshot and notify desktops; send browser notifications between 09:05 and 23:00.
+# Keep the time condition after the snapshot and desktop notifications so those actions remain unconditional.
+garagemotion:
+  alias: 'Garage camera: send motion notifications'
+  description: Take a garage-camera snapshot and notify desktops; send browser notifications between 09:05
+    and 23:00.
+  icon: mdi:cctv
+  mode: single
+  sequence:
+  - action: script.capture_camera_alert
+    data:
+      camera_key: garage
+  - action: script.notify_optional
+    data:
+      notify_service: notify.roomba
+      notify_data:
+        title: Garage
+        message: Motion detected
+        data:
+          displaytime: 20000
+          icon: warning
+  - action: script.notify_optional
+    data:
+      notify_service: notify.imac21
+      notify_data:
+        title: Garage
+        message: Motion detected
+        data:
+          displaytime: 20000
+          icon: warning
+  - condition: time
+    after: 09:05:00
+    before: '23:00:00'
+  - action: script.notify_optional
+    data:
+      notify_service: html5.send_message
+      notify_data:
+        message: garage Motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+        entity_id: notify.chrome
+        icon: /local/garage_camera_alert.jpg?{{ as_timestamp(now()) }}
+        image: /local/garage_camera_alert.jpg?{{ as_timestamp(now()) }}
+        data:
+          url: /local/garage_camera_alert.jpg?{{ as_timestamp(now()) }}

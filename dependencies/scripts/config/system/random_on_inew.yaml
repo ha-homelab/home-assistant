@@ -1,0 +1,9 @@
+# Stable entity: script.random_on_inew
+# Invoke the existing shell_command.random_on_inew helper; its implementation remains in the main configuration.
+random_on_inew:
+  alias: 'iNew: run random playback command'
+  description: Invoke the existing shell_command.random_on_inew helper; its implementation remains in the main configuration.
+  icon: mdi:shuffle
+  mode: single
+  sequence:
+    - service: shell_command.random_on_inew

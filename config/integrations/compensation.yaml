@@ -1,0 +1,29 @@
+# Existing voltage-to-SoC calibration. Canonical system SoC remains supplied by Venus OS.
+battery_soc_percent:
+  unique_id: battery_soc_percent
+  source: sensor.battery_voltage
+  unit_of_measurement: '%'
+  degree: 5
+  data_points:
+    - - 54.4
+      - 100
+    - - 53.6
+      - 90
+    - - 53.1
+      - 80
+    - - 52.8
+      - 70
+    - - 52.3
+      - 60
+    - - 52.2
+      - 50
+    - - 52.0
+      - 40
+    - - 51.5
+      - 30
+    - - 51.2
+      - 20
+    - - 48.0
+      - 10
+    - - 40
+      - 0

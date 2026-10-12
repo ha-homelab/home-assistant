@@ -1,0 +1,75 @@
+# A pending command belongs to one water automation run, never to a standing
+# desired state. Completion/timeout/reload discards it; later manual Flo closures
+# are not undone. New requests replace old requests before any valve action.
+script:
+  water_valve_after_pump:
+    alias: 'Water: finish the valve command after pump switching'
+    description: Wait briefly for an unavailable Flo valve while the original water intent and KMC pump-power state remain valid.
+    mode: restart
+    fields:
+      pump_state:
+        required: true
+        selector:
+          select:
+            options: ['on', 'off']
+      valve_state:
+        required: true
+        selector:
+          select:
+            options: ['on', 'off']
+      min_cm:
+        description: Exclusive lower water limit; omit when the source rule has none.
+        selector:
+          number:
+            min: 0
+            max: 100
+      max_cm:
+        description: Exclusive upper water limit; omit when the source rule has none.
+        selector:
+          number:
+            min: 0
+            max: 100
+    sequence:
+      - variables:
+          lower_limit: '{{ min_cm | default(none) }}'
+          upper_limit: '{{ max_cm | default(none) }}'
+      - condition: template
+        value_template: >-
+          {{ pump_state in ['on', 'off'] and valve_state in ['on', 'off'] }}
+      # Pump switch services can complete before their state acknowledgement.
+      # This wait never sends another pump command.
+      - wait_template: >-
+          {% set level = states('sensor.water_cm') | float(none) %}
+          {{ is_state('switch.pump_power_enable', pump_state)
+             or not is_number(states('sensor.water_cm'))
+             or (lower_limit is not none and level <= lower_limit)
+             or (upper_limit is not none and level >= upper_limit) }}
+        timeout: '00:00:15'
+        continue_on_timeout: false
+      - condition: template
+        value_template: &command_still_valid >-
+          {% set level = states('sensor.water_cm') | float(none) %}
+          {{ is_number(states('sensor.water_cm'))
+             and (lower_limit is none or level > lower_limit)
+             and (upper_limit is none or level < upper_limit)
+             and is_state('switch.pump_power_enable', pump_state) }}
+      # Wake on either availability or cancellation; no periodic polling.
+      - wait_template: >-
+          {% set level = states('sensor.water_cm') | float(none) %}
+          {{ states('switch.shutoff_valve') in ['on', 'off']
+             or not is_state('switch.pump_power_enable', pump_state)
+             or not is_number(states('sensor.water_cm'))
+             or (lower_limit is not none and level <= lower_limit)
+             or (upper_limit is not none and level >= upper_limit) }}
+        timeout: '00:05:00'
+        continue_on_timeout: false
+      - condition: template
+        value_template: *command_still_valid
+      - condition: template
+        value_template: >-
+          {{ states('switch.shutoff_valve') in ['on', 'off']
+             and not is_state('switch.shutoff_valve', valve_state) }}
+      # Exactly one attempt. A later manual/safety closure is never retried.
+      - action: 'switch.turn_{{ valve_state }}'
+        target:
+          entity_id: switch.shutoff_valve

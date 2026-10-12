@@ -1,0 +1,39 @@
+# Self-consumption: Start the large heater on high surplus power.
+# Stable entity: automation.power_below_725_heater_hard_start.
+- id: ha_homelab_self_consumption_start_the_large_heater_on_high_surplus_power
+  alias: 'Self-consumption: Start the large heater on high surplus power'
+  description: Start the large heater on high surplus power. Responds to sensor.home_123_1s below -725; or sensor.home_123_1s
+    below -825; or sensor.home_123_1s below -925; or sensor.home_123_1s below -1025. Runs only when all configured
+    guards pass.
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    below: -725
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    below: -825
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    below: -925
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    below: -1025
+  conditions:
+  - condition: state
+    entity_id: input_boolean.self_consuming
+    state: 'on'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: switch.switch06
+      state: 'on'
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.switch06
+  - service: script.notify
+    data:
+      message: Power below 725 heater hard start
+    continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

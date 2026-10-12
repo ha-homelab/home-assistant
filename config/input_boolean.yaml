@@ -1,0 +1,72 @@
+# Home Assistant configuration; retain stable entity identifiers.
+away:
+  icon: mdi:briefcase
+  initial: false
+  name: Away
+bath_warmer_sticky:
+  icon: mdi:bed-empty
+  initial: false
+  name: Bath warmer sticky
+bathroom_sticky:
+  icon: mdi:water-pump
+  name: Bathroom sticky
+bedroom_sticky:
+  icon: mdi:bed-empty
+  name: Bedroom sticky
+curtains_sticky:
+  icon: mdi:curtains
+  name: Curtains sticky
+dining_room_sticky:
+  icon: mdi:rice
+  name: Dining room sticky
+hallway_sticky:
+  icon: mdi:logout
+  name: Hallway sticky
+kitchen_sticky:
+  icon: mdi:food-variant
+  name: Kitchen sticky
+living_room_sticky:
+  icon: mdi:sofa
+  name: Living room sticky
+lobby_sticky:
+  icon: mdi:logout
+  name: Lobby sticky
+mishka_room_sticky:
+  icon: mdi:bed-empty
+  name: Mishka room sticky
+modern_self_consuming:
+  icon: mdi:briefcase
+  initial: false
+  name: Modern self-consuming
+notifications_off:
+  icon: mdi:volume-mute
+  initial: false
+  name: Notifications off
+pge:
+  icon: mdi:briefcase
+  name: PGE
+porch_sticky:
+  icon: mdi:gate
+  name: Porch sticky
+self_consuming:
+  icon: mdi:briefcase
+  initial: false
+  name: Self-consuming
+silent_mode:
+  icon: mdi:volume-mute
+  initial: false
+  name: Silent mode
+studio_sticky:
+  icon: mdi:bed-empty
+  name: Studio sticky
+summer:
+  icon: mdi:briefcase
+  name: Summer
+winter:
+  icon: mdi:briefcase
+  name: Winter
+
+# Operator-selected island operation. No initial value: restore the previous state.
+off_grid_mode:
+  name: Off-grid mode
+  icon: mdi:transmission-tower-off

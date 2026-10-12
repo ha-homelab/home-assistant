@@ -1,0 +1,686 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: github-actions-ha-ci
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/enforce-version: v1.31
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: runner
+  namespace: github-actions-ha-ci
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: runner-hooks
+  namespace: github-actions-ha-ci
+data:
+  cleanup-docker.sh: |
+    #!/bin/bash
+    set -euo pipefail
+    # This daemon belongs to one runner and executes one job at a time.
+    # A pre-job pass also catches containers left by cancellation or a runner crash.
+    if [ "${1:-}" != --cleanup ]; then
+      exec timeout --kill-after=10 90 /bin/bash "$0" --cleanup
+    fi
+    containers=$(docker container ls --all --quiet)
+    if [ -n "$containers" ]; then
+      mapfile -t ids <<< "$containers"
+      docker container rm --force --volumes "${ids[@]}"
+    fi
+    docker volume prune --all --force
+    docker network prune --force
+    # Images, toolchains and package caches deliberately survive job cleanup.
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: runner
+  namespace: github-actions-ha-ci
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress: []
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+        except:
+        - 10.0.0.0/8
+        - 100.64.0.0/10
+        - 127.0.0.0/8
+        - 169.254.0.0/16
+        - 172.16.0.0/12
+        - 192.168.0.0/16
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ha-ci-1-registration
+  namespace: github-actions-ha-ci
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ha-ci-1-cache
+  namespace: github-actions-ha-ci
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 32Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ha-ci-1
+  namespace: github-actions-ha-ci
+spec:
+  replicas: 0
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: ha-ci-1
+  template:
+    metadata:
+      labels:
+        app: ha-ci-1
+    spec:
+      serviceAccountName: runner
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/hostname: mp
+        kubernetes.io/arch: amd64
+      terminationGracePeriodSeconds: 120
+      containers:
+      - name: runner
+        image: myoung34/github-runner@sha256:1ca564764476565296c8e05b44afe593914228bed00c4fbbc40bf5c3388e673b
+        imagePullPolicy: IfNotPresent
+        workingDir: /actions-runner
+        command:
+        - /usr/bin/dumb-init
+        - --
+        - /bin/bash
+        - -c
+        args:
+        - "set -euo pipefail\numask 077\n# Use the official mirrors over HTTPS; HTTP\
+          \ times out on this network.\nfor apt_source in /etc/apt/sources.list /etc/apt/sources.list.d/*.list\
+          \ /etc/apt/sources.list.d/*.sources; do\n  [ -f \"$apt_source\" ] || continue\n\
+          \  sed -i 's|http://archive\\.ubuntu\\.com/ubuntu|https://archive.ubuntu.com/ubuntu|g;s|http://security\\\
+          .ubuntu\\.com/ubuntu|https://security.ubuntu.com/ubuntu|g' \"$apt_source\"\
+          \ndone\nchown -R runner:runner /home/runner /opt/hostedtoolcache /runner/_work\n\
+          for attempt in $(seq 1 60); do\n  if timeout 5 docker info >/dev/null 2>&1;\
+          \ then break; fi\n  sleep 2\ndone\ntimeout 5 docker info >/dev/null\nexec\
+          \ /bin/bash /entrypoint.sh /bin/bash -c 'set -euo pipefail; chmod 0700 /runner-registration;\
+          \ find /runner-registration -type f -exec chmod 0600 {} +; exec ./run.sh'\n"
+        env:
+        - name: HOME
+          value: /home/runner
+        - name: ORG_NAME
+          value: ha-homelab
+        - name: RUNNER_SCOPE
+          value: org
+        - name: RUNNER_NAME
+          value: mp-ha-ci-1-k3s
+        - name: RUNNER_GROUP
+          value: Default
+        - name: LABELS
+          value: k3s,mp,ha-homelab,private-ci
+        - name: RUN_AS_ROOT
+          value: 'false'
+        - name: START_DOCKER_SERVICE
+          value: 'false'
+        - name: RUNNER_WORKDIR
+          value: /runner/_work
+        - name: CONFIGURED_ACTIONS_RUNNER_FILES_DIR
+          value: /runner-registration
+        - name: DISABLE_AUTOMATIC_DEREGISTRATION
+          value: 'true'
+        - name: UNSET_CONFIG_VARS
+          value: 'true'
+        - name: DOCKER_HOST
+          value: unix:///var/run/docker/docker.sock
+        - name: RUNNER_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: runner-bootstrap
+              key: RUNNER_TOKEN
+              optional: true
+        - name: ACTIONS_RUNNER_HOOK_JOB_STARTED
+          value: /opt/runner-hooks/cleanup-docker.sh
+        - name: ACTIONS_RUNNER_HOOK_JOB_COMPLETED
+          value: /opt/runner-hooks/cleanup-docker.sh
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 3000m
+            memory: 3Gi
+            ephemeral-storage: 24Gi
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - test -s /runner-registration/.runner && pgrep -x Runner.Listener >/dev/null
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 10
+        volumeMounts:
+        - name: registration
+          mountPath: /runner-registration
+        - name: work
+          mountPath: /runner/_work
+        - name: cache
+          mountPath: /home/runner
+          subPath: home
+        - name: cache
+          mountPath: /opt/hostedtoolcache
+          subPath: toolcache
+        - name: tmp
+          mountPath: /tmp
+        - name: docker-socket
+          mountPath: /var/run/docker
+        - name: runner-hooks
+          mountPath: /opt/runner-hooks
+          readOnly: true
+      - name: docker
+        image: myoung34/github-runner@sha256:1ca564764476565296c8e05b44afe593914228bed00c4fbbc40bf5c3388e673b
+        securityContext:
+          privileged: true
+        command:
+        - /usr/bin/dumb-init
+        - --
+        - /bin/bash
+        - -c
+        args:
+        - "set -euo pipefail\ncontainer_cgroup=$(sed -n 's/^0:://p' /proc/self/cgroup)\n\
+          pod_cgroup=${container_cgroup%/*}\ncase \"$pod_cgroup\" in\n  /kubepods.slice/*/kubepods-*-pod*.slice)\
+          \ ;;\n  *) echo 'Expected a cgroup v2 Kubernetes pod parent' >&2; exit 1\
+          \ ;;\nesac\nread -r quota period < \"/sys/fs/cgroup${pod_cgroup}/cpu.max\"\
+          \n[ \"$quota\" != max ] || { echo 'Pod CPU limit is required' >&2; exit\
+          \ 1; }\nexec dockerd --host=unix:///var/run/docker/docker.sock --group=121\
+          \   --storage-driver=overlay2 --mtu=1200 --log-level=warn   --exec-opt=native.cgroupdriver=cgroupfs\
+          \ --cgroup-parent=\"$pod_cgroup\"\n"
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 3Gi
+            ephemeral-storage: 28Gi
+        volumeMounts:
+        - name: docker-socket
+          mountPath: /var/run/docker
+        - name: cache
+          mountPath: /var/lib/docker
+          subPath: docker
+        - name: work
+          mountPath: /runner/_work
+      volumes:
+      - name: registration
+        persistentVolumeClaim:
+          claimName: ha-ci-1-registration
+      - name: work
+        emptyDir:
+          sizeLimit: 8Gi
+      - name: tmp
+        emptyDir:
+          sizeLimit: 2Gi
+      - name: docker-socket
+        emptyDir: {}
+      - name: cache
+        persistentVolumeClaim:
+          claimName: ha-ci-1-cache
+      - name: runner-hooks
+        configMap:
+          name: runner-hooks
+          defaultMode: 365
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ha-ci-2-registration
+  namespace: github-actions-ha-ci
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ha-ci-2-cache
+  namespace: github-actions-ha-ci
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 32Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ha-ci-2
+  namespace: github-actions-ha-ci
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: ha-ci-2
+  template:
+    metadata:
+      labels:
+        app: ha-ci-2
+    spec:
+      serviceAccountName: runner
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/hostname: mp
+        kubernetes.io/arch: amd64
+      terminationGracePeriodSeconds: 120
+      containers:
+      - name: runner
+        image: myoung34/github-runner@sha256:1ca564764476565296c8e05b44afe593914228bed00c4fbbc40bf5c3388e673b
+        imagePullPolicy: IfNotPresent
+        workingDir: /actions-runner
+        command:
+        - /usr/bin/dumb-init
+        - --
+        - /bin/bash
+        - -c
+        args:
+        - "set -euo pipefail\numask 077\n# Use the official mirrors over HTTPS; HTTP\
+          \ times out on this network.\nfor apt_source in /etc/apt/sources.list /etc/apt/sources.list.d/*.list\
+          \ /etc/apt/sources.list.d/*.sources; do\n  [ -f \"$apt_source\" ] || continue\n\
+          \  sed -i 's|http://archive\\.ubuntu\\.com/ubuntu|https://archive.ubuntu.com/ubuntu|g;s|http://security\\\
+          .ubuntu\\.com/ubuntu|https://security.ubuntu.com/ubuntu|g' \"$apt_source\"\
+          \ndone\nchown -R runner:runner /home/runner /opt/hostedtoolcache /runner/_work\n\
+          for attempt in $(seq 1 60); do\n  if timeout 5 docker info >/dev/null 2>&1;\
+          \ then break; fi\n  sleep 2\ndone\ntimeout 5 docker info >/dev/null\nexec\
+          \ /bin/bash /entrypoint.sh /bin/bash -c 'set -euo pipefail; chmod 0700 /runner-registration;\
+          \ find /runner-registration -type f -exec chmod 0600 {} +; exec ./run.sh'\n"
+        env:
+        - name: HOME
+          value: /home/runner
+        - name: ORG_NAME
+          value: ha-homelab
+        - name: RUNNER_SCOPE
+          value: org
+        - name: RUNNER_NAME
+          value: mp-ha-ci-2-k3s
+        - name: RUNNER_GROUP
+          value: Default
+        - name: LABELS
+          value: k3s,mp,ha-homelab,private-ci
+        - name: RUN_AS_ROOT
+          value: 'false'
+        - name: START_DOCKER_SERVICE
+          value: 'false'
+        - name: RUNNER_WORKDIR
+          value: /runner/_work
+        - name: CONFIGURED_ACTIONS_RUNNER_FILES_DIR
+          value: /runner-registration
+        - name: DISABLE_AUTOMATIC_DEREGISTRATION
+          value: 'true'
+        - name: UNSET_CONFIG_VARS
+          value: 'true'
+        - name: DOCKER_HOST
+          value: unix:///var/run/docker/docker.sock
+        - name: RUNNER_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: runner-bootstrap
+              key: RUNNER_TOKEN
+              optional: true
+        - name: ACTIONS_RUNNER_HOOK_JOB_STARTED
+          value: /opt/runner-hooks/cleanup-docker.sh
+        - name: ACTIONS_RUNNER_HOOK_JOB_COMPLETED
+          value: /opt/runner-hooks/cleanup-docker.sh
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 3000m
+            memory: 3Gi
+            ephemeral-storage: 24Gi
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - test -s /runner-registration/.runner && pgrep -x Runner.Listener >/dev/null
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 10
+        volumeMounts:
+        - name: registration
+          mountPath: /runner-registration
+        - name: work
+          mountPath: /runner/_work
+        - name: cache
+          mountPath: /home/runner
+          subPath: home
+        - name: cache
+          mountPath: /opt/hostedtoolcache
+          subPath: toolcache
+        - name: tmp
+          mountPath: /tmp
+        - name: docker-socket
+          mountPath: /var/run/docker
+        - name: runner-hooks
+          mountPath: /opt/runner-hooks
+          readOnly: true
+      - name: docker
+        image: myoung34/github-runner@sha256:1ca564764476565296c8e05b44afe593914228bed00c4fbbc40bf5c3388e673b
+        securityContext:
+          privileged: true
+        command:
+        - /usr/bin/dumb-init
+        - --
+        - /bin/bash
+        - -c
+        args:
+        - "set -euo pipefail\ncontainer_cgroup=$(sed -n 's/^0:://p' /proc/self/cgroup)\n\
+          pod_cgroup=${container_cgroup%/*}\ncase \"$pod_cgroup\" in\n  /kubepods.slice/*/kubepods-*-pod*.slice)\
+          \ ;;\n  *) echo 'Expected a cgroup v2 Kubernetes pod parent' >&2; exit 1\
+          \ ;;\nesac\nread -r quota period < \"/sys/fs/cgroup${pod_cgroup}/cpu.max\"\
+          \n[ \"$quota\" != max ] || { echo 'Pod CPU limit is required' >&2; exit\
+          \ 1; }\nexec dockerd --host=unix:///var/run/docker/docker.sock --group=121\
+          \   --storage-driver=overlay2 --mtu=1200 --log-level=warn   --exec-opt=native.cgroupdriver=cgroupfs\
+          \ --cgroup-parent=\"$pod_cgroup\"\n"
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 3Gi
+            ephemeral-storage: 28Gi
+        volumeMounts:
+        - name: docker-socket
+          mountPath: /var/run/docker
+        - name: cache
+          mountPath: /var/lib/docker
+          subPath: docker
+        - name: work
+          mountPath: /runner/_work
+      volumes:
+      - name: registration
+        persistentVolumeClaim:
+          claimName: ha-ci-2-registration
+      - name: work
+        emptyDir:
+          sizeLimit: 8Gi
+      - name: tmp
+        emptyDir:
+          sizeLimit: 2Gi
+      - name: docker-socket
+        emptyDir: {}
+      - name: cache
+        persistentVolumeClaim:
+          claimName: ha-ci-2-cache
+      - name: runner-hooks
+        configMap:
+          name: runner-hooks
+          defaultMode: 365
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: github-actions-ha-metadata
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: v1.31
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: runner
+  namespace: github-actions-ha-metadata
+automountServiceAccountToken: false
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: runner
+  namespace: github-actions-ha-metadata
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress: []
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+        except:
+        - 10.0.0.0/8
+        - 100.64.0.0/10
+        - 127.0.0.0/8
+        - 169.254.0.0/16
+        - 172.16.0.0/12
+        - 192.168.0.0/16
+    ports:
+    - protocol: TCP
+      port: 443
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ha-metadata-1-registration
+  namespace: github-actions-ha-metadata
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ha-metadata-1
+  namespace: github-actions-ha-metadata
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: ha-metadata-1
+  template:
+    metadata:
+      labels:
+        app: ha-metadata-1
+    spec:
+      serviceAccountName: runner
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/hostname: mp
+        kubernetes.io/arch: amd64
+      terminationGracePeriodSeconds: 120
+      containers:
+      - name: runner
+        image: myoung34/github-runner@sha256:1ca564764476565296c8e05b44afe593914228bed00c4fbbc40bf5c3388e673b
+        imagePullPolicy: IfNotPresent
+        workingDir: /actions-runner
+        command:
+        - /usr/bin/dumb-init
+        - --
+        - /bin/bash
+        - -c
+        args:
+        - "set -euo pipefail\numask 077\nmkdir -p /runner-registration/data\nif [\
+          \ ! -f /runner-registration/data/.runner ] && [ -f /runner-registration/.runner\
+          \ ]; then\n  cp -p /runner-registration/.[!.]* /runner-registration/data/\n\
+          fi\nchmod 0700 /runner-registration/data\nexec /bin/bash /entrypoint.sh\
+          \ /bin/bash -c 'set -euo pipefail; chmod 0700 /runner-registration/data;\
+          \ find /runner-registration/data -type f -exec chmod 0600 {} +; exec ./run.sh'\n"
+        env:
+        - name: HOME
+          value: /home/runner
+        - name: ORG_NAME
+          value: ha-homelab
+        - name: RUNNER_SCOPE
+          value: org
+        - name: RUNNER_NAME
+          value: mp-ha-metadata-1-k3s
+        - name: RUNNER_GROUP
+          value: Default
+        - name: LABELS
+          value: k3s,mp,ha-homelab,private-metadata
+        - name: RUN_AS_ROOT
+          value: 'false'
+        - name: START_DOCKER_SERVICE
+          value: 'false'
+        - name: RUNNER_WORKDIR
+          value: /runner/_work
+        - name: CONFIGURED_ACTIONS_RUNNER_FILES_DIR
+          value: /runner-registration/data
+        # Cold .NET startup on this 500m CPU pool can exceed the default 30s.
+        - name: GITHUB_ACTIONS_RUNNER_CHANNEL_TIMEOUT
+          value: '120'
+        - name: DISABLE_AUTOMATIC_DEREGISTRATION
+          value: 'true'
+        - name: UNSET_CONFIG_VARS
+          value: 'true'
+        - name: RUNNER_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: runner-bootstrap
+              key: RUNNER_TOKEN
+              optional: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+            ephemeral-storage: 4Gi
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - test -s /runner-registration/data/.runner && pgrep -x Runner.Listener
+              >/dev/null
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 10
+        volumeMounts:
+        - name: registration
+          mountPath: /runner-registration
+        - name: work
+          mountPath: /runner/_work
+        - name: home
+          mountPath: /home/runner
+        - name: toolcache
+          mountPath: /opt/hostedtoolcache
+        - name: tmp
+          mountPath: /tmp
+        - name: runtime
+          mountPath: /actions-runner
+          subPath: actions-runner
+        securityContext: &id001
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: registration
+        persistentVolumeClaim:
+          claimName: ha-metadata-1-registration
+      - name: work
+        emptyDir:
+          sizeLimit: 8Gi
+      - name: home
+        emptyDir:
+          sizeLimit: 4Gi
+      - name: toolcache
+        emptyDir:
+          sizeLimit: 4Gi
+      - name: tmp
+        emptyDir:
+          sizeLimit: 2Gi
+      - name: runtime
+        emptyDir:
+          sizeLimit: 2Gi
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 121
+        fsGroup: 121
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+      - name: initialize-runner
+        image: myoung34/github-runner@sha256:1ca564764476565296c8e05b44afe593914228bed00c4fbbc40bf5c3388e673b
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - mkdir -p /runner-runtime/actions-runner; cp -R /actions-runner/. /runner-runtime/actions-runner/
+        securityContext: *id001
+        volumeMounts:
+        - name: runtime
+          mountPath: /runner-runtime

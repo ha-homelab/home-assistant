@@ -1,0 +1,1130 @@
+{
+  "format_version": 1,
+  "purpose": "Read-only dependency and limitation inventory for the managed configuration migration; this is not a device-action acceptance report.",
+  "evidence": {
+    "home_assistant_version": "2026.9.1",
+    "source_snapshot": "2026-09-14",
+    "generated_at_utc": "2026-09-15T07:22:55.907948+00:00",
+    "state_source_sha256": "3983681c1803a0ec9cff675336d953d00d6497049d0d48111536e9094832ae36",
+    "service_source_sha256": "462b6fced1244b40e46ead010789f9f0342f3674cd39930303c7396d91eb3478",
+    "custom_component_source_sha256": "c074456aa3f3dcc18571353c9195e1ccd3ed5b84839f44bad3824ee06a3be6f8",
+    "root_revision_observed": "22145ecaf8f0b07382bddb8640deb448bb0809d6",
+    "dependency_revisions": {
+      "automations": "7b367e0d7d023ad8b365cdb795842935c4c80955",
+      "scripts": "12185d408a6bbaa7557e720ef739c29bed1e6387"
+    },
+    "managed_yaml_file_count": 214,
+    "source_state_count": 3512,
+    "source_service_count": 510,
+    "source_service_domain_count": 99,
+    "installed_custom_component_count": 35
+  },
+  "method": {
+    "scope": "Follow active configuration.yaml includes recursively, child config/ trees, and referenced script blueprints. Exclude archived rules, inactive sibling YAML, comments, repository contracts, and runtime .storage data. Non-action recorder/customization references are summarized by count, not emitted as target failures.",
+    "entity_extraction": "Use exact HA entity IDs only in typed entity fields, live action-schema entity selectors, scene entity maps, customize keys, direct script calls, and parsed Jinja states/state_attr/is_state/has_value/expand/distance/closest references. Limit domains to actual or standard HA entity domains. Never infer entities from arbitrary dotted text.",
+    "service_extraction": "Treat YAML action/service calls separately and compare their exact domain.service names with the source /api/services inventory.",
+    "dynamic_reference_limit": "Computed template targets and service names are recorded by source location and not guessed. No templates or actions were executed.",
+    "classification": "missing means absent from /api/states; unavailable/unknown means an existing state object with that status. Neither classification proves a device is retired or identifies a replacement. Recorder filters and customization-only references are not counted as failing dependencies. Existing unknown scenes are listed separately as informational and do not increase the unavailable-entity count.",
+    "secrets": "No credentials, operational URLs/host fields, location coordinates, account configuration, state attributes, raw commands, or secret values are included. Exact entity/service identifiers are retained only where needed to locate references. Installed integration domains and package versions are inventory metadata."
+  },
+  "summary": {
+    "unique_static_entity_references": 451,
+    "unique_missing_entities": 61,
+    "files_with_missing_entities": 57,
+    "unique_missing_services": 4,
+    "files_calling_missing_services": 7,
+    "unique_action_services_referenced": 56,
+    "dynamic_reference_locations": 8,
+    "template_parse_error_locations": 0,
+    "missing_customization_only_entities": 30,
+    "unique_existing_unavailable_entities": 46,
+    "files_with_existing_unavailable_entities": 56,
+    "unique_existing_unknown_entities": 3,
+    "files_with_existing_unknown_entities": 3
+  },
+  "missing_services_by_source": {
+    "dependencies/automations/config/067_mailbox_send_browser_and_mobile_activity_notifications.yaml": [
+      "notify.chrome",
+      "notify.mobile_app_als_iphone2"
+    ],
+    "dependencies/automations/config/104_ring_camera_send_motion_notifications_and_flash_the_beacon.yaml": [
+      "notify.chrome",
+      "notify.mobile_app_als_iphone2"
+    ],
+    "dependencies/scripts/config/notifications/backdoor_motion.yaml": [
+      "notify.chrome",
+      "notify.mobile_app_als_iphone2"
+    ],
+    "dependencies/scripts/config/notifications/front_camera_motion.yaml": [
+      "notify.chrome",
+      "notify.mobile_app_als_iphone2"
+    ],
+    "dependencies/scripts/config/notifications/front_porch_motion.yaml": [
+      "notify.chrome",
+      "notify.pushbullet"
+    ],
+    "dependencies/scripts/config/notifications/garage_camera_motion.yaml": [
+      "notify.chrome",
+      "notify.mobile_app_als_iphone2"
+    ],
+    "dependencies/scripts/config/television/notify_front_snapshot.yaml": [
+      "notify.living_room_tv"
+    ]
+  },
+  "missing_entities_by_source": {
+    "config/groups.yaml": [
+      "light.led_under_cabinet_2l"
+    ],
+    "config/integrations/camera.yaml": [
+      "camera.garage_camera"
+    ],
+    "config/lights.yaml": [
+      "light.kitchen_table_lamp_2"
+    ],
+    "config/scenes/away_devices.yaml": [
+      "switch.0120020960019453437a",
+      "switch.042004835ccf7f7ceaa8"
+    ],
+    "config/scenes/dehumidifiers.yaml": [
+      "switch.02200216ecfabc8c7361"
+    ],
+    "config/sensors.yaml": [
+      "sensor.solar"
+    ],
+    "config/template_sensors.yaml": [
+      "input_number.battery_out_at_17_yesterday",
+      "sensor.battery_out_total",
+      "sensor.water_level_derivative"
+    ],
+    "dependencies/automations/config/001_guests_turn_off_the_status_indicator_on_departure_rule_1.yaml": [
+      "switch.012002096001945368f0"
+    ],
+    "dependencies/automations/config/002_guests_turn_off_the_status_indicator_on_departure_rule_2.yaml": [
+      "switch.012002096001945368f0"
+    ],
+    "dependencies/automations/config/003_guests_turn_on_the_status_indicator_on_arrival.yaml": [
+      "switch.012002096001945368f0"
+    ],
+    "dependencies/automations/config/005_guests_show_guest_presence_when_family_arrives.yaml": [
+      "switch.012002096001945368f0"
+    ],
+    "dependencies/automations/config/006_guests_turn_off_the_status_indicator_at_night.yaml": [
+      "switch.012002096001945368f0"
+    ],
+    "dependencies/automations/config/013_bathroom_turn_off_lights_after_motion_clears.yaml": [
+      "binary_sensor.rf_rf_motion_kitchen_zigbee_occupancy"
+    ],
+    "dependencies/automations/config/014_bathroom_stop_the_warm_water_pump_after_motion_clears.yaml": [
+      "switch.smart_toilet_2"
+    ],
+    "dependencies/automations/config/015_bathroom_turn_on_lights_after_motion.yaml": [
+      "binary_sensor.rf_rf_motion_kitchen_zigbee_occupancy"
+    ],
+    "dependencies/automations/config/016_bathroom_start_the_warm_water_pump_after_motion.yaml": [
+      "switch.smart_toilet_2"
+    ],
+    "dependencies/automations/config/026_curtains_close_in_the_evening_when_cloudy.yaml": [
+      "sensor.blink_porch_temperature"
+    ],
+    "dependencies/automations/config/030_dining_room_dim_living_room_lights_after_motion_clears.yaml": [
+      "binary_sensor.rf_dinner_motion_two",
+      "light.dinning_wall_one"
+    ],
+    "dependencies/automations/config/031_dining_room_turn_off_lights_after_motion_clears.yaml": [
+      "binary_sensor.rf_dinner_motion_two",
+      "light.dining_lamp_m"
+    ],
+    "dependencies/automations/config/032_dining_room_turn_off_living_room_lights_after_motion_clears.yaml": [
+      "binary_sensor.rf_dinner_motion_two",
+      "light.dinning_wall_one"
+    ],
+    "dependencies/automations/config/033_dining_room_turn_on_lights_after_motion.yaml": [
+      "binary_sensor.rf_dinner_motion_two",
+      "light.dining_lamp_m"
+    ],
+    "dependencies/automations/config/034_dining_room_turn_on_living_room_lights_after_motion.yaml": [
+      "binary_sensor.rf_dinner_motion_two",
+      "light.dinning_wall_one",
+      "switch.7636703898f4abd20462"
+    ],
+    "dependencies/automations/config/036_garage_camera_capture_motion_and_notify_displays.yaml": [
+      "camera.garage_camera"
+    ],
+    "dependencies/automations/config/050_kitchen_turn_on_counter_lights_after_motion.yaml": [
+      "binary_sensor.rf_presence_sensor_1_fast_motion_signal"
+    ],
+    "dependencies/automations/config/055_living_room_dim_lights_after_motion_clears.yaml": [
+      "switch.7636703898f4abd20462"
+    ],
+    "dependencies/automations/config/056_living_room_apply_evening_lighting_after_motion.yaml": [
+      "switch.45142045c82b96c20281",
+      "switch.7636703898f4abd20462"
+    ],
+    "dependencies/automations/config/057_living_room_turn_off_lights_after_motion_clears.yaml": [
+      "switch.7636703898f4abd20462"
+    ],
+    "dependencies/automations/config/058_living_room_turn_off_devices_after_motion_clears.yaml": [
+      "switch.01200209600194536430",
+      "switch.7636703898f4abd20462",
+      "switch.7636703898f4abd205af"
+    ],
+    "dependencies/automations/config/059_living_room_turn_off_loud_devices_after_motion_clears.yaml": [
+      "switch.0220049668c63aa69c01_1",
+      "switch.02200496ecfabc911bc1_2",
+      "switch.06200903b4e62d29879e_1",
+      "switch.7636703898f4abd20462",
+      "switch.7636703898f4abd205af"
+    ],
+    "dependencies/automations/config/060_living_room_turn_on_lights_after_motion.yaml": [
+      "switch.7636703898f4abd20462"
+    ],
+    "dependencies/automations/config/061_living_room_turn_on_devices_after_motion.yaml": [
+      "switch.01200209600194536430"
+    ],
+    "dependencies/automations/config/062_living_room_observe_motion_for_the_legacy_loud_device_rule.yaml": [
+      "switch.7636703898f4abd20462"
+    ],
+    "dependencies/automations/config/068_mishka_room_turn_on_lights_after_motion.yaml": [
+      "light.hall_2_m_l_l"
+    ],
+    "dependencies/automations/config/069_lighting_clear_manual_overrides_each_morning.yaml": [
+      "input_boolean.mishka_sticky"
+    ],
+    "dependencies/automations/config/070_notifications_report_motion_sensor_changes.yaml": [
+      "binary_sensor.rf_backporch_motion",
+      "binary_sensor.rf_garage_one_motion",
+      "binary_sensor.rf_garage_two_motion",
+      "binary_sensor.rf_studio_bathroom_motion"
+    ],
+    "dependencies/automations/config/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml": [
+      "light.bedroom_five",
+      "light.fireplace_led_ll",
+      "switch.fireplace_led_ll",
+      "switch.mishka_bedroom_desk_lamp_l",
+      "switch.studio_wall_lamp",
+      "switch.tiny_garland_ll"
+    ],
+    "dependencies/automations/config/075_lighting_turn_off_scheduled_lights_except_the_living_room.yaml": [
+      "light.bedroom_five",
+      "switch.mishka_bedroom_desk_lamp_l",
+      "switch.studio_wall_lamp"
+    ],
+    "dependencies/automations/config/105_quiet_mode_turn_off_the_configured_device.yaml": [
+      "switch.02200496ecfabc911bc1_1"
+    ],
+    "dependencies/automations/config/110_studio_turn_off_lights_after_motion_clears.yaml": [
+      "switch.studio_wall_lamp"
+    ],
+    "dependencies/automations/config/111_studio_turn_on_lights_after_motion.yaml": [
+      "switch.studio_wall_lamp"
+    ],
+    "dependencies/automations/config/112_notifications_report_switch_state_changes.yaml": [
+      "light.fireplace_led_ll",
+      "switch.attic_dehumidifier_l",
+      "switch.clock_l",
+      "switch.fireplace_led_ll",
+      "switch.hall_sockets_behind_tv_2_l",
+      "switch.hall_sockets_behind_tv_3_l",
+      "switch.ice_maker_l",
+      "switch.mishka_bedroom_desk_lamp_l",
+      "switch.sockets_behind_fireplace_3_l",
+      "switch.tiny_garland_ll"
+    ],
+    "dependencies/automations/config/117_victron_record_battery_discharge_near_the_horizon.yaml": [
+      "input_number.battery_out_at_17_yesterday",
+      "sensor.total_battery_out_integral"
+    ],
+    "dependencies/automations/config/130_water_stop_irrigation_after_five_minutes.yaml": [
+      "sensor.smart_water_timer_smart_water_timer"
+    ],
+    "dependencies/scripts/config/lighting/household_lights_and_media_off.yaml": [
+      "light.bedroom_five",
+      "light.fireplace_led_ll",
+      "switch.fireplace_led_ll",
+      "switch.mishka_bedroom_desk_lamp_l",
+      "switch.studio_wall_lamp",
+      "switch.tiny_garland_ll"
+    ],
+    "dependencies/scripts/config/lighting/reset_cree_bulb.yaml": [
+      "switch.01200209600194536430"
+    ],
+    "dependencies/scripts/config/media/cast_garage_camera.yaml": [
+      "camera.garage_camera"
+    ],
+    "dependencies/scripts/config/media/play_kodi_channel_id.yaml": [
+      "media_player.192_168_160_1"
+    ],
+    "dependencies/scripts/config/media/play_selected_kodi_channel.yaml": [
+      "media_player.192_168_160_1",
+      "sensor.kodi_channels"
+    ],
+    "dependencies/scripts/config/media/plex_ants_android_tv.yaml": [
+      "media_player.plex_plex_for_android_tv_chromecast_google_tv_hd"
+    ],
+    "dependencies/scripts/config/media/set_household_volume_presets.yaml": [
+      "media_player.al_mini",
+      "media_player.imac21",
+      "media_player.vitaly_s_echo"
+    ],
+    "dependencies/scripts/config/media/stop_household_players.yaml": [
+      "media_player.dinning_room_google_mini",
+      "media_player.family_room_speaker_2",
+      "media_player.kitchen_speaker_2",
+      "media_player.living_room_google_home",
+      "media_player.mishka_bedroom_google_mini",
+      "media_player.our_bedroom_google_home"
+    ],
+    "dependencies/scripts/config/notifications/front_porch_motion.yaml": [
+      "switch.002007275ccf7fe09363",
+      "switch.042004835ccf7f7cedb1"
+    ],
+    "dependencies/scripts/config/notifications/garage_camera_motion.yaml": [
+      "camera.garage_camera"
+    ],
+    "dependencies/scripts/config/television/insert_webos_test_text.yaml": [
+      "media_player.living_room_tv"
+    ],
+    "dependencies/scripts/config/television/open_front_snapshot.yaml": [
+      "media_player.living_room_tv"
+    ],
+    "dependencies/scripts/config/television/play_channel_one.yaml": [
+      "media_player.living_room_tv"
+    ],
+    "dependencies/scripts/config/television/play_ren_channel.yaml": [
+      "media_player.living_room_tv"
+    ]
+  },
+  "dynamic_reference_locations_by_source": {
+    "config/blueprints/script/igw/announce_energy.yaml": [
+      "sequence.4.wait_template:computed_entity_argument",
+      "sequence.5.wait_template:computed_entity_argument"
+    ],
+    "dependencies/automations/config/043_notifications_dispatch_ifttt_webhook_actions.yaml": [
+      "0.actions.data_template.entity_id:templated_entity_field"
+    ],
+    "dependencies/automations/config/085_self_consumption_select_controllable_loads_from_grid_power.yaml": [
+      "0.actions.4.choose.0.sequence.0.repeat.sequence.0.choose.0.sequence.0.data.entity_id:templated_entity_field",
+      "0.actions.4.choose.0.sequence.0.repeat.sequence.0.choose.0.sequence.0:templated_action",
+      "0.actions.4.choose.0.sequence.0.repeat.sequence.0.choose.1.sequence.0.data.entity_id:templated_entity_field",
+      "0.actions.4.choose.0.sequence.0.repeat.sequence.0.choose.1.sequence.0:templated_action"
+    ],
+    "dependencies/scripts/config/media/play_selected_tunein_station.yaml": [
+      "kkk.sequence.0.data_template.entity_id:templated_entity_field"
+    ]
+  },
+  "template_parse_error_locations_by_source": {},
+  "action_domain_dependencies": [
+    {
+      "domain": "camera",
+      "distinct_referenced_services": 2,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "cast",
+      "distinct_referenced_services": 1,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "climate",
+      "distinct_referenced_services": 1,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "cover",
+      "distinct_referenced_services": 4,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "frontend",
+      "distinct_referenced_services": 1,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "input_boolean",
+      "distinct_referenced_services": 2,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "input_number",
+      "distinct_referenced_services": 1,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "light",
+      "distinct_referenced_services": 3,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "logger",
+      "distinct_referenced_services": 1,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "media_player",
+      "distinct_referenced_services": 4,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "mqtt",
+      "distinct_referenced_services": 1,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "notify",
+      "distinct_referenced_services": 10,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "persistent_notification",
+      "distinct_referenced_services": 1,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "python_script",
+      "distinct_referenced_services": 1,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "remote",
+      "distinct_referenced_services": 1,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "rest_command",
+      "distinct_referenced_services": 1,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "scene",
+      "distinct_referenced_services": 1,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "script",
+      "distinct_referenced_services": 6,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "shell_command",
+      "distinct_referenced_services": 10,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "switch",
+      "distinct_referenced_services": 2,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "tts",
+      "distinct_referenced_services": 1,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": false
+    },
+    {
+      "domain": "webostv",
+      "distinct_referenced_services": 1,
+      "registered_in_source_snapshot": true,
+      "custom_component_override_installed": true
+    }
+  ],
+  "installed_custom_components": [
+    {
+      "domain": "alexa_media",
+      "installed_version": "5.16.1",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": [
+        "alexapy==1.30.1",
+        "packaging>=20.3",
+        "wrapt>=1.14.0",
+        "dictor>=0.1.12,<0.2"
+      ]
+    },
+    {
+      "domain": "browser_mod",
+      "installed_version": "1.5.3",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": []
+    },
+    {
+      "domain": "chargepoint",
+      "installed_version": "1.4.0",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": [
+        "python-chargepoint>=2.3.2"
+      ]
+    },
+    {
+      "domain": "combined",
+      "installed_version": "0.0.0",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": []
+    },
+    {
+      "domain": "coway",
+      "installed_version": "0.6.1",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": [
+        "cowayaio==0.2.4"
+      ]
+    },
+    {
+      "domain": "email",
+      "installed_version": "3.12.0",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": [
+        "beautifulsoup4==4.7.1",
+        "imapclient==2.3.1",
+        "mail-parser==3.9.3"
+      ]
+    },
+    {
+      "domain": "emporia_vue",
+      "installed_version": "0.11.3",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": [
+        "pyemvue==0.18.9"
+      ]
+    },
+    {
+      "domain": "entity_controller",
+      "installed_version": "9.7.6",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": [
+        "transitions==0.8.8"
+      ]
+    },
+    {
+      "domain": "expose_camera_stream_source",
+      "installed_version": "0.4.0",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": []
+    },
+    {
+      "domain": "files",
+      "installed_version": "0.0.1",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": []
+    },
+    {
+      "domain": "frigate",
+      "installed_version": "5.15.6",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": [
+        "hass-web-proxy-lib==0.0.8",
+        "titlecase==2.4.1"
+      ]
+    },
+    {
+      "domain": "google_home",
+      "installed_version": "1.13.3",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": [
+        "glocaltokens==0.7.6"
+      ]
+    },
+    {
+      "domain": "ha_mcp_tools",
+      "installed_version": "2.1.3",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": [
+        "ruamel.yaml>=0.18.0",
+        "voluptuous-openapi>=0.4.1"
+      ]
+    },
+    {
+      "domain": "hacs",
+      "installed_version": "2.0.5",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": [
+        "aiogithubapi>=22.10.1"
+      ]
+    },
+    {
+      "domain": "hassio",
+      "installed_version": "1.1.0",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": []
+    },
+    {
+      "domain": "ical",
+      "installed_version": "0.0.1",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": [
+        "icalendar",
+        "requests",
+        "arrow>=0.10.0"
+      ]
+    },
+    {
+      "domain": "icloud3",
+      "installed_version": "3.7.5",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": [
+        "srp",
+        "fido2>=1.1.3"
+      ]
+    },
+    {
+      "domain": "kodi_media_sensors",
+      "installed_version": "5.4.1",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": []
+    },
+    {
+      "domain": "localtuya",
+      "installed_version": "2026.07.0",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": []
+    },
+    {
+      "domain": "mail_and_packages",
+      "installed_version": "0.5.32",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": [
+        "beautifulsoup4",
+        "Pillow>=9.0",
+        "dateparser",
+        "aioimaplib"
+      ]
+    },
+    {
+      "domain": "mbapi2020",
+      "installed_version": "v0.40.0",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": [
+        "protobuf>=3.19.5"
+      ]
+    },
+    {
+      "domain": "mikrotik_router",
+      "installed_version": "2.3",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": [
+        "librouteros>=3.4.1",
+        "mac-vendor-lookup>=0.1.12"
+      ]
+    },
+    {
+      "domain": "nodered",
+      "installed_version": "4.2.3",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": []
+    },
+    {
+      "domain": "programmable_thermostat",
+      "installed_version": "8.3",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": []
+    },
+    {
+      "domain": "rocketlaunchlive",
+      "installed_version": "009",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": [
+        "rocketlaunchlive==0.0.2"
+      ]
+    },
+    {
+      "domain": "samsungtv_smart",
+      "installed_version": "0.14.5",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": [
+        "websocket-client!=1.4.0,>=0.58.0",
+        "wakeonlan>=2.0.0",
+        "aiofiles>=0.8.0",
+        "casttube>=0.2.1"
+      ]
+    },
+    {
+      "domain": "smartthinq_sensors",
+      "installed_version": "0.43.0",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": [
+        "pycountry>=23.12.11",
+        "xmltodict>=0.13.0",
+        "charset_normalizer>=3.2.0"
+      ]
+    },
+    {
+      "domain": "solcast_solar",
+      "installed_version": "v4.6.1",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": [
+        "aiofiles>=23.2.0",
+        "watchfiles>=1.0.0"
+      ]
+    },
+    {
+      "domain": "tapo",
+      "installed_version": "3.5.3",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 0,
+      "requirements": [
+        "plugp100==6.0.1"
+      ]
+    },
+    {
+      "domain": "template_migration",
+      "installed_version": "2.0.2",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": []
+    },
+    {
+      "domain": "tuya_v2",
+      "installed_version": "1.5.0",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": [
+        "tuya-iot-py-sdk==0.4.1"
+      ]
+    },
+    {
+      "domain": "victron_vrm_api",
+      "installed_version": "1.8",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": []
+    },
+    {
+      "domain": "watchman",
+      "installed_version": "0.8.4",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": [
+        "prettytable==3.12.0"
+      ]
+    },
+    {
+      "domain": "webostv",
+      "installed_version": "148273",
+      "loaded_in_source_snapshot": true,
+      "referenced_action_count": 1,
+      "requirements": [
+        "aiowebostv==0.7.4"
+      ]
+    },
+    {
+      "domain": "xiaomi_cloud_map_extractor",
+      "installed_version": "v2.2.5",
+      "loaded_in_source_snapshot": false,
+      "referenced_action_count": 0,
+      "requirements": [
+        "pillow",
+        "pybase64",
+        "python-miio",
+        "requests",
+        "pycryptodome"
+      ]
+    }
+  ],
+  "shell_command_local_artifacts": [
+    {
+      "path": "/config/comcast.py",
+      "source_files": [
+        "config/integrations/shell_command.yaml"
+      ],
+      "provisioned_by_configuration_repository": false
+    },
+    {
+      "path": "/config/kodi",
+      "source_files": [
+        "config/integrations/shell_command.yaml"
+      ],
+      "provisioned_by_configuration_repository": false
+    },
+    {
+      "path": "/config/www",
+      "source_files": [
+        "config/integrations/shell_command.yaml"
+      ],
+      "provisioned_by_configuration_repository": false
+    }
+  ],
+  "external_runtime_boundaries": [
+    {
+      "dependency": "Existing Kubernetes StatefulSet, persistent configuration volume, host networking, and companion services",
+      "owned_by": [
+        "4alvit/home-assistant-k3s",
+        "4alvit/k3s-self-healing"
+      ],
+      "limit": "The YAML bundle does not provision the cluster, restore its data, or prove its companion services are healthy."
+    },
+    {
+      "dependency": "Installed custom component code and Python dependencies",
+      "owned_by": "Existing /config/custom_components and its update process",
+      "limit": "The source manifests above identify installed versions. Referencing installed code during check_config validates schemas; it does not test account sessions, external endpoints, or device operation."
+    },
+    {
+      "dependency": "UI integrations, device/entity registry, storage dashboards, voice exposure, and credentials",
+      "owned_by": "Existing runtime .storage and private backup",
+      "limit": "These are intentionally not recreated by the YAML repositories. This inventory does not scan storage dashboards; their separate reference contract still applies."
+    },
+    {
+      "dependency": "MQTT consumers and retained message contracts",
+      "owned_by": "Existing broker and subscriber applications",
+      "limit": "mqtt.publish calls can pass schema checks while subscribers are offline or payloads are invalid for their application. Retained flags and topic/payload behavior are preserved."
+    },
+    {
+      "dependency": "Shell-command helpers, remote hosts, media providers, and camera snapshot paths",
+      "owned_by": "Existing host/container artifacts and external systems",
+      "limit": "The referenced /config paths below are not supplied by this repository. File presence, command exit status, authentication, streams, and player playback are not proven by YAML validation."
+    },
+    {
+      "dependency": "Registered service destinations and entity targets",
+      "owned_by": "Existing integration/account/device configuration",
+      "limit": "Absent notification destinations require an owner-confirmed replacement. No unavailable entity or missing service has been silently rebound to another device."
+    }
+  ],
+  "known_behavior_limits": [
+    {
+      "source": "dependencies/scripts/config/notifications/mqtt_message.yaml",
+      "script": "notify_mqtt",
+      "limitation": "The preserved message template interpolates text directly into JSON; quotes/newlines need subscriber-aware verification before serialization changes."
+    },
+    {
+      "source": "dependencies/scripts/config/media/play_selected_kodi_channel.yaml",
+      "script": "play_kodi_channel",
+      "limitation": "The preserved template uses state_attr(..., 'state'); the selector lookup and JSON sensor contract need validation. Both Kodi player and channel sensor are absent in the source snapshot."
+    },
+    {
+      "source": "dependencies/scripts/config/media/play_kodi_channel_id.yaml",
+      "script": "your_kodi_script",
+      "limitation": "A folded template includes literal inline-comment text in media_content_id. Its actual caller and Kodi request contract must be checked before editing."
+    },
+    {
+      "sources": [
+        "dependencies/scripts/config/television/open_front_snapshot.yaml",
+        "dependencies/scripts/config/television/notify_front_snapshot.yaml"
+      ],
+      "limitation": "The inherited snapshot endpoint differs from the installation node; endpoint and TV-notification compatibility remain unverified."
+    },
+    {
+      "source": "dependencies/scripts/config/media/run_selected_radio_shell_command.yaml",
+      "script": "kk",
+      "limitation": "The existing pla/sta argument mapping is crossed. The shell helper must be inspected before swapping values or renaming its caller interface."
+    },
+    {
+      "source": "dependencies/scripts/config/lighting/household_lights_and_media_off.yaml",
+      "script": "turn_off_living_room",
+      "limitation": "The stable historical key operates several rooms and shuts down a host. It must not be used as a harmless bulk smoke test."
+    }
+  ],
+  "verify_release_review": {
+    "file": "tools/verify_release.py",
+    "checks_performed": [
+      "Automation identity set, registered IDs, phase-appropriate friendly names, modes, and enabled states via child verifier.",
+      "Set equality for scripts whose exported state is on/off before and after.",
+      "Managed script friendly names and modes against the pinned script registry/configuration."
+    ],
+    "not_checked": [
+      "Actual device actions, notifications, playback, external endpoints, MQTT consumers, or shell commands.",
+      "Script on/off equality or current run counts; both on and off count as available in the set comparison.",
+      "Script icons, descriptions, parameter fields, service registration, unavailable script state transitions outside the available set, or external reference health.",
+      "Byte equality between loaded runtime action configuration and the reviewed executable baseline; offline repository validation covers the files, while this verifier inspects state metadata."
+    ],
+    "assessment": "Suitable for its declared identity/name/mode verification scope. A successful result must not be presented as end-to-end action or dependency acceptance.",
+    "playpen_retirement_2026_10_10": "Four heater-only rules retired; Playpen removed from remaining load selection and charger guards after that hardware became Bath2. No heater behavior is redirected to Bath2."
+  },
+  "non_action_reference_notes": {
+    "recorder_filters": {
+      "source": "config/integrations/recorder.yaml",
+      "missing_reference_count": 48,
+      "existing_unavailable_or_unknown_reference_count": 60,
+      "interpretation": "Recorder inclusion/exclusion entries are filters, not calls to device targets. Their absent entries are not counted as missing runtime dependencies, and their exact identifiers are omitted."
+    },
+    "customization": {
+      "missing_reference_count": 30,
+      "interpretation": "Friendly-name/icon customizations for absent entities do not invoke a device. They are excluded from dependency-failure counts and their exact identifiers are omitted."
+    },
+    "unknown_scenes": {
+      "entity_count": 3,
+      "interpretation": "All three existing unknown entities are scenes. Scenes are stateless and their state tracks the last activation timestamp; unknown is not classified here as device unavailability or a proven failed action.",
+      "documentation": "https://www.home-assistant.io/integrations/scene/#the-state-of-a-scene"
+    }
+  },
+  "existing_unavailable_entities_by_source": {
+    "config/covers.yaml": [
+      "cover.dining_curtains_l",
+      "cover.kitchen_curtains_l",
+      "cover.office_curtains_office_curtains"
+    ],
+    "dependencies/automations/config/026_curtains_close_in_the_evening_when_cloudy.yaml": [
+      "cover.dining_curtains_l",
+      "cover.kitchen_curtains_l"
+    ],
+    "dependencies/automations/config/027_curtains_close_in_the_evening.yaml": [
+      "cover.dining_curtains_l",
+      "cover.kitchen_curtains_l"
+    ],
+    "dependencies/automations/config/030_dining_room_dim_living_room_lights_after_motion_clears.yaml": [
+      "light.arc_lamp"
+    ],
+    "dependencies/automations/config/031_dining_room_turn_off_lights_after_motion_clears.yaml": [
+      "light.dining_lights_dimmer_l"
+    ],
+    "dependencies/automations/config/032_dining_room_turn_off_living_room_lights_after_motion_clears.yaml": [
+      "light.arc_lamp",
+      "light.black_lamp"
+    ],
+    "dependencies/automations/config/033_dining_room_turn_on_lights_after_motion.yaml": [
+      "light.arc_lamp_m"
+    ],
+    "dependencies/automations/config/034_dining_room_turn_on_living_room_lights_after_motion.yaml": [
+      "light.arc_lamp"
+    ],
+    "dependencies/automations/config/045_kitchen_turn_on_the_table_lamp_after_motion.yaml": [
+      "binary_sensor.presence_sensor_1_presence"
+    ],
+    "dependencies/automations/config/047_kitchen_turn_off_the_table_lamp_after_motion_clears.yaml": [
+      "binary_sensor.presence_sensor_1_presence"
+    ],
+    "dependencies/automations/config/050_kitchen_turn_on_counter_lights_after_motion.yaml": [
+      "binary_sensor.presence_sensor_1_moving_target",
+      "binary_sensor.presence_sensor_1_presence"
+    ],
+    "dependencies/automations/config/051_kitchen_turn_off_counter_lights_after_motion_clears.yaml": [
+      "binary_sensor.presence_sensor_1_presence"
+    ],
+    "dependencies/automations/config/053_kitchen_turn_on_tea_area_lights_after_motion.yaml": [
+      "binary_sensor.presence_sensor_1_presence"
+    ],
+    "dependencies/automations/config/054_kitchen_turn_off_tea_area_lights_after_motion_clears.yaml": [
+      "binary_sensor.presence_sensor_1_presence"
+    ],
+    "dependencies/automations/config/055_living_room_dim_lights_after_motion_clears.yaml": [
+      "light.arc_lamp",
+      "light.purple_lamp"
+    ],
+    "dependencies/automations/config/056_living_room_apply_evening_lighting_after_motion.yaml": [
+      "light.arc_lamp"
+    ],
+    "dependencies/automations/config/057_living_room_turn_off_lights_after_motion_clears.yaml": [
+      "light.arc_lamp"
+    ],
+    "dependencies/automations/config/060_living_room_turn_on_lights_after_motion.yaml": [
+      "light.arc_lamp"
+    ],
+    "dependencies/automations/config/066_mailbox_announce_activity_and_flash_the_indicator.yaml": [
+      "binary_sensor.postbox",
+      "light.purple_lamp"
+    ],
+    "dependencies/automations/config/067_mailbox_send_browser_and_mobile_activity_notifications.yaml": [
+      "binary_sensor.postbox"
+    ],
+    "dependencies/automations/config/070_notifications_report_motion_sensor_changes.yaml": [
+      "binary_sensor.postbox"
+    ],
+    "dependencies/automations/config/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml": [
+      "light.50w_l",
+      "light.arc_lamp",
+      "light.arc_lamp2",
+      "light.balcony",
+      "light.black_lamp",
+      "light.dining_lights_dimmer_l",
+      "light.garage_one",
+      "light.garage_three",
+      "light.garage_two",
+      "light.living_wall_dimmer_l",
+      "light.tiny_garland_ll",
+      "switch.50w_ll",
+      "switch.fireplace_l",
+      "switch.living_room_light_l",
+      "switch.stage_led_l",
+      "switch.tv_backlight_l"
+    ],
+    "dependencies/automations/config/075_lighting_turn_off_scheduled_lights_except_the_living_room.yaml": [
+      "light.50w_l",
+      "light.balcony",
+      "light.black_lamp",
+      "light.dining_lights_dimmer_l",
+      "switch.50w_ll"
+    ],
+    "dependencies/automations/config/078_curtains_open_curtains_in_the_morning.yaml": [
+      "cover.dining_curtains_l",
+      "cover.kitchen_curtains_l"
+    ],
+    "dependencies/automations/config/087_self_consumption_start_the_large_heater_after_priority_loads.yaml": [
+      "switch.inewswitch",
+      "switch.workdesk"
+    ],
+    "dependencies/automations/config/088_self_consumption_start_the_dehumidifier_on_surplus_power.yaml": [
+      "switch.solar_s2000_switch",
+      "switch.workdesk"
+    ],
+    "dependencies/automations/config/089_self_consumption_start_solar_battery_charging_on_surplus_power.yaml": [
+      "switch.solar_s2000_switch"
+    ],
+    "dependencies/automations/config/091_self_consumption_start_decorative_lights_on_low_surplus_power.yaml": [
+      "switch.inewswitch",
+      "switch.stage_led_l",
+      "switch.workdesk"
+    ],
+    "dependencies/automations/config/093_self_consumption_start_the_large_heater_on_high_surplus_power.yaml": [
+      "switch.inewswitch"
+    ],
+    "dependencies/automations/config/095_self_consumption_stop_the_large_heater_on_grid_import.yaml": [
+      "switch.inewswitch"
+    ],
+    "dependencies/automations/config/096_self_consumption_stop_the_dehumidifier_on_grid_import.yaml": [
+      "switch.workdesk"
+    ],
+    "dependencies/automations/config/098_self_consumption_stop_solar_battery_charging_on_grid_import.yaml": [
+      "switch.solar_s2000_switch",
+      "switch.workdesk"
+    ],
+    "dependencies/automations/config/100_self_consumption_stop_the_large_heater_at_the_upper_threshold.yaml": [
+      "switch.inewswitch"
+    ],
+    "dependencies/automations/config/107_fireplace_turn_off_devices_after_evening_inactivity.yaml": [
+      "light.arc_lamp",
+      "switch.fireplace_switch"
+    ],
+    "dependencies/automations/config/108_fireplace_turn_on_devices_after_dining_room_motion.yaml": [
+      "switch.fireplace_switch"
+    ],
+    "dependencies/automations/config/112_notifications_report_switch_state_changes.yaml": [
+      "light.50w_l",
+      "light.tiny_garland_ll",
+      "sensor.inewswitch_signal",
+      "switch.50w_ll",
+      "switch.audio_system_hall",
+      "switch.audiosystem_l",
+      "switch.fireplace_l",
+      "switch.range_hood_l",
+      "switch.stage_led_l",
+      "switch.tv_backlight_l",
+      "switch.tv_l"
+    ],
+    "dependencies/automations/config/113_notifications_report_covers_opening.yaml": [
+      "cover.dining_curtains_l",
+      "cover.kitchen_curtains_l"
+    ],
+    "dependencies/automations/config/114_notifications_report_covers_closing.yaml": [
+      "cover.dining_curtains_l",
+      "cover.kitchen_curtains_l"
+    ],
+    "dependencies/automations/config/115_heating_lower_a_sustained_high_thermostat_setpoint.yaml": [
+      "climate.thermostat_2"
+    ],
+    "dependencies/automations/config/116_heating_reduce_the_setpoint_after_prolonged_heating.yaml": [
+      "climate.thermostat_2"
+    ],
+    "dependencies/automations/config/130_water_stop_irrigation_after_five_minutes.yaml": [
+      "switch.smart_water_timer_smart_water_timer"
+    ],
+    "dependencies/scripts/config/lighting/flash_arc_lamp.yaml": [
+      "light.arc_lamp"
+    ],
+    "dependencies/scripts/config/lighting/household_lights_and_media_off.yaml": [
+      "light.50w_l",
+      "light.arc_lamp",
+      "light.arc_lamp2",
+      "light.balcony",
+      "light.black_lamp",
+      "light.dining_lights_dimmer_l",
+      "light.garage_one",
+      "light.garage_three",
+      "light.garage_two",
+      "light.living_wall_dimmer_l",
+      "light.tiny_garland_ll",
+      "switch.50w_ll",
+      "switch.audio_l",
+      "switch.audiosystem_l",
+      "switch.dining_wall_lights_l",
+      "switch.fireplace_l",
+      "switch.living_room_light_l",
+      "switch.stage_led_l",
+      "switch.tv_backlight_l",
+      "switch.tv_l"
+    ],
+    "dependencies/scripts/config/media/cast_dashboard_to_kitchen.yaml": [
+      "media_player.kitchen_display"
+    ],
+    "dependencies/scripts/config/media/cast_garage_camera.yaml": [
+      "media_player.chromecast"
+    ],
+    "dependencies/scripts/config/media/cast_plex_movie.yaml": [
+      "media_player.chromecast"
+    ],
+    "dependencies/scripts/config/media/play_amazon_music_album.yaml": [
+      "media_player.living_room_echo_2"
+    ],
+    "dependencies/scripts/config/media/plex_ants_bathroom.yaml": [
+      "media_player.bathroom_speaker"
+    ],
+    "dependencies/scripts/config/media/plex_ants_dining_room.yaml": [
+      "media_player.dining_room_speaker"
+    ],
+    "dependencies/scripts/config/media/plex_mult_living_room.yaml": [
+      "media_player.living_room_display"
+    ],
+    "dependencies/scripts/config/media/stop_household_players.yaml": [
+      "media_player.bathroom_echo_dot",
+      "media_player.bathroom_speaker",
+      "media_player.living_room_echo"
+    ],
+    "dependencies/scripts/config/media/stop_living_room_echo.yaml": [
+      "media_player.living_room_echo_2"
+    ]
+  },
+  "existing_unknown_entities_by_source": {
+    "dependencies/automations/config/004_guests_enable_dehumidifiers_on_arrival.yaml": [
+      "scene.dehumidifiers_on"
+    ],
+    "dependencies/automations/config/007_presence_apply_the_away_scene_when_family_leaves.yaml": [
+      "scene.away_devices_off"
+    ],
+    "dependencies/automations/config/010_presence_apply_arrival_actions_when_family_returns.yaml": [
+      "scene.away_devices_on"
+    ]
+  }
+}

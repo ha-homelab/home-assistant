@@ -1,0 +1,611 @@
+{
+  "schema_version": 1,
+  "limits": {
+    "snapshot_max_age_seconds": 300,
+    "clock_skew_seconds": 30,
+    "recorder_max_age_seconds": 120,
+    "statistics_grace_seconds": 120
+  },
+  "entities": {
+    "binary_sensor.dishwasher_running": {
+      "runtime_kind": "state",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.ac_in_consumption": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.ac_in_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.ac_loads": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.balance_power_1s_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.bath_1_12_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.battery_percent": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.battery_w": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.corrected_battery_soc": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.current_solar_production": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.family_room_power_1s_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.fridge_power_1s_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.garage_power_1s_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.hallway_and_pressure_cooker_power_1s_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.heater_one_energy_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.heater_one_energy_today": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.heater_one_energy_total": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.heater_one_energy_yesterday": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.heater_two_energy_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.heater_two_energy_today": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.heater_two_energy_total": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.heater_two_energy_yesterday": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.home_10_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.home_11_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.home_123_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.home_13_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.home_15_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.home_16_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.home_1_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.home_2_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.home_3_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.home_6_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.home_7_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.home_balance_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.home_power_1s_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_battery_chain_1_high_cell_voltage": {
+      "runtime_kind": "state",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.jbd_battery_chain_1_high_voltage": {
+      "runtime_kind": "state",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.jbd_battery_chain_1_low_cell_voltage": {
+      "runtime_kind": "state",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.jbd_battery_chain_1_low_voltage": {
+      "runtime_kind": "state",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.jbd_battery_chain_1_maximum_cell_voltage": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_battery_chain_1_minimum_cell_voltage": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_battery_chain_2_high_cell_voltage": {
+      "runtime_kind": "state",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.jbd_battery_chain_2_high_voltage": {
+      "runtime_kind": "state",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.jbd_battery_chain_2_low_cell_voltage": {
+      "runtime_kind": "state",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.jbd_battery_chain_2_low_voltage": {
+      "runtime_kind": "state",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "none"
+    },
+    "sensor.jbd_battery_chain_2_maximum_cell_voltage": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_battery_chain_2_minimum_cell_voltage": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell1_bms1": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell1_bms1_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell1_bms2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell1_bms2_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell1_bms3": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell1_bms3_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell1_bms4": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell1_bms4_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell2_bms1": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell2_bms1_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell2_bms2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell2_bms2_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell2_bms3": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell2_bms3_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell2_bms4": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell2_bms4_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell3_bms1": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell3_bms1_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell3_bms2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell3_bms2_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell3_bms3": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell3_bms3_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell3_bms4": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell3_bms4_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell4_bms1": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell4_bms1_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell4_bms2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell4_bms2_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell4_bms3": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell4_bms3_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell4_bms4": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.jbd_chain2_monitor_voltage_cell4_bms4_2": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.kitchen_fridge_5_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.kitchen_fridge_side_power_1s_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.kitchen_stove_teapot_area_power_1s_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.kitchen_tea_9_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.living_and_dining_and_bath2_power_1s_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.microwave_8_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.microwave_power_1s_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.office_and_bedrooms_14_1d": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.office_and_bedrooms_power_1s_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.pv1_kwh": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.sensor_total_battery_in_integral": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.sensor_total_battery_out_integral": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "total"
+    },
+    "sensor.solar_shed_bedrooms_on_1st_light_bedroom_2_3_tv_samsung_switch_ap_range_hood_power_1s_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.solar_tasmota_tasmota_120_power_total": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.solar_tasmota_tasmota_121_power_total": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.solar_total_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.total_battery_in": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.total_battery_out": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.total_power_consuming": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.totalusage_power_1s_power": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    },
+    "sensor.water_level_2_water_level": {
+      "runtime_kind": "numeric",
+      "max_reported_age_seconds": null,
+      "raw_required": true,
+      "statistics": "measurement"
+    }
+  }
+}

@@ -1,0 +1,37 @@
+# Dining room: Turn on lights after motion.
+# Stable entity: automation.dinning_motion_triggered.
+- id: ha_homelab_dining_room_turn_on_lights_after_motion
+  alias: 'Dining room: Turn on lights after motion'
+  description: Turn on lights after motion. Responds to binary_sensor.rf_dinner_motion changing to on; or binary_sensor.rf_dinner_two_motion
+    changing to on. Runs only when all configured guards pass. Independent lighting
+    commands continue if another device fails.
+  triggers:
+  - entity_id: binary_sensor.rf_dinner_motion
+    platform: state
+    to: 'on'
+  - entity_id: binary_sensor.rf_dinner_two_motion
+    platform: state
+    to: 'on'
+  conditions:
+  - condition: template
+    value_template: '{{ state_attr("sun.sun", "elevation") < 0.20 }}'
+  - condition: state
+    entity_id: input_boolean.dining_room_sticky
+    state: 'off'
+  actions:
+  - service: script.notify_mqtt_log
+    data:
+      message: Dining motion automation triggered {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+    continue_on_error: true
+  - service: switch.turn_on
+    entity_id: switch.dining_wall_light_2
+    continue_on_error: true
+  - service: switch.turn_on
+    entity_id: switch.dining_arc_lamp
+    continue_on_error: true
+  - service: light.turn_on
+    entity_id: light.adining_lamp_m
+    continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

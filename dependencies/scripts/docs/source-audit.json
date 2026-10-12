@@ -1,0 +1,290 @@
+{
+  "checked_version": "2026.9.1",
+  "snapshot_date": "2026-09-14",
+  "scripts": {
+    "backdoormotion": {
+      "missing_services_in_snapshot": [
+        "notify.chrome",
+        "notify.mobile_app_als_iphone2"
+      ],
+      "review_note": "The time condition stops only the remaining phone/light actions; desktop notifications happen first. Preserve the fade sequence and final off state.",
+      "live_entity_present": true
+    },
+    "blinkmotion": {
+      "missing_services_in_snapshot": [
+        "notify.chrome",
+        "notify.pushbullet"
+      ],
+      "review_note": "The switch order and delay intervals are intentional compatibility behavior; this does not restore the previous switch states.",
+      "live_entity_present": true
+    },
+    "cast_plex_to_chromecast": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "cast_porch_to_chromecast": {
+      "missing_services_in_snapshot": [],
+      "review_note": "The public script key is retained for callers; the actual source is camera.garage_camera.",
+      "live_entity_present": true
+    },
+    "cast_downstairs_on_kitchen": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "flash": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "frontmotion": {
+      "missing_services_in_snapshot": [
+        "notify.chrome",
+        "notify.mobile_app_als_iphone2"
+      ],
+      "review_note": "Keep the time condition after the snapshot and desktop notifications so those actions remain unconditional.",
+      "live_entity_present": true
+    },
+    "garagemotion": {
+      "missing_services_in_snapshot": [
+        "notify.chrome",
+        "notify.mobile_app_als_iphone2"
+      ],
+      "review_note": "Keep the time condition after the snapshot and desktop notifications so those actions remain unconditional.",
+      "live_entity_present": true
+    },
+    "kk": {
+      "missing_services_in_snapshot": [],
+      "review_note": "Do not swap pla and sta without reviewing shell_command.kk and every caller; this mapping matches the live configuration.",
+      "live_entity_present": true
+    },
+    "kkk": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "turn_off_lg_tv_screen": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "turn_on_lg_tv_screen": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "turn_off_lg2_tv_screen": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "turn_on_lg2_tv_screen": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "living_room_tv_picture_energy_saving": {
+      "missing_services_in_snapshot": [],
+      "review_note": "This uses the TV confirmation-button callback. Preserve the firmware-specific payload and string-valued energySavingModified.",
+      "live_entity_present": true
+    },
+    "mediaoff": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "notify": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "notifymax": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "notify_mqtt": {
+      "missing_services_in_snapshot": [],
+      "review_note": "The existing payload interpolates message directly into JSON. Escaping changes require a separate consumer-compatibility review.",
+      "live_entity_present": true
+    },
+    "notify_mqtt_log": {
+      "missing_services_in_snapshot": [],
+      "review_note": "retain: true is part of the existing subscriber contract; a new subscriber can receive the last message.",
+      "live_entity_present": true
+    },
+    "playplexplaylist": {
+      "missing_services_in_snapshot": [],
+      "review_note": "The historical Plex/two-hour name did not match execution. Only the display name changes; the AMAZON_MUSIC request is unchanged.",
+      "live_entity_present": true
+    },
+    "run_playlist_on_plex_ants": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "run_playlist_on_plex_mobile_ants": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "run_playlist_on_plex_bathroom_ants": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "stopplexplaylist": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "random_on_an2": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "random_on_inew": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "receiver_turn_off": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "receiver_turn_on": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "receiver_surround": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "receiver_surrmodestereo": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "receiver_surroundmodelogic7": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "receiver_inputtuner": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "receiver_inputcd": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "receiver_inputtape": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "tv_pic": {
+      "missing_services_in_snapshot": [],
+      "review_note": "The h2 snapshot hostname is retained from the live configuration; changing it needs endpoint verification.",
+      "live_entity_present": true
+    },
+    "tv_pic2": {
+      "missing_services_in_snapshot": [
+        "notify.living_room_tv"
+      ],
+      "review_note": "The existing h2 attachment URL and local image paths are retained; changing the notification format needs TV verification.",
+      "live_entity_present": true
+    },
+    "tv_pic3": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "tv_pic4": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "resetcreebulb": {
+      "missing_services_in_snapshot": [],
+      "review_note": "This is a device reset sequence, not a normal light toggle. Preserve every transition, delay, and the final on state.",
+      "live_entity_present": true
+    },
+    "run_playlist_on_plex": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "run_playlist_on_plex_hub": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "run_playlist_on_plex_hubold": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "shutdown_inew": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "living_room_display_2_temperature": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "turn_off_living_room": {
+      "missing_services_in_snapshot": [],
+      "review_note": "Despite the stable legacy key, this affects multiple rooms and shuts down iNew. Do not narrow the targets as a naming cleanup.",
+      "live_entity_present": true
+    },
+    "tv_random_channel": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "tv_random_channel_p": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "tv_random_channel2": {
+      "missing_services_in_snapshot": [],
+      "review_note": "Jinja range upper bounds are exclusive: the first digit is always 1; the other ranges remain exactly as deployed.",
+      "live_entity_present": true
+    },
+    "tv_type": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "tv_type2": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "volume_down": {
+      "missing_services_in_snapshot": [],
+      "review_note": null,
+      "live_entity_present": true
+    },
+    "play_kodi_channel": {
+      "missing_services_in_snapshot": [],
+      "review_note": "The selector is read with state_attr(..., 'state'), which may be undefined. Preserve it pending validation against the real Kodi caller and sensor.",
+      "live_entity_present": true
+    },
+    "your_kodi_script": {
+      "missing_services_in_snapshot": [],
+      "review_note": "The folded template contains a literal inline comment in the rendered media ID. It is preserved for the baseline review, not silently corrected.",
+      "live_entity_present": true
+    }
+  }
+}

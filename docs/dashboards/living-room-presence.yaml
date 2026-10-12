@@ -1,0 +1,27 @@
+# Storage-mode Overview / Lighting: insert immediately after the horizontal
+# button row containing Living lamp, inside its existing vertical stack.
+type: vertical-stack
+cards:
+  - type: markdown
+    title: Living room presence — now
+    entity_id:
+      - binary_sensor.living_room_presence
+    content: |-
+      {% set status = states('binary_sensor.living_room_presence') %}
+      {% if status == 'on' %}
+      ## 🟢 Detected
+      {% elif status == 'off' %}
+      ## ⚪ Not detected
+      {% elif status == 'unavailable' %}
+      ## 🟠 Sensor unavailable
+      {% else %}
+      ## ⚪ Status unknown
+      {% endif %}
+  - type: history-graph
+    title: Living room presence — 24h
+    hours_to_show: 24
+    entities:
+      - entity: binary_sensor.living_room_presence
+        name: Presence
+      - entity: switch.living_lamp
+        name: Living lamp

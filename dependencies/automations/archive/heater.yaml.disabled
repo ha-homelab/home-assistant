@@ -1,0 +1,39 @@
+#- alias: Heater from 8am to 11pm
+#  description: Heater from 8am to 11pm
+#  trigger:
+#  - platform: state
+#    entity_id: switch.heater_l
+#    to: 'on'
+#    for:
+#      minutes: 10
+#  condition:
+#  - after: '08:00:00'
+#    before: '23:00:00'
+#    condition: time
+#  action:
+#  - service: switch.turn_off
+#    entity_id: switch.heater_l
+#  - service: persistent_notification.create
+#    data_template:
+#      title: "Heater turned off after 10 min delay"
+#      message: "Heater turned off after 10 min delay {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}"
+
+#- alias: Heater from 11pm to 8am
+#  description: Heater from 10pm to 8am
+#  trigger:
+#  - platform: state
+#    entity_id: switch.heater_l
+#    to: 'on'
+#    for:
+#      minutes: 20
+#  condition:
+#  - after: '00:35:00'
+#    before: '07:00:00'
+#    condition: time
+#  action:
+#  - service: switch.turn_off
+#    entity_id: switch.heater_l
+#  - service: persistent_notification.create
+#    data_template:
+#      title: "Heater turned off after 20 min delay"
+#      message: "Heater turned off after 20 min delay {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}"

@@ -1,0 +1,9 @@
+title: Core Updates
+views:
+  - title: Core Updates
+    path: overview
+    icon: mdi:update
+    cards:
+      - type: custom:core-update-card
+        entity: update.home_assistant_core
+        title: Core updates

@@ -1,0 +1,124 @@
+# Keep 28 days of history in the existing database. Credentials stay in secrets.yaml.
+db_url: !secret 'recorder_db_url'
+purge_keep_days: 28
+# Purging remains automatic; MySQL table rebuilds require a separate capacity check.
+auto_repack: false
+# Exact overrides preserve battery protection and extrema history despite the voltage glob.
+include:
+  entities:
+    - sensor.jbd_battery_chain_1_minimum_cell_voltage
+    - sensor.jbd_battery_chain_1_maximum_cell_voltage
+    - sensor.jbd_battery_chain_1_low_voltage
+    - sensor.jbd_battery_chain_1_high_voltage
+    - sensor.jbd_battery_chain_1_low_cell_voltage
+    - sensor.jbd_battery_chain_1_high_cell_voltage
+    - sensor.jbd_battery_chain_2_minimum_cell_voltage
+    - sensor.jbd_battery_chain_2_maximum_cell_voltage
+    - sensor.jbd_battery_chain_2_low_voltage
+    - sensor.jbd_battery_chain_2_high_voltage
+    - sensor.jbd_battery_chain_2_low_cell_voltage
+    - sensor.jbd_battery_chain_2_high_cell_voltage
+exclude:
+  domains:
+    - media_player
+    - camera
+    - device_tracker
+    - calendar
+    - remote
+    - input_select
+    - input_boolean
+    - automation
+    - script
+    - vacuum
+    - zone
+  entities:
+    - sensor.geonet_nz_quakes_37_77411380617198_122_50019172672184
+    - sensor.sonoff_rf_bridge_wifi_signal
+    - sensor.sonoff_rf_bridge_uptime
+    - sensor.memory_use_percent
+    - sensor.auto_backup
+    - sensor.top_cpu_consumer
+    - sensor.time
+    - sensor.backdoor_images
+    - sensor.front_images
+    - sensor.garage_images
+    - sensor.porch_images
+    - sensor.hacs
+    - sensor.cpu_temperature_1
+    - sensor.cpu_temperature_2
+    - sensor.cpu_temperature_3
+    - sensor.ec4486c1_fa98da6d
+    - sensor.intuit
+    - sensor.weekday
+    - sensor.street_sweeping
+    - group.family
+    - sensor.track
+    - sensor.moon
+    - sensor.disk_use_percent
+    - sensor.sonarr_upcoming_media
+    - sensor.radarr_upcoming_media
+    - sensor.chinese_air_quality_index
+    - sensor.chinese_main_pollutant
+    - sensor.pc_investment
+    - sensor.days_in_current_month
+    - sensor.day_of_current_month
+    - sensor.chinese_air_pollution_level
+    - sensor.pc_cash
+    - sensor.pc_mortgage
+    - sensor.pc_other_asset
+    - sensor.pc_other_liability
+    - sensor.pc_credit
+    - sensor.plex_recently_added
+    - sensor.pc_loan
+    - sensor.pc_networth
+    - sensor.zp3111us_4_in_1_motion_battery
+    - sensor.alvit_work_gmail_com
+    - switch.harmonyhub_listen_to_music
+    - switch.harmonyhub_watch_tv
+    - sensor.elevation
+    - sensor.recology
+    - sensor.season
+    # Emporia virtual L1 aliases duplicate the retained *_power stream.
+    - sensor.balance_power_1s_power_on_l1
+    - sensor.family_room_power_1s_power_on_l1
+    - sensor.fridge_power_1s_power_on_l1
+    - sensor.garage_power_1s_power_on_l1
+    - sensor.hallway_and_pressure_cooker_power_1s_power_on_l1
+    - sensor.home_power_1s_power_on_l1
+    - sensor.kitchen_fridge_side_power_1s_power_on_l1
+    - sensor.kitchen_stove_teapot_area_power_1s_power_on_l1
+    - sensor.living_and_dining_and_bath2_power_1s_power_on_l1
+    - sensor.microwave_power_1s_power_on_l1
+    - sensor.office_and_bedrooms_power_1s_power_on_l1
+    - sensor.solar_shed_bedrooms_on_1st_light_bedroom_2_3_tv_samsung_switch_ap_range_hood_power_1s_power_on_l1
+    - sensor.totalusage_power_1s_power_on_l1
+    # dbus-tasmota-pv publishes the same W value to Power and Ac/L1/Power.
+    # Keep the canonical power_total sources used by solar_total_power.
+    - sensor.solar_tasmota_tasmota_120_power_l1
+    - sensor.solar_tasmota_tasmota_121_power_l1
+    # Live diagnostics remain available; their future history/statistics are not retained.
+    - sensor.heater_one_energy_apparentpower
+    - sensor.heater_one_energy_current
+    - sensor.heater_one_energy_factor
+    - sensor.heater_one_energy_reactivepower
+    - sensor.heater_two_energy_apparentpower
+    - sensor.heater_two_energy_current
+    - sensor.heater_two_energy_factor
+    - sensor.heater_two_energy_reactivepower
+    # One-second experimental signal diagnostics are live-only.
+    - sensor.ruview_assumed_zone_activity
+    - sensor.home_floorplan_assumed_zone_activity
+  entity_globs:
+    - sensor.weather_*
+    - sensor.dark_sky*
+    - switch.*do_not_disturb_switch
+    - switch.*repeat_switch
+    - sensor.*battery_level
+    - sensor.us_*
+    - sensor.italy_*
+    - sensor.china_*
+    - sensor.united_kingdom__*
+    - sensor.*_voltage
+    # Live RuView algorithm diagnostics are not long-term household history.
+    - sensor.ruview_node*_server_modules
+    - sensor.home_floorplan_ruview_node*_modules

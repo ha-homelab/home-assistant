@@ -1,0 +1,1231 @@
+{
+  "format_version": 1,
+  "source": {
+    "home_assistant_version": "2026.9.1",
+    "source_folder": "/config/scripts",
+    "snapshot_date": "2026-09-14",
+    "script_count": 54
+  },
+  "scripts": {
+    "backdoormotion": {
+      "sequence": [
+        {
+          "data": {
+            "entity_id": "camera.backdoor_camera",
+            "filename": "/config/www/backdoor_camera_alert.jpg"
+          },
+          "service": "camera.snapshot"
+        },
+        {
+          "service": "notify.chrome",
+          "data_template": {
+            "message": "backdoor Motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+            "data": {
+              "icon": "https://ha.example.invalid/local/backdoor_camera_alert.jpg?{{ as_timestamp(now()) }}",
+              "image": "https://ha.example.invalid/local/backdoor_camera_alert.jpg?{{ as_timestamp(now()) }}",
+              "url": "https://ha.example.invalid/local/backdoor_camera_alert.jpg?{{ as_timestamp(now()) }}"
+            }
+          }
+        },
+        {
+          "service": "notify.roomba",
+          "data": {
+            "title": "Backdoor Camera",
+            "message": "Motion detected",
+            "data": {
+              "displaytime": 20000,
+              "icon": "warning"
+            }
+          }
+        },
+        {
+          "service": "notify.imac21",
+          "data": {
+            "title": "Backdoor Camera",
+            "message": "Motion detected",
+            "data": {
+              "displaytime": 20000,
+              "icon": "warning"
+            }
+          }
+        },
+        {
+          "condition": "time",
+          "after": "20:30:00",
+          "before": "22:00:00"
+        },
+        {
+          "service": "notify.mobile_app_als_iphone2",
+          "data": {
+            "message": "backdoor Motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+            "data": {
+              "attachment": {
+                "content-type": "jpeg"
+              },
+              "push": {
+                "category": "camera"
+              },
+              "entity_id": "camera.backdoor_camera",
+              "actions": [
+                {
+                  "action": "porch_light_on",
+                  "title": "Porch light"
+                },
+                {
+                  "action": "Dismiss",
+                  "title": "Dismiss"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "service": "notify.chrome",
+          "data": {
+            "message": "Backdoor Motion"
+          }
+        },
+        {
+          "service": "light.turn_on",
+          "entity_id": "light.backdoor_porch",
+          "data": {
+            "brightness": 117
+          }
+        },
+        {
+          "delay": "00:00:10"
+        },
+        {
+          "service": "light.turn_on",
+          "entity_id": "light.backdoor_porch",
+          "data": {
+            "brightness": 90
+          }
+        },
+        {
+          "delay": "00:00:01"
+        },
+        {
+          "service": "light.turn_on",
+          "entity_id": "light.backdoor_porch",
+          "data": {
+            "brightness": 78
+          }
+        },
+        {
+          "delay": "00:00:01"
+        },
+        {
+          "service": "light.turn_on",
+          "entity_id": "light.backdoor_porch",
+          "data": {
+            "brightness": 66
+          }
+        },
+        {
+          "delay": "00:00:01"
+        },
+        {
+          "service": "light.turn_on",
+          "entity_id": "light.backdoor_porch",
+          "data": {
+            "brightness": 54
+          }
+        },
+        {
+          "delay": "00:00:01"
+        },
+        {
+          "service": "light.turn_on",
+          "entity_id": "light.backdoor_porch",
+          "data": {
+            "brightness": 42
+          }
+        },
+        {
+          "delay": "00:00:01"
+        },
+        {
+          "service": "light.turn_on",
+          "entity_id": "light.backdoor_porch",
+          "data": {
+            "brightness": 30
+          }
+        },
+        {
+          "delay": "00:00:05"
+        },
+        {
+          "service": "light.turn_off",
+          "entity_id": "light.backdoor_porch"
+        }
+      ]
+    },
+    "blinkmotion": {
+      "sequence": [
+        {
+          "service": "notify.chrome",
+          "data": {
+            "message": "Front Porch Motion"
+          }
+        },
+        {
+          "service": "notify.pushbullet",
+          "data": {
+            "title": "Front Porch",
+            "target": "email/californian.tiramisu@gmail.com",
+            "message": "Motion detected"
+          }
+        },
+        {
+          "service": "switch.turn_on",
+          "entity_id": "switch.002007275ccf7fe09363"
+        },
+        {
+          "service": "switch.turn_on",
+          "entity_id": "switch.042004835ccf7f7cedb1"
+        },
+        {
+          "delay": "00:00:03"
+        },
+        {
+          "service": "switch.turn_off",
+          "entity_id": "switch.042004835ccf7f7cedb1"
+        },
+        {
+          "delay": "00:00:02"
+        },
+        {
+          "service": "switch.turn_off",
+          "entity_id": "switch.002007275ccf7fe09363"
+        }
+      ]
+    },
+    "cast_plex_to_chromecast": {
+      "alias": "Cast Plex to Chromecast",
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "data": {
+            "entity_id": "media_player.chromecast",
+            "media_content_type": "movie",
+            "media_content_id": "plex://{\"library_name\": \"Movies\", \"title\": \"2012\"}"
+          }
+        }
+      ]
+    },
+    "cast_porch_to_chromecast": {
+      "alias": "Cast Porch to Chromecast",
+      "sequence": [
+        {
+          "service": "camera.play_stream",
+          "data": {
+            "entity_id": "camera.garage_camera",
+            "media_player": "media_player.chromecast"
+          }
+        }
+      ]
+    },
+    "cast_downstairs_on_kitchen": {
+      "alias": "Show Downstairs on kitchen",
+      "sequence": [
+        {
+          "data": {
+            "dashboard_path": "lovelace",
+            "entity_id": "media_player.kitchen_display",
+            "view_path": "default_view"
+          },
+          "service": "cast.show_lovelace_view"
+        }
+      ]
+    },
+    "flash": {
+      "sequence": [
+        {
+          "service": "light.turn_on",
+          "entity_id": "light.arc_lamp"
+        },
+        {
+          "delay": "00:00:10"
+        },
+        {
+          "service": "light.turn_off",
+          "entity_id": "light.arc_lamp",
+          "data": {
+            "flash": "short"
+          }
+        }
+      ]
+    },
+    "frontmotion": {
+      "sequence": [
+        {
+          "data": {
+            "entity_id": "camera.front_camera",
+            "filename": "/config/www/front_camera_alert.jpg"
+          },
+          "service": "camera.snapshot"
+        },
+        {
+          "service": "notify.roomba",
+          "data": {
+            "title": "Front Camera",
+            "message": "Motion detected",
+            "data": {
+              "displaytime": 20000,
+              "icon": "warning"
+            }
+          }
+        },
+        {
+          "service": "notify.imac21",
+          "data": {
+            "title": "Front Camera",
+            "message": "Motion detected",
+            "data": {
+              "displaytime": 20000,
+              "icon": "warning"
+            }
+          }
+        },
+        {
+          "condition": "time",
+          "after": "9:05:00",
+          "before": "23:00:00"
+        },
+        {
+          "service": "notify.chrome",
+          "data_template": {
+            "message": "Front Motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+            "data": {
+              "icon": "https://ha.example.invalid/local/front_camera_alert.jpg?{{ as_timestamp(now()) }}",
+              "image": "https://ha.example.invalid/local/front_camera_alert.jpg?{{ as_timestamp(now()) }}",
+              "url": "https://ha.example.invalid/local/front_camera_alert.jpg?{{ as_timestamp(now()) }}"
+            }
+          }
+        },
+        {
+          "service": "notify.mobile_app_als_iphone2",
+          "data": {
+            "message": "Front Motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+            "data": {
+              "attachment": {
+                "content-type": "jpeg"
+              },
+              "push": {
+                "category": "camera"
+              },
+              "entity_id": "camera.front_camera",
+              "actions": [
+                {
+                  "action": "porch_light_on",
+                  "title": "Porch light"
+                },
+                {
+                  "action": "Dismiss",
+                  "title": "Dismiss"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "garagemotion": {
+      "sequence": [
+        {
+          "data": {
+            "entity_id": "camera.garage_camera",
+            "filename": "/config/www/garage_camera_alert.jpg"
+          },
+          "service": "camera.snapshot"
+        },
+        {
+          "service": "notify.roomba",
+          "data": {
+            "title": "Garage",
+            "message": "Motion detected",
+            "data": {
+              "displaytime": 20000,
+              "icon": "warning"
+            }
+          }
+        },
+        {
+          "service": "notify.imac21",
+          "data": {
+            "title": "Garage",
+            "message": "Motion detected",
+            "data": {
+              "displaytime": 20000,
+              "icon": "warning"
+            }
+          }
+        },
+        {
+          "condition": "time",
+          "after": "09:05:00",
+          "before": "23:00:00"
+        },
+        {
+          "service": "notify.mobile_app_als_iphone2",
+          "data": {
+            "message": "garage Motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+            "data": {
+              "attachment": {
+                "content-type": "jpeg"
+              },
+              "push": {
+                "category": "camera"
+              },
+              "entity_id": "camera.garage_camera",
+              "actions": [
+                {
+                  "action": "porch_light_on",
+                  "title": "Porch light"
+                },
+                {
+                  "action": "Dismiss",
+                  "title": "Dismiss"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "service": "notify.chrome",
+          "data_template": {
+            "message": "garage Motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+            "data": {
+              "icon": "https://ha.example.invalid/local/garage_camera_alert.jpg?{{ as_timestamp(now()) }}",
+              "image": "https://ha.example.invalid/local/garage_camera_alert.jpg?{{ as_timestamp(now()) }}",
+              "url": "https://ha.example.invalid/local/garage_camera_alert.jpg?{{ as_timestamp(now()) }}"
+            }
+          }
+        }
+      ]
+    },
+    "kk": {
+      "sequence": [
+        {
+          "service": "shell_command.kk",
+          "data_template": {
+            "pla": "{{ states.input_select.sta.state | string }}",
+            "sta": "{{ states.input_select.pla.state | string }}"
+          }
+        }
+      ]
+    },
+    "kkk": {
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "data_template": {
+            "entity_id": "media_player.{{ states.input_select.player.state | string }}",
+            "media_content_id": "{{ states.input_select.radio.state | string }}",
+            "media_content_type": "TUNEIN"
+          }
+        }
+      ]
+    },
+    "turn_off_lg_tv_screen": {
+      "sequence": [
+        {
+          "service": "webostv.command",
+          "data": {
+            "entity_id": "media_player.living_room_tv_77",
+            "command": "com.webos.service.tvpower/power/turnOffScreen"
+          }
+        }
+      ]
+    },
+    "turn_on_lg_tv_screen": {
+      "sequence": [
+        {
+          "service": "webostv.command",
+          "data": {
+            "entity_id": "media_player.living_room_tv_77",
+            "command": "com.webos.service.tvpower/power/turnOnScreen"
+          }
+        }
+      ]
+    },
+    "turn_off_lg2_tv_screen": {
+      "sequence": [
+        {
+          "service": "webostv.command",
+          "data": {
+            "entity_id": "media_player.lg2",
+            "command": "com.webos.service.tvpower/power/turnOffScreen"
+          }
+        }
+      ]
+    },
+    "turn_on_lg2_tv_screen": {
+      "sequence": [
+        {
+          "service": "webostv.command",
+          "data": {
+            "entity_id": "media_player.lg2",
+            "command": "com.webos.service.tvpower/power/turnOnScreen"
+          }
+        }
+      ]
+    },
+    "living_room_tv_picture_energy_saving": {
+      "sequence": [
+        {
+          "service": "webostv.command",
+          "data": {
+            "entity_id": "media_player.living_room_tv_77",
+            "command": "system.notifications/createAlert",
+            "payload": {
+              "title": "Energy saving",
+              "message": "{{ energy_saving }}",
+              "modal": false,
+              "buttons": [
+                {
+                  "label": "ok",
+                  "focus": true,
+                  "buttonType": "ok",
+                  "onClick": "luna://com.webos.settingsservice/setSystemSettings",
+                  "params": {
+                    "category": "picture",
+                    "settings": {
+                      "energySaving": "{{ energy_saving }}",
+                      "energySavingModified": "true"
+                    }
+                  }
+                }
+              ],
+              "type": "confirm",
+              "isSysReq": true
+            }
+          }
+        }
+      ]
+    },
+    "mediaoff": {
+      "sequence": [
+        {
+          "service": "media_player.turn_off",
+          "entity_id": "media_player.bathroom_echo_dot"
+        },
+        {
+          "service": "media_player.turn_off",
+          "entity_id": "media_player.living_room_echo"
+        },
+        {
+          "service": "media_player.turn_off",
+          "entity_id": "media_player.bathroom_speaker"
+        },
+        {
+          "service": "media_player.turn_off",
+          "entity_id": "media_player.kitchen_speaker_2"
+        },
+        {
+          "service": "media_player.turn_off",
+          "entity_id": "media_player.family_room_speaker_2"
+        },
+        {
+          "service": "media_player.turn_off",
+          "entity_id": "media_player.dinning_room_google_mini"
+        },
+        {
+          "service": "media_player.turn_off",
+          "entity_id": "media_player.mishka_bedroom_google_mini"
+        },
+        {
+          "service": "media_player.turn_off",
+          "entity_id": "media_player.our_bedroom_google_home"
+        },
+        {
+          "service": "media_player.turn_off",
+          "entity_id": "media_player.living_room_google_home"
+        }
+      ]
+    },
+    "notify": {
+      "sequence": [
+        {
+          "service": "notify.roomba",
+          "data": {
+            "title": "{{ message }}",
+            "message": "{{ message }} {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+            "data": {
+              "displaytime": 20000,
+              "icon": "warning"
+            }
+          }
+        },
+        {
+          "service": "notify.imac21",
+          "data": {
+            "title": "{{ message }}",
+            "message": "{{ message }} {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+            "data": {
+              "displaytime": 20000,
+              "icon": "warning"
+            }
+          }
+        }
+      ]
+    },
+    "notifymax": {
+      "sequence": [
+        {
+          "service": "notify.roomba",
+          "data": {
+            "title": "{{ message }}",
+            "message": "{{ message }} {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+            "data": {
+              "displaytime": 20000,
+              "icon": "warning"
+            }
+          }
+        },
+        {
+          "service": "notify.imac21",
+          "data": {
+            "title": "{{ message }}",
+            "message": "{{ message }} {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}",
+            "data": {
+              "displaytime": 20000,
+              "icon": "warning"
+            }
+          }
+        },
+        {
+          "service": "persistent_notification.create",
+          "data_template": {
+            "title": "{{ message }}",
+            "message": "{{ message }} {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}"
+          }
+        }
+      ]
+    },
+    "notify_mqtt": {
+      "sequence": [
+        {
+          "service": "mqtt.publish",
+          "data_template": {
+            "payload": "{\"title\": \"Info\", \"message\": \"{{ message }}\"}",
+            "topic": "living_room/notifications",
+            "retain": true
+          }
+        }
+      ]
+    },
+    "notify_mqtt_log": {
+      "sequence": [
+        {
+          "service": "mqtt.publish",
+          "data_template": {
+            "payload": "{{ message }}",
+            "topic": "living_room/switch_log",
+            "retain": true
+          }
+        }
+      ]
+    },
+    "playplexplaylist": {
+      "alias": "Play Plex Playlist for 2hr",
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "data": {
+            "entity_id": "media_player.living_room_echo_2",
+            "media_content_id": "album \"Dark Side of the Moon\"",
+            "media_content_type": "AMAZON_MUSIC"
+          }
+        }
+      ]
+    },
+    "run_playlist_on_plex_ants": {
+      "alias": "run_playlist_on_plex_ants",
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "data": {
+            "entity_id": "media_player.plex_plex_for_android_tv_chromecast_google_tv_hd",
+            "media_content_type": "PLAYLIST",
+            "media_content_id": "plex://{ \"playlist_name\": \"Ants\", \"repeatall\": \"1\" }"
+          }
+        }
+      ]
+    },
+    "run_playlist_on_plex_mobile_ants": {
+      "alias": "run_playlist_on_plex_ants",
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "data": {
+            "entity_id": "media_player.dining_room_speaker",
+            "media_content_type": "PLAYLIST",
+            "media_content_id": "plex://{ \"playlist_name\": \"Ants\", \"repeatall\": \"1\" }"
+          }
+        }
+      ]
+    },
+    "run_playlist_on_plex_bathroom_ants": {
+      "alias": "run_playlist_on_plex_ants",
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "data": {
+            "entity_id": "media_player.bathroom_speaker",
+            "media_content_type": "PLAYLIST",
+            "media_content_id": "plex://{ \"playlist_name\": \"Ants\", \"repeatall\": \"1\" }"
+          }
+        }
+      ]
+    },
+    "stopplexplaylist": {
+      "alias": "Stop Playback on Bedroom Chromecast Audio",
+      "sequence": [
+        {
+          "service": "media_player.media_stop",
+          "entity_id": "media_player.living_room_echo_2"
+        }
+      ]
+    },
+    "random_on_an2": {
+      "sequence": [
+        {
+          "service": "shell_command.random_on_an2"
+        }
+      ]
+    },
+    "random_on_inew": {
+      "sequence": [
+        {
+          "service": "shell_command.random_on_inew"
+        }
+      ]
+    },
+    "receiver_turn_off": {
+      "sequence": [
+        {
+          "service": "remote.send_command",
+          "data": {
+            "entity_id": "remote.harmonyhub",
+            "command": [
+              "PowerOff"
+            ],
+            "device": "Pioneer AV Receiver",
+            "delay_secs": 0.6
+          }
+        }
+      ]
+    },
+    "receiver_turn_on": {
+      "sequence": [
+        {
+          "service": "remote.send_command",
+          "data": {
+            "entity_id": "remote.harmonyhub",
+            "command": [
+              "PowerOn",
+              "InputCd"
+            ],
+            "device": "Pioneer AV Receiver",
+            "delay_secs": 0.6
+          }
+        }
+      ]
+    },
+    "receiver_surround": {
+      "sequence": [
+        {
+          "service": "remote.send_command",
+          "data": {
+            "entity_id": "remote.harmonyhub",
+            "command": [
+              "SR+"
+            ],
+            "device": "Pioneer AV Receiver",
+            "delay_secs": 0.6
+          }
+        }
+      ]
+    },
+    "receiver_surrmodestereo": {
+      "sequence": [
+        {
+          "service": "remote.send_command",
+          "data": {
+            "entity_id": "remote.harmonyhub",
+            "command": [
+              "Stereo"
+            ],
+            "device": "Pioneer AV Receiver",
+            "delay_secs": 0.6
+          }
+        }
+      ]
+    },
+    "receiver_surroundmodelogic7": {
+      "sequence": [
+        {
+          "service": "remote.send_command",
+          "data": {
+            "entity_id": "remote.harmonyhub",
+            "command": [
+              "SurroundModeLogic7"
+            ],
+            "device": "Pioneer AV Receiver",
+            "delay_secs": 0.6
+          }
+        }
+      ]
+    },
+    "receiver_inputtuner": {
+      "sequence": [
+        {
+          "service": "remote.send_command",
+          "data": {
+            "entity_id": "remote.harmonyhub",
+            "command": [
+              "InputTuner"
+            ],
+            "device": "Pioneer AV Receiver",
+            "delay_secs": 0.6
+          }
+        }
+      ]
+    },
+    "receiver_inputcd": {
+      "sequence": [
+        {
+          "service": "remote.send_command",
+          "data": {
+            "entity_id": "remote.harmonyhub",
+            "command": [
+              "InputCd"
+            ],
+            "device": "Pioneer AV Receiver",
+            "delay_secs": 0.6
+          }
+        }
+      ]
+    },
+    "receiver_inputtape": {
+      "sequence": [
+        {
+          "service": "remote.send_command",
+          "data": {
+            "entity_id": "remote.harmonyhub",
+            "command": [
+              "InputTape"
+            ],
+            "device": "Pioneer AV Receiver",
+            "delay_secs": 0.6
+          }
+        }
+      ]
+    },
+    "tv_pic": {
+      "sequence": [
+        {
+          "service": "webostv.command",
+          "target": {
+            "entity_id": "media_player.living_room_tv"
+          },
+          "data": {
+            "command": "system.launcher/open",
+            "payload": {
+              "target": "https://ha.example.invalid/local/front_camera_alert.jpg?{{ as_timestamp(now()) }}"
+            }
+          }
+        }
+      ]
+    },
+    "tv_pic2": {
+      "sequence": [
+        {
+          "data": {
+            "data": {
+              "attachment": {
+                "url": "https://ha.example.invalid/local/front_camera_alert.jpg?{{ as_timestamp(now()) }}",
+                "image": "/config/www/front_camera_alert.jpg",
+                "icon": "/config/www/front_camera_alert.jpg"
+              }
+            },
+            "message": "Someone at the Front Camera"
+          },
+          "service": "notify.living_room_tv"
+        }
+      ]
+    },
+    "tv_pic3": {
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "target": {
+            "entity_id": "media_player.living_room_tv"
+          },
+          "data": {
+            "media_content_id": "РЕН",
+            "media_content_type": "channel"
+          }
+        }
+      ]
+    },
+    "tv_pic4": {
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "target": {
+            "entity_id": "media_player.living_room_tv"
+          },
+          "data": {
+            "media_content_id": "1",
+            "media_content_type": "channel"
+          }
+        }
+      ]
+    },
+    "resetcreebulb": {
+      "sequence": [
+        {
+          "service": "switch.turn_on",
+          "entity_id": "switch.01200209600194536430"
+        },
+        {
+          "delay": "00:00:05"
+        },
+        {
+          "service": "switch.turn_off",
+          "entity_id": "switch.01200209600194536430"
+        },
+        {
+          "delay": "00:00:02"
+        },
+        {
+          "service": "switch.turn_on",
+          "entity_id": "switch.01200209600194536430"
+        },
+        {
+          "delay": "00:00:01"
+        },
+        {
+          "service": "switch.turn_off",
+          "entity_id": "switch.01200209600194536430"
+        },
+        {
+          "delay": "00:00:02"
+        },
+        {
+          "service": "switch.turn_on",
+          "entity_id": "switch.01200209600194536430"
+        },
+        {
+          "delay": "00:00:01"
+        },
+        {
+          "service": "switch.turn_off",
+          "entity_id": "switch.01200209600194536430"
+        },
+        {
+          "delay": "00:00:02"
+        },
+        {
+          "service": "switch.turn_on",
+          "entity_id": "switch.01200209600194536430"
+        },
+        {
+          "delay": "00:00:01"
+        },
+        {
+          "service": "switch.turn_off",
+          "entity_id": "switch.01200209600194536430"
+        },
+        {
+          "delay": "00:00:02"
+        },
+        {
+          "service": "switch.turn_on",
+          "entity_id": "switch.01200209600194536430"
+        },
+        {
+          "delay": "00:00:01"
+        },
+        {
+          "service": "switch.turn_off",
+          "entity_id": "switch.01200209600194536430"
+        },
+        {
+          "delay": "00:00:02"
+        },
+        {
+          "service": "switch.turn_on",
+          "entity_id": "switch.01200209600194536430"
+        }
+      ]
+    },
+    "run_playlist_on_plex": {
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "data": {
+            "media_content_id": "plex://{ \"playlist_name\": \"Mult\", \"shuffle\": \"1\" }",
+            "media_content_type": "PLAYLIST"
+          },
+          "target": {
+            "entity_id": "media_player.living_room_display"
+          }
+        }
+      ],
+      "mode": "single",
+      "alias": "Запустить плейлист plex",
+      "icon": "mdi:playlist-play"
+    },
+    "run_playlist_on_plex_hub": {
+      "alias": "Запустить плейлист plex hub new",
+      "icon": "mdi:playlist-play",
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "metadata": {},
+          "data": {
+            "entity_id": "media_player.vitaly_s_family_hub",
+            "media_content_id": "alexa, ask plex to play sailor went to sea sea sea by caboomers",
+            "media_content_type": "custom"
+          }
+        }
+      ]
+    },
+    "run_playlist_on_plex_hubold": {
+      "alias": "Запустить плейлист plex hub",
+      "icon": "mdi:playlist-play",
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "data": {
+            "media_content_type": "music",
+            "media_content_id": "plex://{\"library_name\": \"Music\", \"artist_name\": \"Caboomers\", \"track_name\": \"Sailor went to Sea Sea Sea\", \"shuffle\": \"1\"}"
+          },
+          "target": {
+            "entity_id": "media_player.vitaly_s_family_hub"
+          }
+        }
+      ],
+      "mode": "single"
+    },
+    "shutdown_inew": {
+      "sequence": [
+        {
+          "service": "shell_command.shutdown_inew"
+        }
+      ]
+    },
+    "living_room_display_2_temperature": {
+      "alias": "living_room_display_2_temperature",
+      "icon": "mdi:playlist-play",
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "metadata": {},
+          "data": {
+            "entity_id": "media_player.living_room_display_2",
+            "media_content_id": "okay google, what is the temperature on the porch",
+            "media_content_type": "custom"
+          }
+        }
+      ]
+    },
+    "turn_off_living_room": {
+      "sequence": [
+        {
+          "service": "light.turn_off",
+          "entity_id": [
+            "light.bedroom_light_dimmer_l",
+            "light.hall_1_m",
+            "light.hall_2_m",
+            "light.arc_lamp",
+            "light.black_lamp",
+            "light.led_under_cabinet_2_l",
+            "light.led_under_cabinet_l",
+            "light.kitchen_lamp_m",
+            "light.bathroom_two_light_l",
+            "light.50w_l",
+            "light.fireplace_led_ll",
+            "light.tiny_garland_ll",
+            "light.bathroom_mirror_light",
+            "light.dining_lights_dimmer_l",
+            "light.balcony",
+            "light.porch_one",
+            "light.porch_two",
+            "light.garage_one",
+            "light.garage_two",
+            "light.garage_three",
+            "light.arc_lamp2",
+            "light.backdoor_porch",
+            "light.living_wall_dimmer_l",
+            "light.bedroom_one",
+            "light.bedroom_two",
+            "light.bedroom_three",
+            "light.bedroom_four",
+            "light.bedroom_five"
+          ]
+        },
+        {
+          "service": "switch.turn_off",
+          "entity_id": [
+            "switch.studio_wall_lamp",
+            "switch.fireplace_l",
+            "switch.stage_led_l",
+            "switch.tiny_garland_ll",
+            "switch.fireplace_led_ll",
+            "switch.50w_ll",
+            "switch.tv_backlight_l",
+            "switch.mishka_bedroom_desk_lamp_l",
+            "switch.dining_wall_lights_l",
+            "switch.living_room_light_l",
+            "switch.tv_l",
+            "switch.audio_l",
+            "switch.audiosystem_l"
+          ]
+        },
+        {
+          "service": "shell_command.shutdown_inew"
+        }
+      ]
+    },
+    "tv_random_channel": {
+      "sequence": [
+        {
+          "service": "remote.send_command",
+          "data": {
+            "entity_id": "remote.harmonyhub",
+            "device": "LG TV",
+            "delay_secs": 0.4,
+            "command": "{% set p = range(30, 1215) | random | string %} {{ p | list }}\n"
+          }
+        }
+      ]
+    },
+    "tv_random_channel_p": {
+      "sequence": [
+        {
+          "service": "remote.send_command",
+          "data": {
+            "entity_id": "remote.harmonyhub",
+            "device": "LG TV",
+            "delay_secs": 0.4,
+            "command": "{% set p = range(1216, 1400) | random | string %} {{ p | list }}\n"
+          }
+        }
+      ]
+    },
+    "tv_random_channel2": {
+      "sequence": [
+        {
+          "service": "remote.send_command",
+          "data": {
+            "entity_id": "remote.harmonyhub",
+            "command": [
+              "{{(range(1, 2)|random|int)}}",
+              "{{(range(0, 4)|random|int)}}",
+              "{{(range(0, 9)|random|int)}}",
+              "{{(range(0, 9)|random|int)}}"
+            ],
+            "device": "LG TV",
+            "delay_secs": 0.1
+          }
+        }
+      ]
+    },
+    "tv_type": {
+      "sequence": [
+        {
+          "service": "remote.send_command",
+          "data": {
+            "entity_id": "remote.harmonyhub",
+            "command": [
+              "1",
+              "A",
+              "S",
+              "D",
+              "A"
+            ],
+            "device": "LG TV",
+            "delay_secs": 0.1
+          }
+        }
+      ]
+    },
+    "tv_type2": {
+      "sequence": [
+        {
+          "service": "webostv.command",
+          "target": {
+            "entity_id": "media_player.living_room_tv"
+          },
+          "data": {
+            "command": "com.webos.service.ime/insertText",
+            "payload": {
+              "text": "123",
+              "replace": 0
+            }
+          }
+        }
+      ]
+    },
+    "volume_down": {
+      "sequence": [
+        {
+          "service": "media_player.volume_set",
+          "data": {
+            "entity_id": "media_player.al_mini",
+            "volume_level": 0.45
+          }
+        },
+        {
+          "service": "media_player.volume_set",
+          "data": {
+            "entity_id": "media_player.vitaly_s_echo",
+            "volume_level": 0.2
+          }
+        },
+        {
+          "service": "media_player.volume_set",
+          "data": {
+            "entity_id": "media_player.imac21",
+            "volume_level": 0.45
+          }
+        }
+      ]
+    },
+    "play_kodi_channel": {
+      "alias": "Play Kodi Channel",
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "target": {
+            "entity_id": "media_player.192_168_160_1"
+          },
+          "data": {
+            "media_content_type": "CHANNEL",
+            "media_content_id": "{% set channelid = state_attr('input_select.kodi_channel_selector', 'state') %} {% set channels = (states('sensor.kodi_channels') | from_json) %} {% for channel in channels %}\n  {% if channel.label == channelid %}\n    {{ channel.channelid }}\n  {% endif %}\n{% endfor %}\n"
+          }
+        }
+      ]
+    },
+    "your_kodi_script": {
+      "alias": "Play Kodi Channel",
+      "sequence": [
+        {
+          "service": "media_player.play_media",
+          "target": {
+            "entity_id": "media_player.192_168_160_1"
+          },
+          "data": {
+            "media_content_type": "CHANNEL",
+            "media_content_id": "{{ channelid }}  # This is the channelid passed from the automation\n"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+# Energy telemetry: Publish the inverter state to MQTT.
+# Stable entity: automation.mqtt_publish_sensor_value_inverter_state.
+- id: ha_homelab_energy_telemetry_publish_the_inverter_state_to_mqtt
+  alias: 'Energy telemetry: Publish the inverter state to MQTT'
+  description: Publish the inverter state to MQTT. Responds to sensor.inverter_state changing state.
+  triggers:
+    platform: state
+    entity_id: sensor.inverter_state
+  actions:
+    service: mqtt.publish
+    data_template:
+      payload: '{{trigger.to_state.state}}'
+      topic: home/inverter_state
+  mode: single
+  trace:
+    stored_traces: 5

@@ -1,0 +1,167 @@
+{
+  "snapshot_date": "2026-09-22",
+  "home_assistant_version": "2026.9.1",
+  "scope": {
+    "automations": 133,
+    "scripts": 68,
+    "note": "Loaded folder and package definitions before adding the shared helper. Includes blueprint input references; dynamic references are not resolved."
+  },
+  "method": "Static literal entity references in active automation/script YAML, reviewed against both states and entity registry. Missing means absent from both, not merely unavailable. No actions or templates were executed for inventory. The remaining list excludes the three confirmed ID corrections and is a follow-up inventory, not a promise that every dynamic dependency was found. Payloads, credentials and state attributes are omitted.",
+  "confirmed_entity_corrections": {
+    "binary_sensor.rf_dinner_motion_two": "binary_sensor.rf_dinner_two_motion",
+    "binary_sensor.rf_presence_sensor_1_fast_motion_signal": "binary_sensor.presence_sensor_1_fast_motion_signal",
+    "sensor.smart_water_timer_smart_water_timer": "switch.smart_water_timer_smart_water_timer"
+  },
+  "missing_optional_notification_services": [
+    "notify.chrome",
+    "notify.mobile_app_als_iphone2",
+    "notify.pushbullet",
+    "notify.living_room_tv"
+  ],
+  "remaining_missing_entities": {
+    "binary_sensor.rf_studio_bathroom_motion": [
+      "automations/070_notifications_report_motion_sensor_changes.yaml"
+    ],
+    "camera.garage_camera": [
+      "automations/036_garage_camera_capture_motion_and_notify_displays.yaml",
+      "scripts/media/cast_garage_camera.yaml",
+      "scripts/notifications/garage_camera_motion.yaml"
+    ],
+    "input_boolean.mishka_sticky": [
+      "automations/069_lighting_clear_manual_overrides_each_morning.yaml"
+    ],
+    "light.bedroom_five": [
+      "automations/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml",
+      "automations/075_lighting_turn_off_scheduled_lights_except_the_living_room.yaml",
+      "scripts/lighting/household_lights_and_media_off.yaml"
+    ],
+    "light.dining_lamp_m": [
+      "automations/031_dining_room_turn_off_lights_after_motion_clears.yaml",
+      "automations/033_dining_room_turn_on_lights_after_motion.yaml"
+    ],
+    "light.dinning_wall_one": [
+      "automations/030_dining_room_dim_living_room_lights_after_motion_clears.yaml",
+      "automations/032_dining_room_turn_off_living_room_lights_after_motion_clears.yaml",
+      "automations/034_dining_room_turn_on_living_room_lights_after_motion.yaml"
+    ],
+    "light.fireplace_led_ll": [
+      "automations/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml",
+      "automations/112_notifications_report_switch_state_changes.yaml",
+      "scripts/lighting/household_lights_and_media_off.yaml"
+    ],
+    "light.garage_beam_light": [
+      "automations/085_self_consumption_select_controllable_loads_from_grid_power.yaml"
+    ],
+    "light.hall_2_m_l_l": [
+      "automations/068_mishka_room_turn_on_lights_after_motion.yaml"
+    ],
+    "media_player.dinning_room_google_mini": [
+      "scripts/media/stop_household_players.yaml"
+    ],
+    "media_player.family_room_speaker_2": [
+      "scripts/media/stop_household_players.yaml"
+    ],
+    "media_player.kitchen_speaker_2": [
+      "scripts/media/stop_household_players.yaml"
+    ],
+    "media_player.living_room_google_home": [
+      "scripts/media/stop_household_players.yaml"
+    ],
+    "media_player.living_room_tv": [
+      "scripts/television/insert_webos_test_text.yaml",
+      "scripts/television/open_front_snapshot.yaml",
+      "scripts/television/play_channel_one.yaml",
+      "scripts/television/play_ren_channel.yaml"
+    ],
+    "media_player.mishka_bedroom_echo_dot": [
+      "automations/066_mailbox_announce_activity_and_flash_the_indicator.yaml",
+      "automations/084_porch_announce_motion_through_alexa.yaml"
+    ],
+    "media_player.mishka_bedroom_google_mini": [
+      "scripts/media/stop_household_players.yaml"
+    ],
+    "media_player.plex_plex_for_android_tv_chromecast_google_tv_hd": [
+      "scripts/media/plex_ants_android_tv.yaml"
+    ],
+    "media_player.vitaly_s_echo": [
+      "scripts/media/set_household_volume_presets.yaml"
+    ],
+    "media_player.vitaly_s_portal_2": [
+      "automations/084_porch_announce_motion_through_alexa.yaml"
+    ],
+    "switch.attic_dehumidifier_l": [
+      "automations/112_notifications_report_switch_state_changes.yaml"
+    ],
+    "switch.clock_l": [
+      "automations/112_notifications_report_switch_state_changes.yaml"
+    ],
+    "switch.fireplace_led_ll": [
+      "automations/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml",
+      "automations/112_notifications_report_switch_state_changes.yaml",
+      "scripts/lighting/household_lights_and_media_off.yaml"
+    ],
+    "switch.hall_sockets_behind_tv_2_l": [
+      "automations/112_notifications_report_switch_state_changes.yaml"
+    ],
+    "switch.hall_sockets_behind_tv_3_l": [
+      "automations/112_notifications_report_switch_state_changes.yaml"
+    ],
+    "switch.ice_maker_l": [
+      "automations/112_notifications_report_switch_state_changes.yaml"
+    ],
+    "switch.mishka_bedroom_desk_lamp_l": [
+      "automations/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml",
+      "automations/075_lighting_turn_off_scheduled_lights_except_the_living_room.yaml",
+      "automations/112_notifications_report_switch_state_changes.yaml",
+      "scripts/lighting/household_lights_and_media_off.yaml"
+    ],
+    "switch.smart_toilet_2": [
+      "automations/014_bathroom_stop_the_warm_water_pump_after_motion_clears.yaml",
+      "automations/016_bathroom_start_the_warm_water_pump_after_motion.yaml"
+    ],
+    "switch.sockets_behind_fireplace_3_l": [
+      "automations/112_notifications_report_switch_state_changes.yaml"
+    ],
+    "switch.studio_wall_lamp": [
+      "automations/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml",
+      "automations/075_lighting_turn_off_scheduled_lights_except_the_living_room.yaml",
+      "automations/085_self_consumption_select_controllable_loads_from_grid_power.yaml",
+      "automations/110_studio_turn_off_lights_after_motion_clears.yaml",
+      "automations/111_studio_turn_on_lights_after_motion.yaml",
+      "scripts/lighting/household_lights_and_media_off.yaml"
+    ],
+    "switch.tiny_garland_ll": [
+      "automations/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml",
+      "automations/112_notifications_report_switch_state_changes.yaml",
+      "scripts/lighting/household_lights_and_media_off.yaml"
+    ]
+  },
+  "notification_follow_up": {
+    "status": "resolved after owner clarification",
+    "retired": [
+      "notify.mobile_app_als_iphone2",
+      "notify.pushbullet"
+    ],
+    "chrome": "Seven calls migrated to html5.send_message targeting newly registered notify.chrome; browser received callback confirmed.",
+    "living_room_tv": "Existing LG motion notifications preserved; legacy tv_pic2 reference corrected to registered LG notifier.",
+    "documentation": "notification-repair.md"
+  },
+  "retirement_cleanup": {
+    "date": "2026-09-22",
+    "removed_missing_entity_count": 22,
+    "remaining_missing_entity_count": 30,
+    "retired_automation_count": 11,
+    "retired_scripts": [
+      "play_kodi_channel",
+      "your_kodi_script",
+      "resetcreebulb"
+    ],
+    "tv_guard_replacement": "switch.tv_l",
+    "note": "Owner-approved removal; imported source baselines and retired manifests remain historical evidence.",
+    "tv_followup": {
+      "date": "2026-09-23",
+      "entity_id": "switch.tv_l",
+      "action": "Owner retired the LocalTuya TV device; removed five lighting guards, its switch-notification trigger and its household-off script target."
+    }
+  }
+}

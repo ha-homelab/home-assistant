@@ -1,0 +1,15 @@
+# Appearance: Apply the theme at startup.
+# Stable entity: automation.set_theme_at_startup.
+- id: ha_homelab_appearance_apply_the_theme_at_startup
+  alias: 'Appearance: Apply the theme at startup'
+  description: Apply the theme at startup. Responds to Home Assistant start.
+  triggers:
+    platform: homeassistant
+    event: start
+  actions:
+    service: frontend.set_theme
+    data:
+      name: Dark - Blue/Purple
+  mode: single
+  trace:
+    stored_traces: 5

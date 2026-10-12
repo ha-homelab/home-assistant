@@ -1,0 +1,12 @@
+# Stable entity: script.turn_off_lg2_tv_screen
+# Send the webOS screen-off command to the LG2 TV.
+turn_off_lg2_tv_screen:
+  alias: 'LG2 TV: turn screen off'
+  description: Send the webOS screen-off command to the LG2 TV.
+  icon: mdi:television-off
+  mode: single
+  sequence:
+    - service: webostv.command
+      data:
+        entity_id: media_player.lg2
+        command: com.webos.service.tvpower/power/turnOffScreen

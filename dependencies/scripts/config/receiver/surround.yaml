@@ -1,0 +1,15 @@
+# Stable entity: script.receiver_surround
+# Send the existing SR+ command to the Pioneer AV Receiver through Harmony.
+receiver_surround:
+  alias: 'Receiver: send SR+ command'
+  description: Send the existing SR+ command to the Pioneer AV Receiver through Harmony.
+  icon: mdi:surround-sound
+  mode: single
+  sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.harmonyhub
+        command:
+          - SR+
+        device: Pioneer AV Receiver
+        delay_secs: 0.6

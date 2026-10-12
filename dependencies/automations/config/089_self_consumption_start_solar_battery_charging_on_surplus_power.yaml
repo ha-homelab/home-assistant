@@ -1,0 +1,41 @@
+# Self-consumption: Start solar battery charging on surplus power.
+# Stable entity: automation.power_below_100_solar_battery_charge.
+- id: ha_homelab_self_consumption_start_solar_battery_charging_on_surplus_power
+  alias: 'Self-consumption: Start solar battery charging on surplus power'
+  description: Start solar battery charging on surplus power. Responds to sensor.home_123_1s below -100; or sensor.home_123_1s
+    below -150; or sensor.home_123_1s below -200; or sensor.home_123_1s below -250. Runs only when all configured
+    guards pass.
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    below: -100
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    below: -150
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    below: -200
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    below: -250
+  conditions:
+  - condition: state
+    entity_id: input_boolean.self_consuming
+    state: 'on'
+  - condition: state
+    entity_id: switch.solar_s2000_switch
+    state: 'off'
+    for:
+      seconds: 5
+  actions:
+  - service: switch.turn_off
+    entity_id: switch.bath_fan_1st_floor
+  - service: switch.turn_on
+    entity_id: switch.solar_s2000_switch
+  - service: script.notify
+    data:
+      message: 'Power below 100: Solar battery charge'
+    continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

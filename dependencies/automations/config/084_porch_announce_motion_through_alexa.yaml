@@ -1,0 +1,37 @@
+# Porch: Announce motion through Alexa.
+# Stable entity: automation.porch_motion_alexa_notification.
+- id: ha_homelab_porch_announce_motion_through_alexa
+  alias: 'Porch: Announce motion through Alexa'
+  description: Announce motion through Alexa. Responds to binary_sensor.rf_porch_one_motion changing to on; or binary_sensor.rf_porch_two_motion
+    changing to on. Runs only when all configured guards pass.
+  triggers:
+  - entity_id: binary_sensor.rf_porch_one_motion
+    platform: state
+    to: 'on'
+  - entity_id: binary_sensor.rf_porch_two_motion
+    platform: state
+    to: 'on'
+  conditions:
+  - after: 08:00:00
+    before: '21:00:00'
+    condition: time
+  - condition: state
+    entity_id: input_boolean.porch_sticky
+    state: 'off'
+  actions:
+  - action: script.notify_optional
+    data:
+      notify_service: notify.alexa_media
+      notify_data:
+        data:
+          type: tts
+        target:
+        - media_player.mishka_bedroom_echo_dot
+        - media_player.vitaly_s_echo_show
+        - media_player.bathroom_echo_dot_2
+        - media_player.living_room_echo_2
+        - media_player.vitaly_s_portal_2
+        message: Ding-dong. Porch motion!
+  mode: single
+  trace:
+    stored_traces: 5

@@ -1,0 +1,42 @@
+# Self-consumption: Stop the dehumidifier on grid import.
+# Stable entity: automation.power_above_hundred_off_dehumidifier.
+- id: ha_homelab_self_consumption_stop_the_dehumidifier_on_grid_import
+  alias: 'Self-consumption: Stop the dehumidifier on grid import'
+  description: Stop the dehumidifier on grid import. Responds to sensor.home_123_1s above 70; or sensor.home_123_1s
+    above 125; or sensor.home_123_1s above 150; or sensor.home_123_1s above 200. Runs only when all configured guards
+    pass.
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    above: 70
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    above: 125
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    above: 150
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    above: 200
+  conditions:
+  - condition: state
+    entity_id: input_boolean.self_consuming
+    state: 'on'
+  - condition: state
+    entity_id: switch.bath_fan_1st_floor
+    state: 'off'
+    for:
+      seconds: 5
+  - condition: state
+    entity_id: switch.air_purifier_living
+    state: 'on'
+  actions:
+  - service: switch.turn_off
+    entity_id: switch.air_purifier_living
+  - service: script.notify
+    data:
+      message: Power above hundred off dehumidifier
+    continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

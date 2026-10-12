@@ -1,0 +1,323 @@
+# Home Assistant configuration; retain stable entity identifiers.
+sensor.comcast_utilization:
+  icon: mdi:percent
+  friendly_name: Utilization
+sensor.comcast_template:
+  icon: mdi:calendar-clock
+  friendly_name: Time Left
+sensor.comcast_avg_gb_current:
+  icon: mdi:chart-line
+  friendly_name: Current Daily Avg.
+sensor.comcast_avg_gb_left:
+  icon: mdi:chart-line-stacked
+  friendly_name: Remaining Daily Avg.
+sensor.5r_arrival_40th_ave_outbound_to_ocean_beach:
+  icon: mdi:bus
+  friendly_name: 5R to Ocean 40th
+sensor.5r_arrival_40th_ave_inbound_to_transbay_terminal:
+  icon: mdi:bus
+  friendly_name: 5R to Transbay 40th
+sensor.5_arrival_40th_ave_outbound_to_ocean_beach:
+  icon: mdi:bus
+  friendly_name: 5 to Ocean 40th
+sensor.5_arrival_40th_ave_inbound_to_transbay_terminal:
+  icon: mdi:bus
+  friendly_name: 5 to Transbay 40th
+sensor.38_arrival_39th_ave_inbound_to_transbay_terminal:
+  icon: mdi:bus
+  friendly_name: 38 to Transbay 39th
+sensor.38R_arrival_39th_ave_inbound_to_transbay_terminal:
+  icon: mdi:bus
+  friendly_name: 38R to Transbay 39th
+sensor.31_arrival_40th_ave_inbound_to_ferry_plaza:
+  icon: mdi:bus
+  friendly_name: 31 to Ferry Plaza 40th
+sensor.18_arrival_40th_ave_inbound_to_legion_of_honor:
+  icon: mdi:bus
+  friendly_name: 18 to Legion of Honor 40tt
+sensor.31_arrival_19th_ave_outbound_to_ocean_beach:
+  icon: mdi:bus
+  friendly_name: 31 from Han Il Kwan Korean
+sensor.31ax_arrival_19th_ave_outbound_to_ocean_beach:
+  icon: mdi:bus
+  friendly_name: 31ax from Han Il Kwan Korean
+sensor.31ax_arrival_40th_ave_inbound_to_ferry_plaza:
+  icon: mdi:bus
+  friendly_name: 31ax to Ferry Plaza 40th
+sensor.31ax_davis_and_pine:
+  icon: mdi:bus
+sensor.31bx_davis_and_pine:
+  icon: mdi:bus
+sensor.38ax_davis_and_pine:
+  icon: mdi:bus
+  friendly_name: 38ax Pine and Front
+sensor.38bx_davis_and_pine:
+  icon: mdi:bus
+  friendly_name: 38bx Pine and Front
+sensor.muni_info:
+  icon: mdi:information-variant
+  friendly_name: ''
+device_tracker.maria:
+  entity_picture: /local/maria2.jpg
+  friendly_name: Maria
+device_tracker.airbnb:
+  icon: mdi:nature-people
+  friendly_name: AirBnB
+sensor.street_sweeping:
+  icon: mdi:car
+  friendly_name: Sweeping
+sensor.airbnb_event_0:
+  friendly_name: Current guest
+sensor.airbnb_event_1:
+  friendly_name: Next guest
+sensor.airbnb_event_2:
+  friendly_name: Guest 2
+sensor.airbnb_event_3:
+  friendly_name: Guest 3
+sensor.airbnb_event_4:
+  friendly_name: Guest 4
+sensor.recology:
+  icon: mdi:recycle
+  friendly_name: Recology
+sensor.battery_consumption:
+  friendly_name: Battery consumption
+  device_class: energy
+  state_class: total_increasing
+  unit_of_measurement: kWh
+binary_sensor.counter_motion:
+  state_card_mode: badges
+  templates:
+    theme: 'if (state === ''Clear'') return ''green_badge''; else return ''yellow_badge'';
+
+      '
+cover.74622088cc50e3315521:
+  device_class: shade
+cover.02036272bcddc25823c0:
+  device_class: shade
+cover.70615835ecfabc69c9cb:
+  device_class: shade
+cover.70615835ecfabc698d5b:
+  device_class: shade
+cover.70615835ecfabc698d12:
+  device_class: shade
+
+# Complete display names: prevent device + entity name duplication. IDs stay stable.
+cover.bedroom_curtains_l:
+  friendly_name: "Bedroom curtains"
+cover.dining_curtains_l:
+  friendly_name: "Dining Curtains"
+cover.kitchen_curtains_l:
+  friendly_name: "Kitchen Curtains"
+cover.living_curtains_l:
+  friendly_name: "Living curtains"
+cover.living_light_curtains_l:
+  friendly_name: "Living Light Curtains"
+cover.mishka_curtains_one_l:
+  friendly_name: "Mishka curtains one"
+cover.mishka_curtains_two_l:
+  friendly_name: "Mishka curtains two"
+light.bath2_old:
+  friendly_name: "Bath2_old"
+switch.bath2:
+  friendly_name: "Bath2"
+light.bedroom_light_dimmer_l:
+  friendly_name: "Bedroom light dimmer"
+light.dining_lights_dimmer_l:
+  friendly_name: "Dining lights dimmer"
+switch.tea_table:
+  friendly_name: "Tea table"
+switch.led_under_cabinet:
+  friendly_name: "LED Under Cabinet"
+light.living_wall_dimmer_l:
+  friendly_name: "Living wall dimmer"
+sensor.motion_bath2_l:
+  friendly_name: "Bathroom 2 Motion"
+switch.dining_guard:
+  friendly_name: "Dining guard"
+switch.dining_wall_lights_l:
+  friendly_name: "Dining wall lights"
+switch.garage_opener_l:
+  friendly_name: "Garage opener"
+switch.switch06:
+  friendly_name: "Switch06"
+switch.switch06_mqtt:
+  friendly_name: "Switch06 (MQTT)"
+switch.living_display:
+  friendly_name: "Living Display"
+switch.living_display_2:
+  friendly_name: "Living Display 2"
+switch.mppt_fan:
+  friendly_name: "MPPT fan"
+switch.range_hood_l:
+  friendly_name: "Range Hood"
+switch.recliner:
+  friendly_name: "Recliner"
+switch.living_lamp:
+  friendly_name: "Living lamp"
+switch.studio_tv:
+  friendly_name: "Studio TV"
+switch.studio_guard:
+  friendly_name: "Studio Guard"
+switch.switch01:
+  friendly_name: "Switch01"
+switch.switch02:
+  friendly_name: "Switch02"
+switch.switch03:
+  friendly_name: "Switch03"
+switch.smart_water_timer_smart_water_timer:
+  friendly_name: "Smart Water Timer"
+switch.air_purifier_living:
+  friendly_name: "Air Purifier Living"
+binary_sensor.audio_system_audio_system_button:
+  friendly_name: "Audio System Button"
+binary_sensor.audio_system_audio_system_status:
+  friendly_name: "Audio System Status"
+binary_sensor.audio_system_button_2:
+  friendly_name: "Audio System Button"
+binary_sensor.audio_system_button_3:
+  friendly_name: "Audio System Button"
+binary_sensor.audio_system_status_2:
+  friendly_name: "Audio System Status"
+binary_sensor.audio_system_status_3:
+  friendly_name: "Audio System Status"
+binary_sensor.switch06_button:
+  friendly_name: "Switch06 Button"
+binary_sensor.switch06_mqtt_button:
+  friendly_name: "Switch06 Button (MQTT)"
+binary_sensor.switch06_mqtt_status:
+  friendly_name: "Switch06 Status (MQTT)"
+binary_sensor.switch06_status:
+  friendly_name: "Switch06 Status"
+binary_sensor.sonoff_button1_2:
+  friendly_name: "Sonoff Button1"
+binary_sensor.sonoff_rf_bridge_sonoff_rf_bridge_status:
+  friendly_name: "Sonoff RF Bridge Status"
+binary_sensor.sonoff_rf_bridge_status:
+  friendly_name: "Sonoff RF Bridge Status"
+binary_sensor.sonoff_rf_bridge_status_3:
+  friendly_name: "Sonoff RF Bridge Status"
+sensor.audio_system_audio_system_current:
+  friendly_name: "Audio System Current"
+sensor.audio_system_audio_system_esphome_version:
+  friendly_name: "Audio System ESPHome Version"
+sensor.audio_system_audio_system_power:
+  friendly_name: "Audio System Power"
+sensor.audio_system_audio_system_signal:
+  friendly_name: "Audio System Signal"
+sensor.audio_system_audio_system_total_daily_energy:
+  friendly_name: "Audio System Total Daily Energy"
+sensor.audio_system_audio_system_uptime:
+  friendly_name: "Audio System Uptime"
+sensor.audio_system_audio_system_voltage:
+  friendly_name: "Audio System Voltage"
+sensor.audio_system_current_2:
+  friendly_name: "Audio System Current"
+sensor.audio_system_current_3:
+  friendly_name: "Audio System Current"
+sensor.audio_system_esphome_version_2:
+  friendly_name: "Audio System ESPHome Version"
+sensor.audio_system_esphome_version_3:
+  friendly_name: "Audio System ESPHome Version"
+sensor.audio_system_power_2:
+  friendly_name: "Audio System Power"
+sensor.audio_system_power_3:
+  friendly_name: "Audio System Power"
+sensor.audio_system_signal_2:
+  friendly_name: "Audio System Signal"
+sensor.audio_system_signal_3:
+  friendly_name: "Audio System Signal"
+sensor.audio_system_total_daily_energy_2:
+  friendly_name: "Audio System Total Daily Energy"
+sensor.audio_system_total_daily_energy_3:
+  friendly_name: "Audio System Total Daily Energy"
+sensor.audio_system_uptime_2:
+  friendly_name: "Audio System Uptime"
+sensor.audio_system_uptime_3:
+  friendly_name: "Audio System Uptime"
+sensor.audio_system_voltage_2:
+  friendly_name: "Audio System Voltage"
+sensor.audio_system_voltage_3:
+  friendly_name: "Audio System Voltage"
+sensor.backup_backup_manager_state:
+  friendly_name: "Backup Manager state"
+sensor.switch06_current:
+  friendly_name: "Switch06 Current"
+sensor.switch06_esphome_version:
+  friendly_name: "Switch06 ESPHome Version"
+sensor.switch06_mqtt_current:
+  friendly_name: "Switch06 Current (MQTT)"
+sensor.switch06_mqtt_esphome_version:
+  friendly_name: "Switch06 ESPHome Version (MQTT)"
+sensor.switch06_mqtt_power:
+  friendly_name: "Switch06 Power (MQTT)"
+sensor.switch06_mqtt_signal:
+  friendly_name: "Switch06 Signal (MQTT)"
+sensor.switch06_mqtt_total_daily_energy:
+  friendly_name: "Switch06 Total Daily Energy (MQTT)"
+sensor.switch06_mqtt_uptime:
+  friendly_name: "Switch06 Uptime (MQTT)"
+sensor.switch06_mqtt_voltage:
+  friendly_name: "Switch06 Voltage (MQTT)"
+sensor.switch06_power:
+  friendly_name: "Switch06 Power"
+sensor.switch06_signal:
+  friendly_name: "Switch06 Signal"
+sensor.switch06_total_daily_energy:
+  friendly_name: "Switch06 Total Daily Energy"
+sensor.switch06_uptime:
+  friendly_name: "Switch06 Uptime"
+sensor.switch06_voltage:
+  friendly_name: "Switch06 Voltage"
+sensor.sonoff_energy_apparentpower:
+  friendly_name: "Sonoff ENERGY ApparentPower"
+sensor.sonoff_energy_current:
+  friendly_name: "Sonoff ENERGY Current"
+sensor.sonoff_energy_factor:
+  friendly_name: "Sonoff ENERGY Factor"
+sensor.sonoff_energy_power:
+  friendly_name: "Sonoff ENERGY Power"
+sensor.sonoff_energy_reactivepower:
+  friendly_name: "Sonoff ENERGY ReactivePower"
+sensor.sonoff_energy_today:
+  friendly_name: "Sonoff ENERGY Today"
+sensor.sonoff_energy_total:
+  friendly_name: "Sonoff ENERGY Total"
+sensor.sonoff_energy_totalstarttime:
+  friendly_name: "Sonoff ENERGY TotalStartTime"
+sensor.sonoff_energy_voltage:
+  friendly_name: "Sonoff ENERGY Voltage"
+sensor.sonoff_energy_yesterday:
+  friendly_name: "Sonoff ENERGY Yesterday"
+sensor.sonoff_rf_bridge_sonoff_rf_bridge_uptime:
+  friendly_name: "Sonoff RF Bridge Uptime"
+sensor.sonoff_rf_bridge_sonoff_rf_bridge_wifi_signal:
+  friendly_name: "Sonoff RF Bridge Wifi Signal"
+sensor.sonoff_rf_bridge_uptime:
+  friendly_name: "Sonoff RF Bridge Uptime"
+sensor.sonoff_rf_bridge_uptime_3:
+  friendly_name: "Sonoff RF Bridge Uptime"
+sensor.sonoff_rf_bridge_wifi_signal:
+  friendly_name: "Sonoff RF Bridge Wifi Signal"
+sensor.sonoff_rf_bridge_wifi_signal_3:
+  friendly_name: "Sonoff RF Bridge Wifi Signal"
+sensor.sonoff_status_2:
+  friendly_name: "Sonoff status"
+sensor.water_level_2_water_level:
+  friendly_name: "Water level 2"
+switch.audio_system_2:
+  friendly_name: "Audio System"
+switch.audio_system_3:
+  friendly_name: "Audio System"
+switch.audio_system_audio_system:
+  friendly_name: "Audio System"
+
+# First KMC: water equipment power and laundry, separate from retained controls.
+switch.moen_flo_water_monitor_power:
+  friendly_name: "Moen Flo Water Monitor Power"
+  icon: mdi:power-plug
+switch.pump_power_enable:
+  friendly_name: "Pump Power Enable"
+  icon: mdi:power-plug
+switch.laundry:
+  friendly_name: "Laundry"
+  icon: mdi:washing-machine

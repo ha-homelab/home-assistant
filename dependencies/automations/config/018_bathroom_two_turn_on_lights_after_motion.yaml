@@ -1,0 +1,20 @@
+# Bathroom two: Turn on lights after motion.
+# Stable entity: automation.bathroom_two_motion_triggered.
+- id: ha_homelab_bathroom_two_turn_on_lights_after_motion
+  alias: 'Bathroom two: Turn on lights after motion'
+  description: Turn on lights after motion. Responds to binary_sensor.rf_studio_motion changing to on.
+    Runs only when all configured guards pass.
+  triggers:
+  - entity_id: binary_sensor.rf_studio_motion
+    platform: state
+    to: 'on'
+  conditions:
+  - condition: state
+    entity_id: input_boolean.bathroom_sticky
+    state: 'off'
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.bath2
+  mode: single
+  trace:
+    stored_traces: 5

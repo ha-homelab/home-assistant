@@ -1,0 +1,17 @@
+# Energy telemetry: Publish the total usage reading to MQTT.
+# Stable entity: automation.mqtt_publish_sensor_value_home_totalusage_1s.
+- id: ha_homelab_energy_telemetry_publish_the_total_usage_reading_to_mqtt
+  alias: 'Energy telemetry: Publish the total usage reading to MQTT'
+  description: Publish the total usage reading to MQTT. Responds to sensor.home_totalusage_1s changing
+    state.
+  triggers:
+    platform: state
+    entity_id: sensor.home_totalusage_1s
+  actions:
+    service: mqtt.publish
+    data_template:
+      payload: '{{trigger.to_state.state}}'
+      topic: home/home_totalusage_1s
+  mode: single
+  trace:
+    stored_traces: 5

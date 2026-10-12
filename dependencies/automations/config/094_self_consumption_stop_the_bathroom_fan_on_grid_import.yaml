@@ -1,0 +1,35 @@
+# Self-consumption: Stop the bathroom fan on grid import.
+# Stable entity: automation.power_above_30_bath_1st_floor.
+- id: ha_homelab_self_consumption_stop_the_bathroom_fan_on_grid_import
+  alias: 'Self-consumption: Stop the bathroom fan on grid import'
+  description: Stop the bathroom fan on grid import. Responds to sensor.home_123_1s above 30; or sensor.home_123_1s
+    above 60; or sensor.home_123_1s above 90. Runs only when all configured guards pass.
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    above: 30
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    above: 60
+  - platform: numeric_state
+    entity_id: sensor.home_123_1s
+    above: 90
+  conditions:
+  - condition: state
+    entity_id: input_boolean.self_consuming
+    state: 'on'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: switch.bath_fan_1st_floor
+      state: 'off'
+  actions:
+  - service: switch.turn_off
+    entity_id: switch.bath_fan_1st_floor
+  - service: script.notify
+    data:
+      message: Power above 30 bath 1st floor
+    continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

@@ -1,0 +1,12 @@
+# Stable entity: script.turn_on_lg2_tv_screen
+# Send the webOS screen-on command to the LG2 TV.
+turn_on_lg2_tv_screen:
+  alias: 'LG2 TV: turn screen on'
+  description: Send the webOS screen-on command to the LG2 TV.
+  icon: mdi:television
+  mode: single
+  sequence:
+    - service: webostv.command
+      data:
+        entity_id: media_player.lg2
+        command: com.webos.service.tvpower/power/turnOnScreen

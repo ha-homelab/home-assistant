@@ -1,0 +1,33 @@
+# Kitchen: Turn on the table lamp after motion.
+# Stable entity: automation.table_lamp_motion_triggered.
+- id: ha_homelab_kitchen_turn_on_the_table_lamp_after_motion
+  alias: 'Kitchen: Turn on the table lamp after motion'
+  description: Turn on the table lamp after motion. Responds to binary_sensor.rf_tea_motion changing
+    to on; or binary_sensor.rf_counter_motion changing to on. Runs
+    only when all configured guards pass.
+  triggers:
+  - entity_id: binary_sensor.rf_tea_motion
+    platform: state
+    to: 'on'
+  - entity_id: binary_sensor.rf_counter_motion
+    platform: state
+    to: 'on'
+  conditions:
+  - condition: template
+    value_template: '{{ state_attr("sun.sun", "elevation") < 0.60 }}'
+  - condition: state
+    entity_id: input_boolean.kitchen_sticky
+    state: 'off'
+  actions:
+  - service: script.notify_mqtt_log
+    data:
+      message: Kitchen table lamp motion triggered {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+    continue_on_error: true
+  - service: light.turn_on
+    entity_id: light.kitchen_lamp_m
+    data_template:
+      brightness: '{{ 150 if now().strftime("%H")|int < 17 or now().strftime("%H")|int > 23 else 255 }}'
+      transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'
+  mode: single
+  trace:
+    stored_traces: 5

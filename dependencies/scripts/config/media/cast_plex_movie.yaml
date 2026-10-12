@@ -1,0 +1,13 @@
+# Stable entity: script.cast_plex_to_chromecast
+# Play the movie 2012 from the Movies library on the Chromecast.
+cast_plex_to_chromecast:
+  alias: 'Chromecast: play 2012 from Plex'
+  description: Play the movie 2012 from the Movies library on the Chromecast.
+  icon: mdi:cast
+  mode: single
+  sequence:
+    - service: media_player.play_media
+      data:
+        entity_id: media_player.chromecast
+        media_content_type: movie
+        media_content_id: 'plex://{"library_name": "Movies", "title": "2012"}'

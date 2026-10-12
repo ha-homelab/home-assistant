@@ -1,0 +1,29 @@
+# Porch: Turn off lights after motion clears.
+# Stable entity: automation.porch_motion_off.
+- id: ha_homelab_porch_turn_off_lights_after_motion_clears
+  alias: 'Porch: Turn off lights after motion clears'
+  description: Turn off after a new motion cycle or genuine unknown/unavailable recovery. Preserve later manual
+    ON states; recheck all original timeout, presence and override guards for each device and retry.
+  mode: parallel
+  trace:
+    stored_traces: 5
+  use_blueprint:
+    path: ha_homelab/motion_light_off.yaml
+    input:
+      motion_triggers:
+      - platform: state
+        to: 'off'
+        for:
+          minutes: 5
+        entity_id:
+        - binary_sensor.rf_porch_two_motion
+        - binary_sensor.rf_porch_one_motion
+      target_entities:
+      - light.porch_one
+      - light.porch_two
+      guards:
+      - condition: template
+        value_template: '{{ state_attr("sun.sun", "elevation") < 0.20 }}'
+      - condition: state
+        entity_id: input_boolean.porch_sticky
+        state: 'off'

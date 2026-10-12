@@ -1,0 +1,18 @@
+language: ru
+intents:
+  EchoPlexPlayMusic:
+    data:
+      - sentences:
+          - "[пожалуйста] (включи|играй|поставь) музыку [из (плекса|plex)] [на (эхо|echo)]"
+  EchoPlexPauseMusic:
+    data:
+      - sentences:
+          - "[пожалуйста] (останови|выключи|поставь на паузу) музыку [на (эхо|echo)]"
+  EchoPlexResumeMusic:
+    data:
+      - sentences:
+          - "[пожалуйста] (продолжи|возобнови) (музыку|воспроизведение музыки) [на (эхо|echo)]"
+  EchoPlexNextTrack:
+    data:
+      - sentences:
+          - "[пожалуйста] [включи] (следующий трек|следующую песню) [на (эхо|echo)]"

@@ -1,0 +1,170 @@
+# Home Assistant configuration; retain stable entity identifiers.
+sta:
+  name: 'Select Radio Station:'
+  options:
+    - Первый
+    - Action
+    - Киноман
+    - Рен
+    - Filmzone
+    - Kinoman
+    - Cineman
+    - A1
+    - A2
+    - Домашний
+    - Шансон
+    - Euronews
+    - ТВЦ
+    - Пятница
+    - Настоящее время
+    - Матч Премьер
+    - Мир HD
+    - ТВ3
+    - Пятый канал
+    - СТС
+    - НТВ
+    - 8 канал
+    - ОТР
+    - Звезда
+    - RTG
+    - Eurika
+    - Русский Север
+    - Эхо ТВ
+    - Югра ТВ
+    - 12 канал
+    - Kino 24
+    - Красная линия
+    - Любимый
+    - Мир Premium
+    - НСТ
+    - rr
+    - QQ
+    - shutdown
+pla:
+  name: 'Select Speakers:'
+  options:
+    - iNew
+    - Al-Mini
+    - Al-Air
+    - Al-MBP
+    - FireTV2
+    - KindleHD8-2
+    - KindleHD8-Bathroom
+    - Everywhere
+  initial: iNew
+  icon: mdi:speaker-wireless
+log_level:
+  name: Log Level
+  options:
+    - critical
+    - fatal
+    - error
+    - warning
+    - warn
+    - info
+    - debug
+    - notset
+  initial: warn
+radio:
+  name: Radio
+  options:
+    - CRC FM 973
+    - Canale 100 949
+    - Ciccio Riccio 916
+    - Idea Radio 891
+    - Idea Radio Nel Mondo 978
+    - LatteMiele Puglia 90
+    - Love FM 985
+    - Mondoradio Tuttifrutti 886
+    - News c57922
+    - R101 923
+    - RADIO 7 965
+    - RAI Gr Parlamento 982
+    - RAI Isoradio 1033
+    - RAI Radio 1 891
+    - RAI Radio 2 911
+    - RAI Radio 3 977
+    - RMCentro Manfredonia 1030
+    - RTL 1025 Best
+    - RTL 1025 Groove
+    - RTL 1025 Guardia Costiera
+    - Radiobombo 1011
+    - Radio 5 Network 948
+    - Radio 24 1033
+    - Radio Antennasud 989
+    - Radio Bari 888
+    - Radio Blu Monopli 942
+    - Radio Buon Consiglio 881
+    - Radio Canale 93 928
+    - Radio Cittadella 965
+    - Radio Classica 1050
+    - Radio Cuore 10040
+    - Radio Deejay 1047
+    - Radio Deltauno 1031
+    - Radio Enny Sound 963
+    - Radio Flor Levante 918
+    - Radio Francavilla 935
+    - Radio Frate Sole 942
+    - Radio Futura New Generation 985
+    - Radio Gamma Puglia 919
+    - Radio Incontro 939
+    - Radio Italia Anni 60 1052
+    - Radio Kiss Kiss 898
+    - Radio Kiss Kiss Italia 985
+    - Radio Lattemiele 9350
+    - Radio Logos 973
+    - Radio Manbassa 969
+    - Radio Master 1022
+    - Radio Mater 9545
+    - Radio Mi Piaci 1013
+    - Radio Mola International 10345
+    - Radio M P A 1007
+    - Radio Norba 1055
+    - Radio Nova 97 970
+    - Radio Puglia 902
+    - Radio RG Studio 1019
+    - Radio Radicale 893
+    - Radio Rama 1027
+    - Radio Record 9370
+    - Radio Selene 961
+    - Radio Sound Bari 917
+    - Radio Studio Piu 1057
+    - Radio System 1012
+    - Radio Venere 877
+    - Radio Zeta
+    - Rai Radio 1 Sport
+    - Rai Radio Kids
+    - Rai Radio Live
+    - Rai Radio Tutta Italiana
+    - Rete Smash Gargano 975
+    - Rete Uno Network 921
+    - Ritmo 80 972
+    - Tele Radio Padre Pio 997
+    - Vera FM 904
+    - m2o 876
+player:
+  name: Player
+  options:
+    - mishka_bedroom_echo_dot
+    - kitchen_display
+    - vitaly_s_echo_dot
+    - al_s_echo_dot
+    - al_s_echo
+    - vitaly_s_3rd_echo
+    - mom_living_room_echo_dot
+    - living_room_echo_2
+    - bathroom_echo_dot
+    - kitchen_echo
+    - bedroom_echo_dot
+    - mom_bedroom_echo_dot
+    - vitaly_s_echo_show
+    - kindlehd8_bathroom
+    - everywhere
+    - kitchen_speaker
+    - mishka_bedroom_speaker
+    - bathroom_speaker
+    - bedroom_speaker
+    - living_room_speaker
+    - dining_room_speaker
+    - living_room_display
+    - living_room_tv

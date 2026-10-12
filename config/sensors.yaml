@@ -1,0 +1,63 @@
+# Home Assistant configuration; retain stable entity identifiers.
+- platform: history_stats
+  name: Dishwasher Wash Time Today
+  entity_id: binary_sensor.dishwasher_running
+  state: 'on'
+  type: time
+  start: '{{ now().replace(hour=0, minute=0, second=0) }}'
+  end: '{{ now() }}'
+- platform: integration
+  unique_id: total_power_consumed
+  source: sensor.total_power_consuming
+  unit_prefix: k
+  round: 3
+- platform: integration
+  unique_id: total_battery_in_kwh
+  source: sensor.total_battery_in
+  unit_prefix: k
+  round: 3
+- platform: integration
+  unique_id: total_battery_out_kwh
+  source: sensor.total_battery_out
+  unit_prefix: k
+  round: 3
+- platform: integration
+  unique_id: total_solar_kwh
+  source: sensor.solar
+  unit_prefix: k
+  round: 3
+- platform: reddit
+  username: !secret 'reddit_username'
+  password: !secret 'reddit_password'
+  client_id: !secret 'reddit_client_id'
+  client_secret: !secret 'reddit_client_secret'
+  subreddits:
+    - news
+    - worldnews
+- platform: files
+  folder: /config/www/images/BabyCamera/
+  name: baby_images
+  sort: date
+- platform: files
+  folder: /config/www/images/GarageCamera/
+  name: garage_images
+  sort: date
+- platform: files
+  folder: /config/www/images/FrontCamera/
+  name: front_images
+  sort: date
+- platform: files
+  folder: /config/www/images/TenantsCamera/
+  name: backdoor_images
+  sort: date
+- platform: snmp
+  host: 192.168.160.1
+  version: 2c
+  community: public
+  port: 161
+  accept_errors: true
+  name: Heaven3 Load Average
+  baseoid: 1.3.6.1.4.1.2021.10.1.3.1
+- platform: time_date
+  display_options:
+    - time

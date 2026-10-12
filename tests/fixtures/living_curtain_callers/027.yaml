@@ -1,0 +1,41 @@
+# Curtains: Close in the evening.
+# Stable entity: automation.close_curtains_in_the_evening.
+- id: ha_homelab_curtains_close_in_the_evening
+  alias: 'Curtains: Close in the evening'
+  description: Close in the evening. Responds to sun.sun below 0.2. Runs only when all configured guards
+    pass.
+  triggers:
+  - platform: numeric_state
+    entity_id: sun.sun
+    value_template: '{{ state_attr(''sun.sun'', ''elevation'') }}'
+    below: 0.2
+  conditions:
+  - condition: state
+    entity_id: input_boolean.curtains_sticky
+    state: 'off'
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.kitchen_guard_1
+  - service: switch.turn_on
+    entity_id: switch.studio_guard_1
+  - service: switch.turn_on
+    entity_id: switch.dining_guard_3
+  - delay: 00:01:30
+  - service: cover.close_cover
+    entity_id: cover.kitchen_curtains_l
+  - service: cover.close_cover
+    entity_id: cover.office_curtains_r
+  - service: cover.close_cover
+    entity_id: cover.living_curtains_l
+  - service: cover.close_cover
+    entity_id: cover.dining_curtains_l
+  - delay: 01:00:00
+  - service: switch.turn_off
+    entity_id: switch.dining_guard_3
+  - service: switch.turn_off
+    entity_id: switch.kitchen_guard_1
+  - service: switch.turn_off
+    entity_id: switch.studio_guard_1
+  mode: single
+  trace:
+    stored_traces: 5

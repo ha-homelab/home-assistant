@@ -1,0 +1,30 @@
+# Curtains: Open living-room curtains in the morning.
+# Stable entity: automation.open_living_curtains_in_the_morning.
+- id: ha_homelab_curtains_open_living_room_curtains_in_the_morning
+  alias: 'Curtains: Open living-room curtains in the morning'
+  description: Open both living-room curtains at sunrise or 06:30, whichever is later.
+    Power the motors, start learned RF commands after three seconds, then independently
+    repeat Open over Wi-Fi when each motor returns. Preserve the manual override.
+  triggers:
+  - platform: time
+    at: 06:30:00
+  - platform: sun
+    event: sunrise
+  conditions:
+  - condition: state
+    entity_id: input_boolean.curtains_sticky
+    state: 'off'
+  - condition: time
+    after: 06:30:00
+    before: '12:00:00'
+  - condition: sun
+    after: sunrise
+    before: sunset
+  actions:
+  - action: script.living_curtains_move
+    data:
+      curtain: both
+      command: open
+  mode: single
+  trace:
+    stored_traces: 5

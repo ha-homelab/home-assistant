@@ -1,0 +1,16 @@
+# Energy telemetry: Publish the grid power reading to MQTT.
+# Stable entity: automation.mqtt_publish_sensor_value.
+- id: ha_homelab_energy_telemetry_publish_the_grid_power_reading_to_mqtt
+  alias: 'Energy telemetry: Publish the grid power reading to MQTT'
+  description: Publish the grid power reading to MQTT. Responds to sensor.home_123_1s changing state.
+  triggers:
+    platform: state
+    entity_id: sensor.home_123_1s
+  actions:
+    service: mqtt.publish
+    data_template:
+      payload: '{{trigger.to_state.state}}'
+      topic: home/power_main
+  mode: single
+  trace:
+    stored_traces: 5

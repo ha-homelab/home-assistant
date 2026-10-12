@@ -1,0 +1,18 @@
+# Storage-mode Overview / Lighting: current Garage KMC group in the existing
+# entities card. Keep the separate water-valve control above this group.
+- type: custom:text-divider-row
+  text: Garage KMC Water and Laundry
+- entity: switch.moen_flo_water_monitor_power
+  name: Moen Flo Water Monitor Power
+  icon: mdi:power-plug
+  secondary_info: last-changed
+- entity: switch.pump_power_enable
+  name: Pump Power Enable
+  icon: mdi:power-plug
+  secondary_info: last-changed
+- entity: switch.laundry
+  name: Laundry
+  icon: mdi:washing-machine
+  secondary_info: last-changed
+- entity: sensor.kmc_water_and_laundry_power
+  name: Garage KMC Power

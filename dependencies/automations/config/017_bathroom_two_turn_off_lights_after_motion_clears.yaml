@@ -1,0 +1,24 @@
+# Bathroom two: Turn off lights after motion clears.
+# Stable entity: automation.bathroom_two_motion_off.
+- id: ha_homelab_bathroom_two_turn_off_lights_after_motion_clears
+  alias: 'Bathroom two: Turn off lights after motion clears'
+  description: Turn off after a new motion cycle or genuine unknown/unavailable recovery. Preserve later manual
+    ON states; recheck all original timeout, presence and override guards for each device and retry.
+  mode: parallel
+  trace:
+    stored_traces: 5
+  use_blueprint:
+    path: ha_homelab/motion_light_off.yaml
+    input:
+      motion_triggers:
+      - entity_id: binary_sensor.rf_studio_motion
+        platform: state
+        to: 'off'
+        for:
+          minutes: 20
+      target_entities:
+      - switch.bath2
+      guards:
+      - condition: state
+        entity_id: input_boolean.bathroom_sticky
+        state: 'off'

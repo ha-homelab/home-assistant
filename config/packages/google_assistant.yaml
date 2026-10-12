@@ -1,0 +1,23 @@
+# Manual Google Home integration. Keep private project settings in secrets.yaml.
+google_assistant:
+  project_id: !secret epg_voice_google_project_id
+  expose_by_default: false
+  report_state: false
+  service_account: !secret epg_voice_google_service_account
+  entity_config:
+    script.epg_voice_play_programme:
+      expose: false
+    script.epg_voice_catalogue_controller:
+      expose: false
+    input_select.home_tv:
+      name: Home TV
+      expose: true
+    script.play_news_channel:
+      name: Play News Channel
+      expose: true
+    script.play_kukutiki:
+      name: Play Kukutiki
+      expose: true
+    script.play_rainbow_channel:
+      name: Rainbow Channel
+      expose: true

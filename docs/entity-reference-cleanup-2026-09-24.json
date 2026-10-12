@@ -1,0 +1,109 @@
+{
+  "date": "2026-09-24",
+  "home_assistant_version": "2026.9.1",
+  "method": "Literal references absent from both live state and entity registry. Six replacements are confirmed from current registry names and existing same-role usage; ambiguous hardware identities are retained pending identification. Unavailable registered devices are not counted as missing.",
+  "resolved_missing_entity_ids": [
+    "switch.studio_wall_lamp",
+    "light.dining_lamp_m",
+    "input_boolean.mishka_sticky",
+    "light.hall_2_m_l_l",
+    "media_player.living_room_tv",
+    "binary_sensor.rf_studio_bathroom_motion",
+    "switch.tiny_garland_ll"
+  ],
+  "replacements": {
+    "switch.studio_wall_lamp": "switch.studiowalllamp_studio_wall_lamp",
+    "light.dining_lamp_m": "light.adining_lamp_m",
+    "input_boolean.mishka_sticky": "input_boolean.mishka_room_sticky",
+    "light.hall_2_m_l_l": "light.hall_2_m",
+    "media_player.living_room_tv": "media_player.living_room_tv_77",
+    "binary_sensor.rf_studio_bathroom_motion": "binary_sensor.studio_bathroom_motion"
+  },
+  "redundant_removed_reference": {
+    "entity_id": "switch.tiny_garland_ll",
+    "retained_entity_id": "light.tiny_garland_ll",
+    "reason": "Each affected rule already targets the same tiny-garland light; no second nonexistent switch action is needed."
+  },
+  "remaining_missing_entity_count": 22,
+  "remaining_missing_entities": {
+    "light.dinning_wall_one": [
+      "dependencies/automations/config/030_dining_room_dim_living_room_lights_after_motion_clears.yaml",
+      "dependencies/automations/config/032_dining_room_turn_off_living_room_lights_after_motion_clears.yaml",
+      "dependencies/automations/config/034_dining_room_turn_on_living_room_lights_after_motion.yaml"
+    ],
+    "switch.smart_toilet_2": [
+      "dependencies/automations/config/014_bathroom_stop_the_warm_water_pump_after_motion_clears.yaml",
+      "dependencies/automations/config/016_bathroom_start_the_warm_water_pump_after_motion.yaml"
+    ],
+    "media_player.mishka_bedroom_echo_dot": [
+      "dependencies/automations/config/066_mailbox_announce_activity_and_flash_the_indicator.yaml",
+      "dependencies/automations/config/084_porch_announce_motion_through_alexa.yaml"
+    ],
+    "media_player.vitaly_s_portal_2": [
+      "dependencies/automations/config/084_porch_announce_motion_through_alexa.yaml"
+    ],
+    "switch.sockets_behind_fireplace_3_l": [
+      "dependencies/automations/config/112_notifications_report_switch_state_changes.yaml"
+    ],
+    "switch.ice_maker_l": [
+      "dependencies/automations/config/112_notifications_report_switch_state_changes.yaml"
+    ],
+    "switch.hall_sockets_behind_tv_3_l": [
+      "dependencies/automations/config/112_notifications_report_switch_state_changes.yaml"
+    ],
+    "switch.attic_dehumidifier_l": [
+      "dependencies/automations/config/112_notifications_report_switch_state_changes.yaml"
+    ],
+    "light.fireplace_led_ll": [
+      "dependencies/automations/config/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml",
+      "dependencies/automations/config/112_notifications_report_switch_state_changes.yaml",
+      "dependencies/scripts/config/lighting/household_lights_and_media_off.yaml"
+    ],
+    "switch.fireplace_led_ll": [
+      "dependencies/automations/config/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml",
+      "dependencies/automations/config/112_notifications_report_switch_state_changes.yaml",
+      "dependencies/scripts/config/lighting/household_lights_and_media_off.yaml"
+    ],
+    "switch.mishka_bedroom_desk_lamp_l": [
+      "dependencies/automations/config/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml",
+      "dependencies/automations/config/075_lighting_turn_off_scheduled_lights_except_the_living_room.yaml",
+      "dependencies/automations/config/112_notifications_report_switch_state_changes.yaml",
+      "dependencies/scripts/config/lighting/household_lights_and_media_off.yaml"
+    ],
+    "switch.clock_l": [
+      "dependencies/automations/config/112_notifications_report_switch_state_changes.yaml"
+    ],
+    "switch.hall_sockets_behind_tv_2_l": [
+      "dependencies/automations/config/112_notifications_report_switch_state_changes.yaml"
+    ],
+    "light.garage_beam_light": [
+      "dependencies/automations/config/085_self_consumption_select_controllable_loads_from_grid_power.yaml"
+    ],
+    "light.bedroom_five": [
+      "dependencies/automations/config/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml",
+      "dependencies/automations/config/075_lighting_turn_off_scheduled_lights_except_the_living_room.yaml",
+      "dependencies/scripts/config/lighting/household_lights_and_media_off.yaml"
+    ],
+    "media_player.vitaly_s_echo": [
+      "dependencies/scripts/config/media/set_household_volume_presets.yaml"
+    ],
+    "media_player.plex_plex_for_android_tv_chromecast_google_tv_hd": [
+      "dependencies/scripts/config/media/plex_ants_android_tv.yaml"
+    ],
+    "media_player.kitchen_speaker_2": [
+      "dependencies/scripts/config/media/stop_household_players.yaml"
+    ],
+    "media_player.living_room_google_home": [
+      "dependencies/scripts/config/media/stop_household_players.yaml"
+    ],
+    "media_player.family_room_speaker_2": [
+      "dependencies/scripts/config/media/stop_household_players.yaml"
+    ],
+    "media_player.dinning_room_google_mini": [
+      "dependencies/scripts/config/media/stop_household_players.yaml"
+    ],
+    "media_player.mishka_bedroom_google_mini": [
+      "dependencies/scripts/config/media/stop_household_players.yaml"
+    ]
+  }
+}

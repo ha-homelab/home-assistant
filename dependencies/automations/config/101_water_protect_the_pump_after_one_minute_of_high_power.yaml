@@ -1,0 +1,62 @@
+# Water: Protect the pump after one minute of high power.
+# Stable entity: automation.pump_running_for_more_than_a_minute.
+- id: ha_homelab_water_protect_the_pump_after_one_minute_of_high_power
+  alias: 'Water: Protect the pump after one minute of high power'
+  description: >-
+    Disable pump power after shared total KMC power stays above 700 W for 3 minutes,
+    subject to the existing water-level guards. sensor.kmc_water_and_laundry_power sums
+    all three outputs and is not yet calibrated; it is not an individual pump meter.
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.kmc_water_and_laundry_power
+    above: 700
+    for:
+      minutes: 3
+  conditions:
+  - condition: numeric_state
+    entity_id: sensor.water_cm
+    below: &water_101_maximum 19
+  - condition: numeric_state
+    entity_id: sensor.water_cm
+    above: &water_101_minimum 5
+  actions:
+  - service: switch.turn_off
+    entity_id: switch.pump_power_enable
+  - action: script.notify_optional
+    data:
+      notify_service: notify.roomba
+      also_chrome: true
+      notify_data:
+        title: Pump running for more than a minute
+        message: Pump running for more than a minute {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+        data:
+          displaytime: 20000
+          icon: warning
+  - action: script.notify_optional
+    data:
+      notify_service: notify.imac21
+      notify_data:
+        title: Pump running for more than a minute
+        message: Pump running for more than a minute {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+        data:
+          displaytime: 20000
+          icon: warning
+  - service: persistent_notification.create
+    data_template:
+      title: Pump running for more than a minute
+      message: Pump running for more than a minute {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+  - delay:
+      milliseconds: 10000
+  # Dispatch asynchronously: an offline valve must not block the next pump event.
+  - action: script.turn_on
+    target:
+      entity_id: script.water_valve_after_pump
+    data:
+      variables:
+        pump_state: 'off'
+        valve_state: 'on'
+        min_cm: *water_101_minimum
+        max_cm: *water_101_maximum
+  mode: single
+  trace:
+    stored_traces: 5

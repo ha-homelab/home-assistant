@@ -1,0 +1,22 @@
+# Bathroom: Restore the warmer after one minute off.
+# Stable entity: automation.bathroom_warmer_turn_on_if_it_is_off_for_more_than_a_minute.
+- id: ha_homelab_bathroom_restore_the_warmer_after_one_minute_off
+  alias: 'Bathroom: Restore the warmer after one minute off'
+  description: Restore the warmer after one minute off. Responds to switch.bathroom_warmer changing
+    to off for 1 minutes. Runs only when all configured guards pass.
+  triggers:
+  - entity_id: switch.bathroom_warmer
+    platform: state
+    to: 'off'
+    for:
+      minutes: 1
+  conditions:
+  - condition: state
+    entity_id: input_boolean.bath_warmer_sticky
+    state: 'off'
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.bathroom_warmer
+  mode: single
+  trace:
+    stored_traces: 5

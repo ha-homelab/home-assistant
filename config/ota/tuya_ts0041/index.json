@@ -1,0 +1,18 @@
+[
+  {
+    "fileVersion": 285421569,
+    "fileSize": 151698,
+    "imageType": 45636,
+    "manufacturerCode": 4417,
+    "sha512": "760b86ecf85f3331d2f11b02e7e0592611627c6d9cb820336fab5b0a370be4350b56c41912a999c7b90a8784261e1ba161a025a865f6cce815110dc24072a666",
+    "otaHeaderString": "Telink OTA Image",
+    "fileName": "ts0041-hold-off-1.1.3.1.zigbee",
+    "path": "ts0041-hold-off-1.1.3.1.zigbee",
+    "url": "https://github.com/ha-homelab/zigbee-direct-button/releases/download/v1.1.3-holdoff.1/ts0041-hold-off-1.1.3.1.zigbee",
+    "manufacturerName": [
+      "mrpevh8p"
+    ],
+    "modelId": "TS0041-TB",
+    "releaseNotes": "Experimental EndDevice 1.1.3-holdoff1; opt-in short-release Toggle and absolute Off on hold."
+  }
+]

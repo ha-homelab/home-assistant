@@ -1,0 +1,25 @@
+# Bedroom: Turn on lights after motion.
+# Stable entity: automation.bedroom_motion_triggered.
+- id: ha_homelab_bedroom_turn_on_lights_after_motion
+  alias: 'Bedroom: Turn on lights after motion'
+  description: Turn on lights after motion. Responds to binary_sensor.rf_bedroom_motion changing to on.
+    Runs only when all configured guards pass.
+  triggers:
+  - entity_id: binary_sensor.rf_bedroom_motion
+    platform: state
+    to: 'on'
+  conditions:
+  - condition: template
+    value_template: '{{ state_attr("sun.sun", "elevation") < 0.60 }}'
+  - condition: time
+    after: '18:00:00'
+    before: '23:00:00'
+  - condition: state
+    entity_id: input_boolean.bedroom_sticky
+    state: 'off'
+  actions:
+  - service: light.turn_on
+    entity_id: light.bedroom_lamp
+  mode: single
+  trace:
+    stored_traces: 5

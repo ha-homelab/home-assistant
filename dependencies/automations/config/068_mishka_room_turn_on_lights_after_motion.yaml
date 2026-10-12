@@ -1,0 +1,26 @@
+# Mishka room: Turn on lights after motion.
+# Stable entity: automation.mishka_room_motion_triggered.
+- id: ha_homelab_mishka_room_turn_on_lights_after_motion
+  alias: 'Mishka room: Turn on lights after motion'
+  description: Turn on lights after motion. Responds to binary_sensor.rf_mishka_motion changing to on.
+    Runs only when all configured guards pass.
+  triggers:
+  - entity_id: binary_sensor.rf_mishka_motion
+    platform: state
+    to: 'on'
+  conditions:
+  - after: '20:45:00'
+    before: 07:00:00
+    condition: time
+  - condition: state
+    entity_id: input_boolean.mishka_room_sticky
+    state: 'off'
+  actions:
+  - service: light.turn_on
+    entity_id: light.hall_2_m
+    data_template:
+      brightness: '{{ 15 if now().strftime("%H")|int < 16 or now().strftime("%H")|int > 22 else 255 }}'
+      transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'
+  mode: single
+  trace:
+    stored_traces: 5

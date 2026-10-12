@@ -1,0 +1,9 @@
+# Stable entity: script.shutdown_inew
+# Invoke the existing shell_command.shutdown_inew helper to shut down its configured host.
+shutdown_inew:
+  alias: 'iNew: shut down host'
+  description: Invoke the existing shell_command.shutdown_inew helper to shut down its configured host.
+  icon: mdi:power
+  mode: single
+  sequence:
+    - service: shell_command.shutdown_inew

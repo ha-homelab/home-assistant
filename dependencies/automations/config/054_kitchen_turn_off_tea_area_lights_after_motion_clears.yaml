@@ -1,0 +1,26 @@
+# Kitchen: Turn off tea-area lights after motion clears.
+# Stable entity: automation.tea_motion_off.
+- id: ha_homelab_kitchen_turn_off_tea_area_lights_after_motion_clears
+  alias: 'Kitchen: Turn off tea-area lights after motion clears'
+  description: Turn off after a new motion cycle or genuine unknown/unavailable recovery. Preserve later manual
+    ON states; recheck all original timeout, presence and override guards for each device and retry.
+  mode: parallel
+  trace:
+    stored_traces: 5
+  use_blueprint:
+    path: ha_homelab/motion_light_off.yaml
+    input:
+      motion_triggers:
+      - entity_id: binary_sensor.rf_tea_motion
+        platform: state
+        to: 'off'
+        for:
+          minutes: 3
+      target_entities:
+      - switch.tea_table
+      guards:
+      - condition: template
+        value_template: '{{ state_attr("sun.sun", "elevation") < 0.60 }}'
+      - condition: state
+        entity_id: input_boolean.kitchen_sticky
+        state: 'off'

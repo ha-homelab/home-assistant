@@ -1,0 +1,179 @@
+# Shared delivery boundary: an optional notifier must not stop household actions.
+script:
+  notify_optional:
+    alias: 'Notifications: attempt an optional delivery'
+    description: >-
+      Attempt the configured notify or HTML5 notification service with its original payload. If the
+      service is absent, log its name without logging message contents. Runtime
+      delivery failures remain visible in HA logs and do not stop the caller.
+      Invalid templates and payload schemas still fail so configuration bugs
+      are not silently hidden. Callers can explicitly request one Chrome copy
+      using also_chrome; provider-specific payload data is not copied to Chrome.
+      Allowed Chrome deliveries also send one copy to Vitaly iPhone Air. Front
+      Camera, Kerberos, Frigate and RF motion messages are suppressed on Chrome
+      and iPhone; light/switch state reports are suppressed on iPhone only.
+      Explicit camera_person deliveries may send Garage/Porch video to the phone.
+      Explicit camera_onvif deliveries may send Living Room video to the phone.
+      Ring snapshot deliveries remain browser-only; the dedicated Ring motion
+      automation prepares its live video and sends the phone notification.
+      Known webOS destinations are quietly skipped while their TV is off or
+      unavailable; any requested Chrome copy is still delivered.
+    icon: mdi:message-check-outline
+    mode: parallel
+    max: 50
+    trace:
+      stored_traces: 0
+    fields:
+      notify_service:
+        name: Notification service
+        required: true
+        selector:
+          text:
+            multiline: false
+      notify_data:
+        name: Original service data
+        default: {}
+        selector:
+          object:
+            multiple: false
+      also_chrome:
+        name: Also send a Chrome copy
+        description: Set true on one delivery per event, unless that event already sends to Chrome.
+        default: false
+      chrome_image:
+        name: Chrome snapshot URL
+        description: Optional browser-accessible image URL for the Chrome copy.
+        selector:
+          text:
+            multiline: false
+      notification_category:
+        name: Notification category
+        description: Use light_switch_state for state reports, camera_person for Garage/Porch, camera_onvif for Living Room phone alerts, or rf_motion for RF sensor reports.
+        default: general
+    sequence:
+      - if:
+          - condition: template
+            value_template: >-
+              {{ not (notify_service is defined and notify_service is string
+                and (notify_service.startswith('notify.')
+                  or notify_service == 'html5.send_message')
+                and notify_service.count('.') == 1
+                and notify_data is defined and notify_data is mapping) }}
+        then:
+          - stop: 'Expected a notify/HTML5 notification action and a mapping of service data.'
+            error: true
+      - variables:
+          suppress_browser_phone: >-
+            {% set title = notify_data.get('title', '') | lower %}
+            {% set message = notify_data.get('message', '') | lower %}
+            {% set picture = chrome_image | default(notify_data.get('image', ''), true) %}
+            {% set extra = notify_data.get('data', {}) %}
+            {{ notification_category | default('general') in ['camera_onvif', 'rf_motion']
+              or title | regex_search('kerberos|frigate|(?:front|garage|porch|backdoor) camera')
+              or message | regex_search('kerberos|frigate|(?:front|garage|porch|backdoor) camera')
+              or title | regex_search('^(?:motion +)?rf(?:[ :]|$)')
+              or message | regex_search('^(?:motion +)?rf(?:[ :]|$)')
+              or message | regex_search('^(?:front(?: porch)?|garage|porch|backdoor) motion(?:$| [0-9])')
+              or picture.startswith('/api/frigate/')
+              or picture.split('?')[0] in ['/local/front_camera_alert.jpg',
+                '/local/garage_camera_alert.jpg', '/local/porch_camera_alert.jpg',
+                '/local/backdoor_camera_alert.jpg']
+              or (extra is mapping and extra.get('entity_id') in ['camera.front_camera_notifications',
+                'camera.garage_camera_notifications', 'camera.porch_camera_notifications',
+                'camera.backdoor_camera_notifications', 'camera.living_room_onvif_notifications']) }}
+          suppress_phone: >-
+            {{ notification_category | default('general') == 'light_switch_state' }}
+          allow_camera_phone: >-
+            {% set extra = notify_data.get('data', {}) %}
+            {{ notify_service == 'notify.mobile_app_als_iphone_89310'
+              and extra is mapping
+              and ((notification_category | default('general') == 'camera_person'
+                and extra.get('entity_id') in ['camera.garage_camera_notifications',
+                  'camera.porch_camera_notifications'])
+                or (notification_category | default('general') == 'camera_onvif'
+                  and extra.get('entity_id') == 'camera.living_room_onvif_notifications')) }}
+          deliveries: >-
+            {% set original = {'service': notify_service, 'data': notify_data} %}
+            {% if also_chrome | default(false) | bool and notify_service != 'html5.send_message' %}
+              {% set payload = {'entity_id': 'notify.chrome',
+                'message': notify_data['message'],
+                'title': notify_data.get('title', 'Home Assistant'),
+                'data': {'url': chrome_image | default('/', true)}} %}
+              {% if chrome_image | default('', true) %}
+                {% set payload = dict(payload, image=chrome_image, icon=chrome_image) %}
+              {% endif %}
+              {{ [original, {'service': 'html5.send_message', 'data': payload}] }}
+            {% else %}
+              {{ [original] }}
+            {% endif %}
+      - variables:
+          deliveries: >-
+            {% set ns = namespace(items=[]) %}
+            {% for delivery in deliveries %}
+              {% set browser = delivery.service in ['html5.send_message', 'notify.chrome'] %}
+              {% set phone = delivery.service == 'notify.mobile_app_als_iphone_89310' %}
+              {% if not (suppress_browser_phone and (browser or (phone and not allow_camera_phone)))
+                    and not (suppress_phone and phone) %}
+                {% set ns.items = ns.items + [delivery] %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.items }}
+      - variables:
+          deliveries: >-
+            {% set ns = namespace(items=deliveries) %}
+            {% set cameras = {
+              '/local/front_camera_alert.jpg': 'camera.front_camera_notifications',
+              '/local/garage_camera_alert.jpg': 'camera.garage_camera_notifications',
+              '/local/porch_camera_alert.jpg': 'camera.porch_camera_notifications',
+              '/local/backdoor_camera_alert.jpg': 'camera.backdoor_camera_notifications',
+              '/local/ring_camera_alert.jpg': 'camera.ring_camera_notifications'} %}
+            {% for delivery in deliveries %}
+              {% set target = delivery.data.get('entity_id', []) %}
+              {% if delivery.service == 'html5.send_message'
+                    and (target == 'notify.chrome' or (target is not string and 'notify.chrome' in target))
+                    and delivery.data.get('image', '').split('?')[0] != '/local/ring_camera_alert.jpg'
+                    and not suppress_phone and not suppress_browser_phone %}
+                {% set picture = delivery.data.get('image', '') %}
+                {% set camera = cameras.get(picture.split('?')[0], '') %}
+                {% if not camera and delivery.data.get('message') == 'Front Porch Motion' %}
+                  {% set camera = 'camera.porch_camera_notifications' %}
+                {% endif %}
+                {% set extra = {'url': '/lovelace/2' if camera else '/'} %}
+                {% if camera %}
+                  {% set extra = dict(extra, entity_id=camera, tag='motion-' ~ camera,
+                    push={'category': 'camera'}) %}
+                {% elif picture %}
+                  {% set extra = dict(extra, image=picture) %}
+                {% endif %}
+                {% set payload = {'message': delivery.data['message'],
+                  'title': delivery.data.get('title', 'Home Assistant'), 'data': extra} %}
+                {# The service ID retains the app's original registration name;
+                   its verified config entry/device is Vitaly iPhone Air. #}
+                {% set ns.items = ns.items + [{'service': 'notify.mobile_app_als_iphone_89310', 'data': payload}] %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.items }}
+      - repeat:
+          for_each: '{{ deliveries }}'
+          sequence:
+            - action: python_script.notification_service_available
+              data:
+                service: '{{ repeat.item.service }}'
+              response_variable: notification_service
+            - if:
+                - condition: template
+                  value_template: '{{ notification_service.available }}'
+              then:
+                - if:
+                    - condition: template
+                      value_template: '{{ notification_service.delivery_allowed }}'
+                  then:
+                    - action: '{{ repeat.item.service }}'
+                      data: '{{ repeat.item.data }}'
+                      continue_on_error: true
+              else:
+                - action: system_log.write
+                  data:
+                    level: warning
+                    logger: homeassistant.ha_homelab.notifications
+                    message: 'Optional notification service is unavailable: {{ repeat.item.service }}'

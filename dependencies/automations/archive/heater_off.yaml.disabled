@@ -1,0 +1,31 @@
+#- alias: Heater off
+#  description: Heater off
+#  trigger:
+#  - platform: time_pattern
+#    minutes: "/5"
+#  condition:
+#  - condition: state
+#    entity_id: input_boolean.man_at_work
+#    state: 'off'
+#  action:
+#  - service: switch.turn_off
+#    entity_id: switch.old_lamp
+#  - service: switch.turn_off
+#    entity_id: switch.heater_one
+#  - service: switch.turn_off
+#    entity_id: switch.inewswitch # Ozon heavy
+#  - service: switch.turn_off
+#    entity_id: switch.workdesk
+
+#- alias: Man at work off in ten minutes
+#  description: Man at work off in ten minutes
+#  trigger:
+#  - platform: state
+#    to: 'on'
+#    for:
+#      minutes: 120
+#    entity_id:
+#      - input_boolean.man_at_work
+#  action:
+#   - service: input_boolean.turn_off
+#     entity_id: input_boolean.man_at_work

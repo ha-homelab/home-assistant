@@ -1,0 +1,7 @@
+# Inactive in production: a later input_number key replaced this include.
+battery_out_at_17_yesterday:
+  name: Battery Out at 5PM Yesterday
+  unit_of_measurement: kWh
+  min: 0
+  max: 10000
+  step: 0.01

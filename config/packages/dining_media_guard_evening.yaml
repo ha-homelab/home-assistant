@@ -1,0 +1,28 @@
+# Dining Media guard: owner-selected Living lamp evening power-off.
+automation:
+- id: ha_homelab_dining_media_guard_evening_power_off
+  alias: 'Dining Media guard: Turn off after evening lamp inactivity'
+  description: Turn off only dining media power after the selected lamp stays off
+    for 15 minutes, when the sun is below -2 degrees and the living-room manual override
+    is off.
+  triggers:
+  - trigger: state
+    entity_id: switch.living_lamp
+    to: 'off'
+    for: 00:15:00
+  conditions:
+  - condition: template
+    value_template: '{{ state_attr(''sun.sun'', ''elevation'') | float(90) < -2 }}'
+  - condition: state
+    entity_id: switch.living_lamp
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.living_room_sticky
+    state: 'off'
+  actions:
+  - action: switch.turn_off
+    target:
+      entity_id: switch.dining_media_guard
+  mode: single
+  trace:
+    stored_traces: 5

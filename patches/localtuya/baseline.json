@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "upstream_repository": "https://github.com/xZetsubou/hass-localtuya",
+  "upstream_tag": "2026.7.0",
+  "manifest_version": "2026.07.0",
+  "upstream_commit": "3d0c0ec737b59ebfb1eea65df42f5d902eafaecc",
+  "source_path": "custom_components/localtuya/cover.py",
+  "source_sha256": "e5a0f563de34a0252cd2f732f264deab9f6e9c9dc5d32fbf9ee4e34545424af9",
+  "patched_sha256": "0849c2c0d2e78dd1a1778c44d9396d54040721a428fea899c3a1e6b0f15eea46",
+  "patch_file": "2026.7.0-cover-missing-position.patch",
+  "generator": "tools/patch_localtuya_cover.py"
+}

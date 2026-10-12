@@ -1,0 +1,7 @@
+# Home Assistant configuration; retain stable entity identifiers.
+- name: Dehumidifiers On
+  entities:
+    switch.02200216ecfabc8c7361: true
+- name: Dehumidifiers Off
+  entities:
+    switch.02200216ecfabc8c7361: false

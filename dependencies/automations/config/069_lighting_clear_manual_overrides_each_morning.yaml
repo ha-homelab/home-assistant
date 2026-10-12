@@ -1,0 +1,39 @@
+# Lighting: Clear manual overrides each morning.
+# Stable entity: automation.morning_sticky_reset.
+- id: ha_homelab_lighting_clear_manual_overrides_each_morning
+  alias: 'Lighting: Clear manual overrides each morning'
+  description: Clear manual overrides each morning. Responds to the daily schedule at 06:15:00.
+  triggers:
+    platform: time
+    at: 06:15:00
+  actions:
+  - service: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.kitchen_sticky
+  - service: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.lobby_sticky
+  - service: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.living_room_sticky
+  - service: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.dining_room_sticky
+  - service: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.bathroom_sticky
+  - service: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.hallway_sticky
+  - service: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.porch_sticky
+  - service: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.bedroom_sticky
+  - service: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.mishka_room_sticky
+  mode: single
+  trace:
+    stored_traces: 5

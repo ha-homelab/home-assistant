@@ -1,0 +1,65 @@
+# A transient URL, not a retained camera state or a video transport.
+# The camera-scoped token is read at motion time; never store URLs in traces.
+automation:
+  - id: ha_homelab_tapo_desktop_live_url
+    alias: 'Cameras: publish Tapo live URL for desktop'
+    description: >-
+      Publish one current HA MJPEG URL when a Tapo cell-motion sensor turns on.
+      Publishing does not open a camera stream. The desktop consumer opens the
+      URL on demand and closes its preview after 15 seconds.
+    triggers:
+      - trigger: state
+        entity_id:
+          - binary_sensor.living_room_camera_cell_motion_detection
+          - binary_sensor.front_tapo_cell_motion_detection
+          - binary_sensor.dining_room_camera_cell_motion_detection
+          - binary_sensor.kitchen_camera_cell_motion_detection
+          - binary_sensor.bedroom_camera_cell_motion_detection
+          - binary_sensor.studio_camera_cell_motion_detection
+          - binary_sensor.mishka_camera_cell_motion_detection
+        from: 'off'
+        to: 'on'
+    variables:
+      base_url: !secret home_assistant_external_url
+      sources:
+        binary_sensor.living_room_camera_cell_motion_detection:
+          id: c225
+          camera: camera.living_room_onvif_notifications
+        binary_sensor.front_tapo_cell_motion_detection:
+          id: front
+          camera: camera.front_camera_notifications
+        binary_sensor.dining_room_camera_cell_motion_detection:
+          id: c225-2
+          camera: camera.dining_room_camera_minorstream
+        binary_sensor.kitchen_camera_cell_motion_detection:
+          id: kitchen
+          camera: camera.kitchen_camera_minorstream
+        binary_sensor.bedroom_camera_cell_motion_detection:
+          id: bedroom
+          camera: camera.bedroom_camera_minorstream
+        binary_sensor.studio_camera_cell_motion_detection:
+          id: studio
+          camera: camera.studio_camera_minorstream
+        binary_sensor.mishka_camera_cell_motion_detection:
+          id: mishka
+          camera: camera.mishka_camera_minorstream
+      source: "{{ sources.get(trigger.entity_id if trigger is defined else '', {}) }}"
+      camera_entity: "{{ source.get('camera', '') }}"
+    conditions:
+      - condition: template
+        value_template: >-
+          {{ camera_entity != '' and has_value(camera_entity)
+             and state_attr(camera_entity, 'access_token') is string
+             and state_attr(camera_entity, 'access_token') | length > 0 }}
+    actions:
+      - action: mqtt.publish
+        data:
+          topic: 'homelab/cameras/live/{{ source.id }}'
+          payload: >-
+            {{ base_url }}/api/camera_proxy_stream/{{ camera_entity }}?token={{ state_attr(camera_entity, 'access_token') | urlencode }}
+          qos: 0
+          retain: false
+    mode: parallel
+    max: 10
+    trace:
+      stored_traces: 0

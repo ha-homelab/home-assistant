@@ -1,0 +1,13 @@
+# Stable entity: script.run_playlist_on_plex_mobile_ants
+# Play the Ants Plex playlist on the dining room speaker with repeat-all enabled.
+run_playlist_on_plex_mobile_ants:
+  alias: 'Dining room: play Ants playlist'
+  description: Play the Ants Plex playlist on the dining room speaker with repeat-all enabled.
+  icon: mdi:playlist-play
+  mode: single
+  sequence:
+    - service: media_player.play_media
+      data:
+        entity_id: media_player.dining_room_speaker
+        media_content_type: PLAYLIST
+        media_content_id: 'plex://{ "playlist_name": "Ants", "repeatall": "1" }'

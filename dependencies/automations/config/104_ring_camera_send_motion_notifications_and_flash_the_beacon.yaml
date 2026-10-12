@@ -1,0 +1,35 @@
+# Ring camera: Send motion notifications and flash the beacon.
+# Stable entity: automation.ring_motion_html5_mobile_and_beacon.
+- id: ha_homelab_ring_camera_send_motion_notifications_and_flash_the_beacon
+  alias: 'Ring camera: Send motion notifications and flash the beacon'
+  description: Send motion notifications and flash the beacon. Responds to MQTT messages on kios/ring. Runs
+    only when all configured guards pass.
+  triggers:
+  - platform: mqtt
+    topic: kios/ring
+  conditions:
+  - after: 09:05:00
+    before: '23:20:00'
+    condition: time
+  - condition: state
+    entity_id: input_boolean.notifications_off
+    state: 'off'
+  - condition: template
+    value_template: '{{ trigger.payload_json[''name''] == ''Ring'' }}'
+  actions:
+  - action: script.capture_camera_alert
+    data:
+      camera_key: ring
+  - action: script.notify_optional
+    data:
+      notify_service: html5.send_message
+      notify_data:
+        message: Ring Motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+        entity_id: notify.chrome
+        icon: /local/ring_camera_alert.jpg?{{ as_timestamp(now()) }}
+        image: /local/ring_camera_alert.jpg?{{ as_timestamp(now()) }}
+        data:
+          url: /local/ring_camera_alert.jpg?{{ as_timestamp(now()) }}
+  mode: single
+  trace:
+    stored_traces: 5

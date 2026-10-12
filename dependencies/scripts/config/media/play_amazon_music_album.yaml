@@ -1,0 +1,15 @@
+# Stable entity: script.playplexplaylist
+# Request the Dark Side of the Moon album through AMAZON_MUSIC on the living room Echo; this script has no playback timeout.
+# The historical Plex/two-hour name did not match execution. Only the display name changes; the AMAZON_MUSIC request is unchanged.
+playplexplaylist:
+  alias: 'Living room Echo: play Dark Side of the Moon'
+  description: Request the Dark Side of the Moon album through AMAZON_MUSIC on the living room Echo; this script
+    has no playback timeout.
+  icon: mdi:album
+  mode: single
+  sequence:
+    - service: media_player.play_media
+      data:
+        entity_id: media_player.living_room_echo_2
+        media_content_id: album "Dark Side of the Moon"
+        media_content_type: AMAZON_MUSIC

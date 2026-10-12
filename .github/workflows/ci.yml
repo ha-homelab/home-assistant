@@ -1,0 +1,275 @@
+name: Configuration CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: config-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt
+      - run: python tools/validate.py
+      - name: Validate bundled automation and script contracts
+        run: |
+          python dependencies/automations/tools/validate.py
+          python dependencies/scripts/tools/validate.py
+      - name: Test bundled component validators
+        run: |
+          (cd dependencies/automations && python -m unittest discover -s tests -v)
+          (cd dependencies/scripts && python -m unittest discover -s tests -v)
+      - name: Build a complete release without private dependencies
+        run: python tools/build.py "$RUNNER_TEMP/ha-release"
+      - run: python -m compileall -q tools config/python_scripts config/custom_zha_quirks
+      - name: Test Core update card confirmation and stale-candidate handling
+        run: node tests/core_update_card.cjs config/www/core-update-card.js
+      - name: Fetch pinned LocalTuya source for hotfix regression tests
+        run: |
+          curl --fail --location --retry 2 --max-time 30 \
+            https://raw.githubusercontent.com/xZetsubou/hass-localtuya/3d0c0ec737b59ebfb1eea65df42f5d902eafaecc/custom_components/localtuya/cover.py \
+            --output "$RUNNER_TEMP/localtuya-cover.py"
+          echo "e5a0f563de34a0252cd2f732f264deab9f6e9c9dc5d32fbf9ee4e34545424af9  $RUNNER_TEMP/localtuya-cover.py" | sha256sum --check
+      - name: Fetch pinned Vehicle Info Card for JavaScript regression tests
+        run: |
+          cache_dir="$HOME/.cache/ha-ci-sources"
+          cached="$cache_dir/vehicle-info-card-1.12.3.js"
+          mkdir -p "$cache_dir"
+          if ! echo "ea1a5f23dfd4f28a2b2eb48d99adc2f40b65d3d2e36a8364442d6ddfdca9dcfe  $cached" | sha256sum --check --status 2>/dev/null; then
+            curl --fail --location --retry 2 --retry-max-time 900 --connect-timeout 30 --max-time 600 \
+              https://github.com/ngocjohn/vehicle-info-card/releases/download/v1.12.3/vehicle-info-card.js \
+              --output "$RUNNER_TEMP/vehicle-info-card.js"
+            echo "ea1a5f23dfd4f28a2b2eb48d99adc2f40b65d3d2e36a8364442d6ddfdca9dcfe  $RUNNER_TEMP/vehicle-info-card.js" | sha256sum --check
+            cp "$RUNNER_TEMP/vehicle-info-card.js" "$cached"
+          fi
+          cp "$cached" "$RUNNER_TEMP/vehicle-info-card.js"
+          echo "ea1a5f23dfd4f28a2b2eb48d99adc2f40b65d3d2e36a8364442d6ddfdca9dcfe  $RUNNER_TEMP/vehicle-info-card.js" | sha256sum --check
+      - run: python -m unittest discover -s tests -v
+        env:
+          LOCAL_TUYA_COVER_SOURCE: ${{ runner.temp }}/localtuya-cover.py
+          VEHICLE_INFO_CARD_SOURCE: ${{ runner.temp }}/vehicle-info-card.js
+      - name: Scan source and comments with the pinned secret scanner
+        run: |
+          case "$RUNNER_ARCH" in
+            X64)
+              asset_arch=x64
+              checksum=551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+              ;;
+            ARM64)
+              asset_arch=arm64
+              checksum=e4a487ee7ccd7d3a7f7ec08657610aa3606637dab924210b3aee62570fb4b080
+              ;;
+            *)
+              echo "Unsupported runner architecture: $RUNNER_ARCH" >&2
+              exit 1
+              ;;
+          esac
+          cache_dir="$HOME/.cache/gitleaks/8.30.1"
+          archive="$cache_dir/gitleaks_8.30.1_linux_${asset_arch}.tar.gz"
+          mkdir -p "$cache_dir"
+          if ! echo "$checksum  $archive" | sha256sum --check --status 2>/dev/null; then
+            download="$RUNNER_TEMP/gitleaks-8.30.1-${asset_arch}.tar.gz"
+            curl --fail --location --silent --show-error --retry 2 --retry-max-time 900 --connect-timeout 30 --max-time 600 \
+              "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_${asset_arch}.tar.gz" \
+              --output "$download"
+            echo "$checksum  $download" | sha256sum --check
+            mv "$download" "$archive"
+          fi
+          echo "$checksum  $archive" | sha256sum --check
+          tar -xzf "$archive" -C "$RUNNER_TEMP" gitleaks
+          "$RUNNER_TEMP/gitleaks" dir . --redact --no-banner
+
+  maintenance-runtime:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Verify RF matching and guarded transmission without hardware I/O
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --env REQUIRE_HA_RUNTIME=1
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_rf_airbridge.py -v
+      - name: Verify RM433 player navigation and bounded delivery without hardware I/O
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --env REQUIRE_HA_RUNTIME=1
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_ott_d1_remote.py -v
+      - name: Verify living curtain RF start and independent Wi-Fi fallback
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --env REQUIRE_HA_RUNTIME=1
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_living_curtain_morning.py -v
+      - name: Verify Victron battery telemetry without hardware I/O
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --env REQUIRE_HA_RUNTIME=1
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p 'test_victron_*.py' -v
+      - name: Verify garage button OTA artifacts and native ZHA registration
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --env REQUIRE_HA_RUNTIME=1
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_garage_button_artifacts.py -v
+      - name: Verify Recorder protection and selective retention boundaries
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_recorder_retention.py -v
+      - name: Render office curtain connection and position templates
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_office_cover_template.py -v
+      - name: Execute maintenance scenarios in the deployed HA image
+        # Home Assistant 2026.9.1 compatibility baseline, pinned by digest.
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_hacs_maintenance.py -v
+      - name: Execute explicit Core update approvals without deployment I/O
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --env REQUIRE_HA_RUNTIME=1
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_core_updates.py -v
+      - name: Execute lighting recovery scenarios in the deployed HA image
+        env:
+          REQUIRE_PRIVATE_DEPENDENCIES: '1'
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --env REQUIRE_HA_RUNTIME=1
+          --env REQUIRE_PRIVATE_DEPENDENCIES
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_motion_light_off.py -v
+      - name: Verify dining media evening guards without hardware I/O
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --env REQUIRE_HA_RUNTIME=1
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_dining_media_evening.py -v
+      - name: Verify living room presence lighting without hardware I/O
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --env REQUIRE_HA_RUNTIME=1
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_living_room_presence.py -v
+      - name: Verify migrated self-consumption targets with the pinned selector
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --env REQUIRE_HA_RUNTIME=1
+          --env SELF_CONSUMPTION_SELECTOR=/workspace/config/python_scripts/select_devices.py
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s dependencies/automations/tests -p test_self_consumption_runtime.py -v
+      - name: Execute optional notification resilience scenarios
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --env REQUIRE_HA_RUNTIME=1
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_runtime_resilience.py -v
+      - name: Execute cooktop notification scenarios
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_cooktop_notifications.py -v
+      - name: Execute camera snapshot preservation scenarios
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_camera_snapshots.py -v
+      - name: Execute bounded Ring video readiness scenarios
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_ring_video_ready.py -v
+      - name: Execute notification frame cache reuse scenarios
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_notification_frame_cache.py -v
+      - name: Execute bounded water valve recovery scenarios
+        # Also bound failures that prevent an asyncio waiter from resuming.
+        timeout-minutes: 5
+        env:
+          REQUIRE_PRIVATE_DEPENDENCIES: '1'
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --env REQUIRE_HA_RUNTIME=1
+          --env REQUIRE_PRIVATE_DEPENDENCIES
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_water_valve_recovery.py -v
+      - name: Render water availability and calendar boundary scenarios
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_water_calendar_templates.py -v
+      - name: Execute Roomba network recovery scenarios
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_roomba_recovery.py -v
+      - name: Execute Echo Plex queue reuse scenarios
+        run: >-
+          docker run --rm --network none --read-only --tmpfs /tmp:rw
+          --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+          --workdir /workspace --entrypoint python
+          ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+          -m unittest discover -s tests -p test_echo_plex_music.py -v

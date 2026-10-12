@@ -1,0 +1,74 @@
+# Inactive archive: this mapping was ignored by include_dir_merge_list.
+alias: "Smart Knob: Control Samsung Family Hub Alexa"
+description: "Control the volume and TuneIn station on the refrigerator"
+mode: restart
+
+triggers:
+  # Button press (toggle/play)
+  - device_id: 1d449a5dda9436ac7d96f4b482a9d9c1
+    domain: zha
+    type: remote_button_short_press
+    subtype: turn_on
+    trigger: device
+    id: "press"
+
+  # Turn clockwise (increase volume)
+  - device_id: 1d449a5dda9436ac7d96f4b482a9d9c1
+    domain: zha
+    type: device_rotated
+    subtype: right
+    trigger: device
+    id: "right"
+
+  # Turn counterclockwise (decrease volume)
+  - device_id: 1d449a5dda9436ac7d96f4b482a9d9c1
+    domain: zha
+    type: device_rotated
+    subtype: left
+    trigger: device
+    id: "left"
+
+actions:
+  - choose:
+      # Button behavior
+      - conditions:
+          - condition: trigger
+            id: "press"
+        sequence:
+          - if:
+              - condition: state
+                entity_id: media_player.vitaly_s_family_hub
+                state: "playing"
+            then:
+              - action: media_player.media_pause
+                target:
+                  entity_id: media_player.vitaly_s_family_hub
+            else:
+              - action: media_player.play_media
+                target:
+                  entity_id: media_player.vitaly_s_family_hub
+                data:
+                  media_content_id: "CAFÉ I Soulside Radio Paris"
+                  media_content_type: "TUNEIN"
+
+      # Increase volume by 5%
+      - conditions:
+          - condition: trigger
+            id: "right"
+        sequence:
+          - action: media_player.volume_set
+            target:
+              entity_id: media_player.vitaly_s_family_hub
+            data:
+              volume_level: "{{ [state_attr('media_player.vitaly_s_family_hub', 'volume_level') + 0.05, 1.0] | min }}"
+
+      # Decrease volume by 5%
+      - conditions:
+          - condition: trigger
+            id: "left"
+        sequence:
+          - action: media_player.volume_set
+            target:
+              entity_id: media_player.vitaly_s_family_hub
+            data:
+              volume_level: "{{ [state_attr('media_player.vitaly_s_family_hub', 'volume_level') - 0.05, 0.0] | max }}"

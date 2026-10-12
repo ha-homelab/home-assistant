@@ -1,0 +1,25 @@
+# Victron: Restore daytime inverter settings at 14:59.
+# Stable entity: automation.daily_at_2_59_pm_reset_charging_states_and_ensure_victron_on.
+- id: ha_homelab_victron_restore_daytime_inverter_settings_at_14_59
+  alias: 'Victron: Restore daytime inverter settings at 14:59'
+  description: Restore daytime inverter settings at 14:59. Responds to the daily schedule at 14:59:00.
+  triggers:
+  - platform: time
+    at: '14:59:00'
+  conditions: []
+  actions:
+  - service: switch.turn_off
+    data:
+      entity_id:
+      - switch.inverter_charge_battery
+      - switch.inverter_no_feed
+      - switch.inverter_only_charging
+      - switch.inverter_do_not_supply_ev
+  - condition: state
+    entity_id: switch.victron_quattro
+    state: 'off'
+  - service: switch.turn_on
+    entity_id: switch.victron_quattro
+  mode: single
+  trace:
+    stored_traces: 5

@@ -1,0 +1,16 @@
+# Stable entity: script.tv_type2
+# Insert the literal text 123 through the existing webOS input-method command with replace set to zero.
+tv_type2:
+  alias: 'Living room TV: insert legacy test text'
+  description: Insert the literal text 123 through the existing webOS input-method command with replace set to zero.
+  icon: mdi:keyboard
+  mode: single
+  sequence:
+    - service: webostv.command
+      target:
+        entity_id: media_player.living_room_tv_77
+      data:
+        command: com.webos.service.ime/insertText
+        payload:
+          text: '123'
+          replace: 0

@@ -1,0 +1,15 @@
+# Stable entity: script.receiver_inputtape
+# Send InputTape to the Pioneer AV Receiver through Harmony.
+receiver_inputtape:
+  alias: 'Receiver: select tape input'
+  description: Send InputTape to the Pioneer AV Receiver through Harmony.
+  icon: mdi:cassette
+  mode: single
+  sequence:
+    - service: remote.send_command
+      data:
+        entity_id: remote.harmonyhub
+        command:
+          - InputTape
+        device: Pioneer AV Receiver
+        delay_secs: 0.6

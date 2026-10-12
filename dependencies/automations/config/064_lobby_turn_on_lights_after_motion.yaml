@@ -1,0 +1,22 @@
+# Lobby: Turn on lights after motion.
+# Stable entity: automation.lobby_motion_triggered.
+- id: ha_homelab_lobby_turn_on_lights_after_motion
+  alias: 'Lobby: Turn on lights after motion'
+  description: Turn on lights after motion. Responds to binary_sensor.rf_lobby_motion changing to on.
+    Runs only when all configured guards pass.
+  triggers:
+  - entity_id: binary_sensor.rf_lobby_motion
+    platform: state
+    to: 'on'
+  conditions:
+  - condition: template
+    value_template: '{{ state_attr("sun.sun", "elevation") < 0.20 }}'
+  - condition: state
+    entity_id: input_boolean.lobby_sticky
+    state: 'off'
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.dining_wall_light_2
+  mode: single
+  trace:
+    stored_traces: 5

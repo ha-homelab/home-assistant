@@ -1,0 +1,232 @@
+# Home Assistant configuration; retain stable entity identifiers.
+- name: Water Fill Speed
+  availability: "{{ is_number(states('sensor.water_speed')) }}"
+  unit_of_measurement: cm/h
+  state_class: measurement
+  state: >-
+    {% set rate = states('sensor.water_speed') | float(0) %}
+    {{ rate | round(2) if rate > 0 else 0 }}
+- name: Dishwasher Duration
+  unique_id: dishwasher_duration
+  icon: mdi:timer-outline
+  state: '{% set duration = states(''sensor.dishwasher_wash_time_today'') | float(0) %} {% set hours = duration
+    | int %} {% set minutes = ((duration - hours) * 60) | int %} {% set seconds = ((duration * 3600) % 60) | int
+    %} {{ "%02d:%02d:%02d" | format(hours, minutes, seconds) }}
+
+    '
+- name: Battery Minimum Cell Voltage
+  unit_of_measurement: V
+  state: "{% set voltages = [\n  states('sensor.battery_cell_1_voltage') | float(default=none),\n  states('sensor.battery_cell_2_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_3_voltage') | float(default=none),\n  states('sensor.battery_cell_4_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_5_voltage') | float(default=none),\n  states('sensor.battery_cell_6_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_7_voltage') | float(default=none),\n  states('sensor.battery_cell_8_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_9_voltage') | float(default=none),\n  states('sensor.battery_cell_10_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_11_voltage') | float(default=none),\n  states('sensor.battery_cell_12_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_13_voltage') | float(default=none),\n  states('sensor.battery_cell_14_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_15_voltage') | float(default=none),\n  states('sensor.battery_cell_16_voltage')\
+    \ | float(default=none)\n] | select('is_number') | list %} {% if voltages | count > 0 %}\n  {{ voltages | min\
+    \ }}\n{% else %}\n  unavailable\n{% endif %}\n"
+  device_class: voltage
+  state_class: measurement
+- name: Battery Maximum Cell Voltage
+  unit_of_measurement: V
+  state: "{% set voltages = [\n  states('sensor.battery_cell_1_voltage') | float(default=none),\n  states('sensor.battery_cell_2_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_3_voltage') | float(default=none),\n  states('sensor.battery_cell_4_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_5_voltage') | float(default=none),\n  states('sensor.battery_cell_6_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_7_voltage') | float(default=none),\n  states('sensor.battery_cell_8_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_9_voltage') | float(default=none),\n  states('sensor.battery_cell_10_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_11_voltage') | float(default=none),\n  states('sensor.battery_cell_12_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_13_voltage') | float(default=none),\n  states('sensor.battery_cell_14_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_cell_15_voltage') | float(default=none),\n  states('sensor.battery_cell_16_voltage')\
+    \ | float(default=none)\n] | select('is_number') | list %} {% if voltages | count > 0 %}\n  {{ voltages | max\
+    \ }}\n{% else %}\n  unavailable\n{% endif %}\n"
+  device_class: voltage
+  state_class: measurement
+- name: Battery 2 Minimum Cell Voltage
+  unit_of_measurement: V
+  state: "{% set voltages = [\n  states('sensor.battery_2_cell_1_voltage') | float(default=none),\n  states('sensor.battery_2_cell_2_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_3_voltage') | float(default=none),\n  states('sensor.battery_2_cell_4_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_5_voltage') | float(default=none),\n  states('sensor.battery_2_cell_6_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_7_voltage') | float(default=none),\n  states('sensor.battery_2_cell_8_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_9_voltage') | float(default=none),\n  states('sensor.battery_2_cell_10_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_11_voltage') | float(default=none),\n  states('sensor.battery_2_cell_12_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_13_voltage') | float(default=none),\n  states('sensor.battery_2_cell_14_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_15_voltage') | float(default=none),\n  states('sensor.battery_2_cell_16_voltage')\
+    \ | float(default=none)\n] | select('is_number') | list %} {% if voltages | count > 0 %}\n  {{ voltages | min\
+    \ }}\n{% else %}\n  unavailable\n{% endif %}\n"
+  device_class: voltage
+  state_class: measurement
+- name: Battery 2 Maximum Cell Voltage
+  unit_of_measurement: V
+  state: "{% set voltages = [\n  states('sensor.battery_2_cell_1_voltage') | float(default=none),\n  states('sensor.battery_2_cell_2_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_3_voltage') | float(default=none),\n  states('sensor.battery_2_cell_4_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_5_voltage') | float(default=none),\n  states('sensor.battery_2_cell_6_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_7_voltage') | float(default=none),\n  states('sensor.battery_2_cell_8_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_9_voltage') | float(default=none),\n  states('sensor.battery_2_cell_10_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_11_voltage') | float(default=none),\n  states('sensor.battery_2_cell_12_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_13_voltage') | float(default=none),\n  states('sensor.battery_2_cell_14_voltage')\
+    \ | float(default=none),\n  states('sensor.battery_2_cell_15_voltage') | float(default=none),\n  states('sensor.battery_2_cell_16_voltage')\
+    \ | float(default=none)\n] | select('is_number') | list %} {% if voltages | count > 0 %}\n  {{ voltages | max\
+    \ }}\n{% else %}\n  unavailable\n{% endif %}\n"
+  device_class: voltage
+  state_class: measurement
+- name: Battery in yesterday
+  unique_id: battery_in_yesterday
+  device_class: battery
+  availability: "{{ is_number(state_attr('sensor.today_battery_in', 'last_period')) }}"
+  state: "{{ state_attr('sensor.today_battery_in', 'last_period') | float(none) }}"
+- name: Battery out yesterday
+  unique_id: battery_out_yesterday
+  device_class: battery
+  availability: "{{ is_number(state_attr('sensor.today_battery_out', 'last_period')) }}"
+  state: "{{ state_attr('sensor.today_battery_out', 'last_period') | float(none) }}"
+- name: Corrected Battery SOC
+  unique_id: corrected_battery_soc
+  unit_of_measurement: '%'
+  state_class: measurement
+  device_class: battery
+  state: "{% set soc = states('sensor.compensation_sensor_battery_voltage') | float(0) %} {% set power = states('sensor.battery_w')\
+    \ | float(0) %} {% set capacity = 280 %} {% set capacity2 = 180 %} {% set efficiency = 0.95 %}\n{% if power\
+    \ < 0 %}\n  {% set correction = ((power | abs) / capacity2) * 100 * (1 - efficiency) %}\n  {{ [soc + correction,\
+    \ 100] | min | round(2) }}\n{% elif power > 0 %}\n  {% set correction = (power / capacity) * 100 * (1 - efficiency)\
+    \ %}\n  {{ [soc - correction, 0] | max | round(2) }}\n{% else %}\n  {{ soc }}\n{% endif %}\n"
+- name: sensor.self_consumption_w
+  unit_of_measurement: W
+  state: '{{ (states(''sensor.home_123_1s'') | float(0)) - (states(''sensor.battery_w'') | float(0)) }}
+
+    '
+- name: nightstate
+  state: '{% if is_state(''sun.sun'', ''below_horizon'') %}1{% else %}0{% endif %}'
+- name: solar_days
+  state: "{% set start_str = states('input_datetime.solar_started') %} {% if start_str not in ['unknown', 'unavailable',\
+    \ 'none'] %}\n  {% set start_ts = as_timestamp(states.input_datetime.solar_started.state ~ ' 00:00:00') %}\n\
+    \  {{ ((as_timestamp(now()) - start_ts) / 86400) | round(0, default=0) | int }}\n{% else %}\n  0\n{% endif %}\n"
+  unit_of_measurement: Days
+  state_class: measurement
+  icon: mdi:calendar-clock
+- name: produced
+  state: '{{ (states(''sensor.heater_two_energy_total'') | float(0)) + (states(''sensor.heater_one_energy_total'')
+    | float(0)) + (states(''sensor.pv1_kwh'') | float(0)) + 1329.1 + 21.27 + 1073.492 }}'
+- name: produced_today
+  state: '{{ ( states(''sensor.heater_two_energy_today'') | float(0) + states(''sensor.heater_one_energy_today'')
+    | float(0) + states(''sensor.pv1_kwh_today'') | float(0) ) | round(3) }}'
+- name: produced_per_day
+  state: '{%- set heater_two = states(''sensor.heater_two_energy_total'') | float(0) -%} {%- set heater_one = states(''sensor.heater_one_energy_total'')
+    | float(0) -%} {%- set pv1 = states(''sensor.pv1_kwh'') | float(0) -%} {%- set solar_days = states(''sensor.solar_days'')
+    | float(1) -%} {{ ((heater_two + heater_one + pv1 + 1329.1 + 21.27 + 1073.492) / solar_days) | round(3) }}
+
+    '
+- name: produced_dollars
+  state: '{{ ( ( states(''sensor.heater_two_energy_total'') | float(0) + states(''sensor.heater_one_energy_total'')
+    | float(0) + states(''sensor.pv1_kwh'') | float(0) + 1329.1 + 21.27 + 1073.492 ) * 0.44 ) | round(2)  }}'
+- name: produced_dollars_today
+  state: '{{ ( states(''sensor.produced_today'') | float(0) * 0.44 ) | round(2) }}'
+- name: produced_dollars_per_day
+  state: '{{ ( states(''sensor.produced_per_day'') | float(0) * 0.44 ) | round(2) }}'
+- name: water_gal
+  availability: "{{ is_number(states('sensor.778_40th_ave_sf_today_s_water_usage')) }}"
+  state: '{{ ( states(''sensor.778_40th_ave_sf_today_s_water_usage'') | float(0) / 3.78541 ) | round(1) }}'
+  unit_of_measurement: gal
+- name: Water cost
+  availability: "{{ is_number(states('sensor.778_40th_ave_sf_today_s_water_usage')) }}"
+  state: '{{ ( states(''sensor.778_40th_ave_sf_today_s_water_usage'') | float(0) / 3.78541 * 0.035 ) | round(2)
+    }}'
+  unit_of_measurement: $
+- name: elevation
+  state: '{{ states.sun.sun.attributes.elevation | float(0) }}'
+  unit_of_measurement: '%'
+- name: street_sweeping
+  state: "{% set wday = 5 - now().weekday() %} {% if (now().isocalendar().week  is odd) %}\n  Sweeping week! Left\
+    \ {{ wday }} days! On Friday street sweeping from 11am to 1pm!\n{% else %}\n  Ok, you can park on the street!\n\
+    {% endif %}\n"
+- name: Street Sweeping 2
+  unique_id: street_sweeping_days_left
+  state: >-
+    {% set today = now().date() %}
+    {% set first = today.replace(day=1) %}
+    {% set second = first + timedelta(days=(4 - first.weekday()) % 7 + 7) %}
+    {% set fourth = second + timedelta(days=14) %}
+    {% if today <= second %}
+      {{ (second - today).days }}
+    {% elif today <= fourth %}
+      {{ (fourth - today).days }}
+    {% else %}
+      {% set first = (first + timedelta(days=32)).replace(day=1) %}
+      {% set second = first + timedelta(days=(4 - first.weekday()) % 7 + 7) %}
+      {{ (second - today).days }}
+    {% endif %}
+  unit_of_measurement: days
+  icon: mdi:calendar-clock
+- name: Recology
+  state: "{% set wday = 3 - now().weekday() %} {% if wday < 0 %} {% set wday = 0 - wday +1 %} {% endif %}\n  Garbage\
+    \ collection in {{ wday }} days!\n"
+- name: Recology2
+  state: "{% if now().weekday() in (2,) %}\n  Garbage collection tomorrow!!\n{% elif now().weekday() in (1,) %}\n\
+    \  Garbage collection in 2 days\n{% elif now().weekday() in (0,) %}\n  Garbage collection in 3 days\n{% elif\
+    \ now().weekday() in (6,) %}\n  Garbage collection in 4 days\n{% elif now().weekday() in (5,) %}\n  Garbage\
+    \ collection in 5 days\n{% elif now().weekday() in (4,) %}\n  Garbage collection in 6 days\n{% elif now().weekday()\
+    \ in (3,) %}\n  Garbage was collected, you can put the garbage cans back in the garage.\n{% endif %}\n"
+- name: total_power_consuming
+  unique_id: total_power_consuming
+  unit_of_measurement: W
+  state_class: measurement
+  device_class: power
+  state: '{% set dc_loads = states(''sensor.dc_loads'') | int(0) %} {% set ac_loads = states(''sensor.ac_loads'')
+    | int(0) %} {{ dc_loads + ac_loads }}
+
+    '
+- name: total_battery_out
+  unique_id: total_battery_out
+  unit_of_measurement: W
+  state_class: measurement
+  device_class: power
+  state: "{% set battery_load = states('sensor.battery_load') | int(0) %} {% if battery_load < 0 %}\n  {{ battery_load\
+    \ | abs }}\n{% else %}\n  0\n{% endif %}\n"
+- name: total_battery_in
+  unique_id: total_battery_in
+  unit_of_measurement: W
+  state_class: measurement
+  device_class: power
+  state: "{% set battery_load = states('sensor.battery_load') | int(0) %} {% if battery_load >= 0 %}\n  {{ battery_load\
+    \ }}\n{% else %}\n  0\n{% endif %}\n"
+- name: water_cm
+  unique_id: water_cm
+  availability: "{{ is_number(states('sensor.water_level_2_water_level')) }}"
+  unit_of_measurement: cm
+  state_class: measurement
+  state: "{% set wl  = states('sensor.water_level_2_water_level') | int(0) %} {% if wl >= 100 %}\n  100\n{% else\
+    \ %}\n  {{ wl }}\n{% endif %}\n"
+- name: water_in_the_tank
+  unique_id: water_in_the_tank
+  availability: "{{ is_number(states('sensor.water_cm')) }}"
+  unit_of_measurement: L
+  state_class: measurement
+  state: '{{ ( ( states(''sensor.water_cm'') | float(0) - 18 ) *  3.141592 * 35.56 * 35.56 / 1000 ) | round(2) }}'
+- name: Battery %
+  unit_of_measurement: °%
+  device_class: battery
+  availability: >-
+    {% set v = states('sensor.battery_voltage') | float(none) %}
+    {{ v is not none and is_number(v) and 0 < v <= 70 }}
+  state: >-
+    {% set v = states('sensor.battery_voltage') | float(none) %}
+    {% if v is not none and is_number(v) and 0 < v <= 70 %}
+      {{ ([0, (v - 40) / (54.4 - 40) * 100, 100] | sort)[1] | round(0) }}
+    {% else %}
+      {{ none }}
+    {% endif %}
+- name: Water Pressure PSI
+  unique_id: water_pressure_psi
+  unit_of_measurement: psi
+  availability: "{{ is_number(states('sensor.778_40th_ave_sf_water_pressure')) }}"
+  state: "{{ (states('sensor.778_40th_ave_sf_water_pressure') | float(0) * 0.1450377377) | round(2) }}"
+- name: Solar Age
+  unique_id: solar_age
+  state: "{% set raw = states('sensor.solar_days') %} {% set match = raw | regex_findall('^\\\\s*(\\\\d+)') | first | default(none) %} {% if match %}\n  {% set total_days = match | int %}\n  {% set years = total_days // 365 %}\n  {% set\
+    \ months = (total_days % 365) // 30 %}\n  {% set days = (total_days % 365) % 30 %}\n\n  {% set y = years ~ '\
+    \ year' ~ ('s' if years != 1 else '') if years > 0 else '' %}\n  {% set m = months ~ ' month' ~ ('s' if months\
+    \ != 1 else '') if months > 0 else '' %}\n  {% set d = days ~ ' day' ~ ('s' if days != 1 else '') if days >\
+    \ 0 else '' %}\n\n  {% if y and m and d %}\n    {{ y }}, {{ m }} and {{ d }}\n  {% elif y and m %}\n    {{ y\
+    \ }} and {{ m }}\n  {% elif y and d %}\n    {{ y }} and {{ d }}\n  {% elif m and d %}\n    {{ m }} and {{ d\
+    \ }}\n  {% elif y %}\n    {{ y }}\n  {% elif m %}\n    {{ m }}\n  {% elif d %}\n    {{ d }}\n  {% else %}\n\
+    \    0 days\n  {% endif %}\n{% else %}\n  unknown\n{% endif %}\n"

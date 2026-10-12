@@ -1,0 +1,13 @@
+# Garage: Toggle lights from the audio button.
+# Stable entity: automation.audio_button_toggle_audio_switch.
+- id: ha_homelab_garage_toggle_lights_from_the_audio_button
+  alias: 'Garage: Toggle lights from the audio button'
+  description: Superseded by the converted TS0041-TB button's direct Zigbee group binding. Kept disabled
+    and empty to preserve its registered entity ID without obsolete stock-firmware triggers or duplicate light commands.
+  triggers: []
+  conditions: []
+  actions: []
+  mode: single
+  trace:
+    stored_traces: 5
+  initial_state: false

@@ -1,0 +1,14 @@
+# Stable entity: script.kk
+# Call shell_command.kk with the existing crossed selector mapping: pla receives input_select.sta and sta receives input_select.pla.
+# Do not swap pla and sta without reviewing shell_command.kk and every caller; this mapping matches the live configuration.
+kk:
+  alias: 'Radio: run selected shell command'
+  description: 'Call shell_command.kk with the existing crossed selector mapping: pla receives input_select.sta
+    and sta receives input_select.pla.'
+  icon: mdi:radio
+  mode: single
+  sequence:
+    - service: shell_command.kk
+      data_template:
+        pla: '{{ states.input_select.sta.state | string }}'
+        sta: '{{ states.input_select.pla.state | string }}'

@@ -1,0 +1,52 @@
+# Camera detection stays on the camera; HA only opens video for the alert/viewer.
+shell_command:
+  onvif_notification_video_ready: python3 /config/housekeeping/notification_video_ready.py {{ camera_key }}
+
+automation:
+  - id: ha_homelab_phone_living_room_onvif_video
+    alias: 'Security: Living Room ONVIF video on Vitaly iPhone Air'
+    description: >-
+      Send a phone-only live camera notification on new native ONVIF motion.
+      Prepare a bounded Oracle relay subscriber; never preload or keep a viewer
+      open permanently. Suppress reconnect replays and alerts within 60 seconds.
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.living_room_camera_cell_motion_detection
+        from: 'off'
+        to: 'on'
+    conditions:
+      - condition: state
+        entity_id: input_boolean.notifications_off
+        state: 'off'
+      - condition: template
+        value_template: >-
+          {{ as_timestamp(now()) - as_timestamp(this.attributes.get('last_triggered'), 0) >= 60 }}
+    actions:
+      - action: shell_command.onvif_notification_video_ready
+        data:
+          camera_key: living_room_onvif
+        response_variable: video
+        continue_on_error: true
+      - condition: state
+        entity_id: input_boolean.notifications_off
+        state: 'off'
+      - action: script.notify_optional
+        data:
+          notify_service: notify.mobile_app_als_iphone_89310
+          notification_category: camera_onvif
+          notify_data:
+            title: 'Living Room ONVIF: motion detected'
+            message: >-
+              {{ 'The camera detected motion. Expand to view live video.'
+                 if video is defined and video.returncode == 0
+                 else 'The camera detected motion. Live video may be unavailable.' }}
+            data:
+              entity_id: camera.living_room_onvif_notifications
+              tag: living-room-onvif-motion
+              url: entityId:camera.living_room_onvif_notifications
+              push:
+                category: camera
+    mode: single
+    max_exceeded: silent
+    trace:
+      stored_traces: 5

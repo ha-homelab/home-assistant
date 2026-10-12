@@ -1,0 +1,96 @@
+# Follow the scheduled curtain window, not reported curtain positions or manual moves.
+automation:
+  - id: ha_homelab_living_lamp_presence_overnight
+    alias: 'Living lamp: Follow presence overnight'
+    description: >-
+      Keep Living lamp on while living-room presence is detected, from the evening
+      curtain threshold (descending sun below 0.2 degrees) until sunrise or 06:30,
+      whichever is later. Switch off after 20 continuous minutes of confirmed
+      absence, or at the morning boundary. Unknown sensor states never count as absence.
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.living_room_presence
+        to: 'on'
+        id: presence
+      - trigger: state
+        entity_id: binary_sensor.living_room_presence
+        to: 'off'
+        for: '00:20:00'
+        id: absence
+      - trigger: numeric_state
+        entity_id: sun.sun
+        attribute: elevation
+        below: 0.2
+        id: evening
+      - trigger: sun
+        event: sunrise
+        id: morning
+      - trigger: time
+        at: '06:30:00'
+        id: morning
+      # Reconcile the boundary after sun.sun updates, independent of event order.
+      - trigger: template
+        value_template: >-
+          {{ is_state('sun.sun', 'above_horizon')
+             and state_attr('sun.sun', 'rising') == true
+             and now() >= today_at('06:30') }}
+        id: morning
+      - trigger: state
+        entity_id: switch.living_lamp
+        to:
+          - 'on'
+          - 'off'
+        id: lamp
+      - trigger: homeassistant
+        event: start
+        id: startup
+      - trigger: event
+        event_type: automation_reloaded
+        id: reload
+      - trigger: time_pattern
+        minutes: '/1'
+        id: reconcile
+    variables:
+      absence_seconds: 1200
+      schedule_known: >-
+        {{ states('sun.sun') in ['above_horizon', 'below_horizon']
+           and is_number(state_attr('sun.sun', 'elevation'))
+           and state_attr('sun.sun', 'rising') in [true, false] }}
+      overnight: >-
+        {{ schedule_known and
+           ((not state_attr('sun.sun', 'rising')
+             and state_attr('sun.sun', 'elevation') | float(90) < 0.2)
+            or (state_attr('sun.sun', 'rising')
+                and (is_state('sun.sun', 'below_horizon')
+                     or now() < today_at('06:30')))) }}
+    conditions:
+      - condition: template
+        value_template: '{{ schedule_known }}'
+    actions:
+      - choose:
+          - conditions: >-
+              {{ not overnight and trigger is defined and trigger.id == 'morning'
+                 and is_state('switch.living_lamp', 'on') }}
+            sequence:
+              - action: switch.turn_off
+                target:
+                  entity_id: switch.living_lamp
+          - conditions: >-
+              {{ overnight and is_state('binary_sensor.living_room_presence', 'on')
+                 and is_state('switch.living_lamp', 'off') }}
+            sequence:
+              - action: switch.turn_on
+                target:
+                  entity_id: switch.living_lamp
+          - conditions: >-
+              {% set presence = states.binary_sensor.living_room_presence %}
+              {{ overnight and presence is defined and presence.state == 'off'
+                 and as_timestamp(now()) - as_timestamp(presence.last_changed) >= absence_seconds
+                 and is_state('switch.living_lamp', 'on') }}
+            sequence:
+              - action: switch.turn_off
+                target:
+                  entity_id: switch.living_lamp
+    mode: restart
+    trace:
+      stored_traces: 10

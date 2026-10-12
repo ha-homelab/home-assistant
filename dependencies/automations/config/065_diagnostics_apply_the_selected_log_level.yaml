@@ -1,0 +1,15 @@
+# Diagnostics: Apply the selected log level.
+# Stable entity: automation.log_level.
+- id: ha_homelab_diagnostics_apply_the_selected_log_level
+  alias: 'Diagnostics: Apply the selected log level'
+  description: Apply the selected log level. Responds to input_select.log_level changing state.
+  triggers:
+    platform: state
+    entity_id: input_select.log_level
+  actions:
+    service: logger.set_level
+    data_template:
+      homeassistant.components: '{{ trigger.to_state.state }}'
+  mode: single
+  trace:
+    stored_traces: 5

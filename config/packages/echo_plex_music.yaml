@@ -1,0 +1,122 @@
+# Plex audio is handled by Music Assistant on the home LAN, not HA in OCI.
+script:
+  echo_plex_music:
+    alias: Echo Dot Plex Music
+    description: Resume Echo's Plex queue, start All Music when needed, or control playback.
+    icon: mdi:music
+    mode: single
+    fields:
+      command:
+        description: Defaults to starting the Plex playlist.
+        default: play
+        selector:
+          select:
+            options: [play, pause, resume, next]
+    sequence:
+      - variables:
+          music_command: "{{ command | default('play', true) }}"
+          replies:
+            play: "Включаю музыку из Плекса."
+            pause: "Музыка на паузе."
+            resume: "Продолжаю музыку."
+            next: "Следующий трек."
+          controls:
+            pause: media_player.media_pause
+            resume: media_player.media_play
+            next: media_player.media_next_track
+      - if: "{{ music_command not in replies }}"
+        then:
+          - variables:
+              result:
+                success: false
+                message: "Неизвестная команда управления музыкой."
+          - stop: Unsupported music command.
+            response_variable: result
+      - if: "{{ not has_value('media_player.echo_dot_music') }}"
+        then:
+          - variables:
+              result:
+                success: false
+                message: "Колонка Echo сейчас недоступна."
+          - stop: Echo Dot music player is unavailable.
+            response_variable: result
+      - if: "{{ music_command == 'play' }}"
+        then:
+          - action: music_assistant.get_queue
+            target:
+              entity_id: media_player.echo_dot_music
+            response_variable: queue_response
+          - variables:
+              # Keep the service response inside one template: nested MA values
+              # need not survive HA's string-to-native conversion of variables.
+              plex_queue: >-
+                {% set queue = queue_response.get('media_player.echo_dot_music', {}) or {} %}
+                {% set current_item = queue.get('current_item') or {} %}
+                {{ queue.get('items', 0) | int(0) > 0
+                   and ((current_item.get('stream_details') or {}).get('provider') == 'plex--home-music'
+                        or ((current_item.get('media_item') or {}).get('uri') or '').startswith('plex--home-music://')) }}
+          - if: "{{ plex_queue }}"
+            then:
+              - if: "{{ not is_state('media_player.echo_dot_music', 'playing') }}"
+                then:
+                  - action: media_player.media_play
+                    target:
+                      entity_id: media_player.echo_dot_music
+            else:
+              - action: music_assistant.play_media
+                target:
+                  entity_id: media_player.echo_dot_music
+                data:
+                  media_id: "plex--home-music://playlist//playlists/60771"
+                  media_type: playlist
+                  enqueue: replace
+        else:
+          - action: "{{ controls[music_command] }}"
+            target:
+              entity_id: media_player.echo_dot_music
+      - variables:
+          result:
+            success: true
+            message: "{{ replies[music_command] }}"
+      - stop: Return music command result.
+        response_variable: result
+
+intent_script:
+  EchoPlexPlayMusic:
+    action:
+      - action: script.echo_plex_music
+        response_variable: result
+      - stop: Return music result.
+        response_variable: result
+    speech:
+      text: "{{ (action_response | default({})).get('message', 'Не удалось включить музыку.') }}"
+  EchoPlexPauseMusic:
+    action:
+      - action: script.echo_plex_music
+        data:
+          command: pause
+        response_variable: result
+      - stop: Return music result.
+        response_variable: result
+    speech:
+      text: "{{ (action_response | default({})).get('message', 'Не удалось остановить музыку.') }}"
+  EchoPlexResumeMusic:
+    action:
+      - action: script.echo_plex_music
+        data:
+          command: resume
+        response_variable: result
+      - stop: Return music result.
+        response_variable: result
+    speech:
+      text: "{{ (action_response | default({})).get('message', 'Не удалось продолжить музыку.') }}"
+  EchoPlexNextTrack:
+    action:
+      - action: script.echo_plex_music
+        data:
+          command: next
+        response_variable: result
+      - stop: Return music result.
+        response_variable: result
+    speech:
+      text: "{{ (action_response | default({})).get('message', 'Не удалось переключить трек.') }}"

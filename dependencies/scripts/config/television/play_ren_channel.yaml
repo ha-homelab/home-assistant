@@ -1,0 +1,15 @@
+# Stable entity: script.tv_pic3
+# Play the existing REN channel name on the living room TV, preserving the provider-facing Cyrillic identifier.
+tv_pic3:
+  alias: 'Living room TV: play REN channel'
+  description: Play the existing REN channel name on the living room TV, preserving the provider-facing Cyrillic
+    identifier.
+  icon: mdi:television-play
+  mode: single
+  sequence:
+    - service: media_player.play_media
+      target:
+        entity_id: media_player.living_room_tv_77
+      data:
+        media_content_id: РЕН
+        media_content_type: channel

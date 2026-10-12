@@ -1,0 +1,20 @@
+# Presence: Apply the away scene when family leaves.
+# Stable entity: automation.family_leaving_home.
+# Starts disabled because the original installation explicitly uses initial_state: off.
+- id: ha_homelab_presence_apply_the_away_scene_when_family_leaves
+  alias: 'Presence: Apply the away scene when family leaves'
+  description: Apply the away scene when family leaves. Responds to group.family changing to not_home
+    for 15 minutes.
+  initial_state: 'off'
+  triggers:
+  - platform: state
+    to: not_home
+    entity_id: group.family
+    for:
+      minutes: 15
+  actions:
+    service: scene.turn_on
+    entity_id: scene.away_devices_off
+  mode: single
+  trace:
+    stored_traces: 5

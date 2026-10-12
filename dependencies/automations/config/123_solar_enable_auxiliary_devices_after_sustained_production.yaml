@@ -1,0 +1,50 @@
+# Solar: Enable auxiliary devices after sustained production.
+# Stable entity: automation.solar_3_or_4_producing_over_200_for_five_minutes.
+- id: ha_homelab_solar_enable_auxiliary_devices_after_sustained_production
+  alias: 'Solar: Enable auxiliary devices after sustained production'
+  description: Enable auxiliary devices after sustained production. Responds to sensor.heater_one_energy_power above
+    200 for 5 minutes; or sensor.heater_two_energy_power above 200 for 5 minutes; or sensor.ppv1_w above 300 for
+    5 minutes; or sensor.ppv2_w above 300 for 5 minutes; or sensor.ppv3_w above 300 for 5 minutes. Runs only when
+    all configured guards pass.
+  triggers:
+  - platform: numeric_state
+    entity_id: sensor.heater_one_energy_power
+    above: 200
+    for:
+      minutes: 5
+  - platform: numeric_state
+    entity_id: sensor.heater_two_energy_power
+    above: 200
+    for:
+      minutes: 5
+  - platform: numeric_state
+    entity_id: sensor.ppv1_w
+    above: 300
+    for:
+      minutes: 5
+  - platform: numeric_state
+    entity_id: sensor.ppv2_w
+    above: 300
+    for:
+      minutes: 5
+  - platform: numeric_state
+    entity_id: sensor.ppv3_w
+    above: 300
+    for:
+      minutes: 5
+  conditions:
+  - condition: state
+    entity_id: switch.mppt_fan
+    state: 'off'
+  actions:
+  - service: switch.turn_on
+    entity_id: switch.mppt_fan
+  - service: switch.turn_on
+    entity_id: switch.heater_three
+  - service: script.notify
+    data:
+      message: Solar 3 or 4 producing over 200W for five minutes
+    continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

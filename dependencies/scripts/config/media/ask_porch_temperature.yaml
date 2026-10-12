@@ -1,0 +1,14 @@
+# Stable entity: script.living_room_display_2_temperature
+# Send the existing custom Google voice request for the porch temperature to living room display 2.
+living_room_display_2_temperature:
+  alias: 'Living room display 2: ask porch temperature'
+  description: Send the existing custom Google voice request for the porch temperature to living room display 2.
+  icon: mdi:thermometer
+  mode: single
+  sequence:
+    - service: media_player.play_media
+      metadata: {}
+      data:
+        entity_id: media_player.living_room_display_2
+        media_content_id: okay google, what is the temperature on the porch
+        media_content_type: custom

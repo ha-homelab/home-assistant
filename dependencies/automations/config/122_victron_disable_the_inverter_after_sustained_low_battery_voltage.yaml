@@ -1,0 +1,59 @@
+# Victron: Disable the inverter after sustained low battery voltage.
+# Stable entity: automation.battery_voltage_below_50v_for_five_minutes.
+- id: ha_homelab_victron_disable_the_inverter_after_sustained_low_battery_voltage
+  alias: 'Victron: Disable the inverter after sustained low battery voltage'
+  description: Shut down only after the valid-low battery sensor has remained on
+    continuously for five minutes and voltage is still below 50 V. Missing telemetry
+    resets the confirmation period. Recheck after startup, mode changes, inverter
+    start, and once a minute so a missed threshold crossing cannot disable protection.
+    Off-grid permits this low-battery exception even if the charge-only flag is set.
+  triggers:
+  - platform: state
+    entity_id: binary_sensor.victron_battery_low
+    to: 'on'
+    for:
+      minutes: 5
+  - platform: homeassistant
+    event: start
+  - platform: state
+    entity_id: input_boolean.off_grid_mode
+    to: 'on'
+  - platform: state
+    entity_id: switch.victron_quattro
+    to: 'on'
+  - platform: state
+    entity_id: switch.inverter_only_charging
+    to: 'off'
+  - platform: time_pattern
+    minutes: /1
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.victron_battery_low
+    state: 'on'
+    for:
+      minutes: 5
+  - condition: state
+    entity_id: switch.victron_quattro
+    state: 'on'
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: input_boolean.off_grid_mode
+      state: 'on'
+    - condition: state
+      entity_id: switch.inverter_only_charging
+      state: 'off'
+  actions:
+  - condition: template
+    value_template: >-
+      {% set v = states('sensor.battery_voltage') | float(none) %}
+      {{ v is not none and is_number(v) and 0 < v < 50 }}
+  - service: switch.turn_off
+    entity_id: switch.victron_quattro
+  - service: script.notify
+    data:
+      message: Battery voltage below 50V for five minutes
+    continue_on_error: true
+  mode: single
+  trace:
+    stored_traces: 5

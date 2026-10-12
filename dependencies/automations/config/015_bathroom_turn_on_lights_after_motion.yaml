@@ -1,0 +1,20 @@
+# Bathroom: Turn on lights after motion.
+# Stable entity: automation.bathroom_motion_triggered.
+- id: ha_homelab_bathroom_turn_on_lights_after_motion
+  alias: 'Bathroom: Turn on lights after motion'
+  description: Turn on the bathroom mirror light after the retained restroom motion sensor detects motion, unless
+    the manual override is enabled.
+  triggers:
+  - entity_id: binary_sensor.rf_restroom_one_motion
+    platform: state
+    to: 'on'
+  conditions:
+  - condition: state
+    entity_id: input_boolean.bathroom_sticky
+    state: 'off'
+  actions:
+  - service: light.turn_on
+    entity_id: light.bathroom_mirror_light
+  mode: single
+  trace:
+    stored_traces: 5

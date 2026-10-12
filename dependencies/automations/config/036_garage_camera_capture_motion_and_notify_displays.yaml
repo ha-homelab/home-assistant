@@ -1,0 +1,43 @@
+# Garage camera: Capture motion and notify displays.
+# Stable entity: automation.garage_motion.
+- id: ha_homelab_garage_camera_capture_motion_and_notify_displays
+  alias: 'Garage camera: Capture motion and notify displays'
+  description: Capture motion and notify displays. Responds to MQTT messages on kios/garage.
+  triggers:
+  - platform: mqtt
+    topic: kios/garage
+  actions:
+  - service: script.notify_mqtt
+    data:
+      message: Garage motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+    continue_on_error: true
+  - action: script.capture_camera_alert
+    data:
+      camera_key: garage
+  - action: script.notify_optional
+    data:
+      notify_service: notify.roomba
+      also_chrome: true
+      chrome_image: /local/garage_camera_alert.jpg?{{ as_timestamp(now()) }}
+      notify_data:
+        title: Garage Camera
+        message: Motion detected
+        data:
+          displaytime: 20000
+          icon: warning
+  - action: script.notify_optional
+    data:
+      notify_service: notify.imac21
+      notify_data:
+        title: Garage Camera
+        message: Motion detected
+        data:
+          displaytime: 20000
+          icon: warning
+  - service: persistent_notification.create
+    data_template:
+      title: Garage
+      message: Garage Motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+  mode: single
+  trace:
+    stored_traces: 5

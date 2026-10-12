@@ -1,0 +1,18 @@
+# Bathroom: Stop the warm-water pump after motion clears.
+# Stable entity: automation.bathroom_motion_off_warm_water_pump_off.
+- id: ha_homelab_bathroom_stop_the_warm_water_pump_after_motion_clears
+  alias: 'Bathroom: Stop the warm-water pump after motion clears'
+  description: Stop the warm-water pump after motion clears. Responds to binary_sensor.rf_restroom_one_motion
+    changing to off for 5 minutes.
+  triggers:
+  - entity_id: binary_sensor.rf_restroom_one_motion
+    platform: state
+    to: 'off'
+    for:
+      minutes: 5
+  actions:
+  - service: switch.turn_off
+    entity_id: switch.smart_toilet_2
+  mode: single
+  trace:
+    stored_traces: 5

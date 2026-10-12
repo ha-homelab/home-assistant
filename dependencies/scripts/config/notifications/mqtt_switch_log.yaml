@@ -1,0 +1,23 @@
+# Stable entity: script.notify_mqtt_log
+# Publish the supplied message to living_room/switch_log with retention enabled.
+# retain: true is part of the existing subscriber contract; a new subscriber can receive the last message.
+notify_mqtt_log:
+  alias: 'Notifications: publish retained MQTT switch log'
+  description: Publish the supplied message to living_room/switch_log with retention enabled.
+  icon: mdi:text-box-outline
+  fields:
+    message:
+      name: Message
+      description: Message text forwarded using the existing notification template.
+      required: true
+      selector:
+        text:
+          multiline: true
+  mode: queued
+  sequence:
+  - service: mqtt.publish
+    data_template:
+      payload: '{{ message }}'
+      topic: living_room/switch_log
+      retain: true
+  max: 100

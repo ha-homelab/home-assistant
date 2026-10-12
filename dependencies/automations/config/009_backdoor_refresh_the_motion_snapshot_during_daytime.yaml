@@ -1,0 +1,20 @@
+# Backdoor: Refresh the motion snapshot during daytime.
+# Stable entity: automation.backdoor_motion_msg.
+- id: ha_homelab_backdoor_refresh_the_motion_snapshot_during_daytime
+  alias: 'Backdoor: Refresh the motion snapshot during daytime'
+  description: Refresh the motion snapshot during daytime. Responds to MQTT messages on kios/backdoor.
+    Runs only when all configured guards pass.
+  triggers:
+  - platform: mqtt
+    topic: kios/backdoor
+  conditions:
+  - after: 09:00:00
+    before: '23:20:00'
+    condition: time
+  actions:
+  - action: script.capture_camera_alert
+    data:
+      camera_key: backdoor
+  mode: single
+  trace:
+    stored_traces: 5

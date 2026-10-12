@@ -1,0 +1,47 @@
+# Porch camera: Show motion on Kodi.
+# Stable entity: automation.porch_motion_display_on_kodi.
+- id: ha_homelab_porch_camera_show_motion_on_kodi
+  alias: 'Porch camera: Show motion on Kodi'
+  description: Show motion on Kodi. Responds to MQTT messages on kios/porch. Runs only when all configured guards
+    pass.
+  triggers:
+  - platform: mqtt
+    topic: kios/porch
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.payload_json[''name''] == ''Porch'' }}'
+  actions:
+  - service: script.notify_mqtt
+    data:
+      message: Porch camera motion {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+    continue_on_error: true
+  - action: script.capture_camera_alert
+    data:
+      camera_key: porch
+  - action: script.notify_optional
+    data:
+      notify_service: notify.roomba
+      also_chrome: true
+      chrome_image: /local/porch_camera_alert.jpg?{{ as_timestamp(now()) }}
+      notify_data:
+        title: Porch Camera
+        message: Motion detected {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+        data:
+          displaytime: 20000
+          icon: warning
+  - action: script.notify_optional
+    data:
+      notify_service: notify.imac21
+      notify_data:
+        title: Porch Camera
+        message: Motion detected {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+        data:
+          displaytime: 20000
+          icon: warning
+  - service: persistent_notification.create
+    data_template:
+      title: Ding-dong. Porch camera motion!
+      message: Ding-dong. Porch camera motion! {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
+  mode: single
+  trace:
+    stored_traces: 5
