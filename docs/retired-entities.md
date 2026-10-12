@@ -295,3 +295,42 @@ After reloading automations and input booleans, remove only the three retired
 entity-registry records if they remain. The live removal was checked with HA's
 installed configuration validator. No relay commands or HA restart are needed.
 Tasmota's local 30-minute Wi-Fi watchdog and power-on settings are unchanged.
+
+## Obsolete MQTT diagnostics and inert metadata (2026-10-12)
+
+Retire `sensor.track` and `sensor.top_cpu_consumer`, the unused manual MQTT
+sensors on `home-assistant/track` and `home-assistant/ps`. Neither has a current
+consumer. Remove the five empty manual MQTT tracker definitions that create
+`device_tracker.vitaly_2`, `maria_2`, `vitaly_iwatch_2`, `maria_iwatch_2` and
+`airbnb_2`. The original, unsuffixed trackers, their presence groups and the
+current mobile-app trackers remain in place.
+
+Remove the seven restored MQTT registry orphans `binary_sensor.inverter_` with
+suffixes `only_charging`, `no_feed`, `house_support`, `charge_battery`,
+`do_not_supply_ev`, `limit_to_ev` and `minimize_charging`. Current mode controls
+are the corresponding `switch.inverter_*` entities; preserve their definitions,
+state and command topics. Replace the obsolete `input_boolean.minimize_charging`
+entity row/tile in the `lovelace` and `zero-grid` storage dashboards with
+`switch.inverter_minimize_charging`, then remove the orphan helper registry entry.
+Do not send a switch command during migration.
+
+Remove 32 customization entries and 26 recorder exclusions for entities absent
+from both the live state machine and registry, plus the two exclusions for the
+retired diagnostic sensors. These are inert references to older transit,
+Comcast, guest-calendar, cloud-cover, financial, media, backup and diagnostic
+entities. The reference audit found no live consumers of these absent identities.
+Do not purge their historical recorder data. Existing historical runbooks and
+old dashboard backup files are not active configuration.
+
+Apply only the three changed YAML files with pre-change content guards. Use
+HA's Lovelace and entity-registry APIs for the storage changes; do not edit a
+running `.storage` file. Validate with the installed HA configuration checker,
+reload MQTT YAML and core customizations, and verify the exact retired identities
+are gone while current switches, presence sources and automation enablement are
+preserved. Recorder exclusion cleanup takes effect on the next ordinary restart;
+it requires no immediate restart because those entities are absent.
+
+Current System Monitor CPU, memory, disk and uptime sensors still provide data.
+Offline physical devices and ambiguous older RF/audio registrations are not
+retired merely because they are unavailable. The shared source change must also
+be adopted by updating the private repository's `public/` pin.
