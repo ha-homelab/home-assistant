@@ -61,8 +61,8 @@ sensor automations. Its counter is a storage-backed helper; create or restore
 that helper before loading the package.
 
 [Studio Zigbee curtains](docs/studio-curtains-zha.md) document the local ZHA
-adapter, verified **three short presses followed by a fourth press held for about
-two seconds** pairing sequence, command checks, and pending track calibration.
+adapter, verified Zigbee pairing and installed travel calibration, motor/remote
+button commands, and the remaining power-loss and Office Curtains migration checks.
 
 [Living-room RF curtains](docs/living-curtains-rf.md) start main and sheer motor
 commands three seconds after socket power, while retaining independent Wi-Fi
