@@ -115,7 +115,7 @@ The user installed this motor on the track previously driven by **Office Curtain
 
 A subsequent full opening took approximately 9.3 seconds and produced a real DP 3 position report of `0`, shown by Home Assistant as **100% open**. The radio acknowledged and echoed the movement and direction commands. Command acknowledgements alone were not treated as proof of physical movement.
 
-A `set_cover_position` command to **50%** was acknowledged and echoed on DP 2; the user confirmed that the curtain stopped approximately halfway open. The curtain was then commanded back to fully open. No factory reset, pairing change or speculative limit-datapoint write was used. Power-loss retention of the learned limits has not been tested. The existing Office Curtains entity, dashboard references and automations have not been migrated as part of calibration.
+A `set_cover_position` command to **50%** was acknowledged and echoed on DP 2; the user confirmed that the curtain stopped approximately halfway open. The curtain was then commanded back to fully open. No factory reset, pairing change or speculative limit-datapoint write was used. Power-loss retention of the learned limits has not been tested. The existing Office Curtains entity and dashboard references were not migrated as part of calibration. The subsequent automation migration is recorded below.
 
 ## Replacing the previous Office Curtains R motor
 
@@ -123,7 +123,7 @@ The installed motor has demonstrated correct full travel and midpoint positionin
 
 Before claiming that replacement solves the delay, record the time from restored power to the first command that actually moves the curtain, then verify direction, endpoints and a physical 50% stop. Separately record whether travel memory was enabled and survived the power cycle. The manual's memory shortcut alone is not evidence that this unit retained calibration.
 
-As of the 2026-10-12 calibration, logical migration remains pending:
+At calibration time, the automation migration was still pending:
 
 - The new working target is `cover.studio_curtains`.
 - The old `cover.office_curtains_r` template wraps `cover.office_curtains_office_curtains` with inverted commands/position in [`config/covers.yaml`](../config/covers.yaml). Do not carry that inversion over to the new cover: its installed direction is already corrected.
@@ -140,3 +140,33 @@ The motor was paired while powered separately from the curtain track. Install it
 - **Future upstream support:** [zha-device-handlers PR 4943](https://github.com/zigpy/zha-device-handlers/pull/4943) includes this fingerprint, but was unmerged when this adapter was prepared. Its broad proposed mapping was not copied wholesale.
 
 No factory reset, firmware flash or travel calibration is required to install the adapter.
+
+## Automation migration on 2026-10-12
+
+The owner confirmed that the new Zigbee motor is powered through
+`switch.studio_guard`. Both existing automation identities, schedules,
+`input_boolean.curtains_sticky` conditions and power sequences are retained.
+
+- Morning rule **078** explicitly sends `cover.open_cover` to
+  `cover.studio_curtains` after the existing 90-second shared warm-up. Previously
+  it only powered Studio guard; it had no Studio opening command.
+- Evening rule **027** sends `cover.close_cover` to `cover.studio_curtains`.
+  The exact former `cover.office_curtains_r` action remains commented beside it.
+  The existing 90-second warm-up and one-hour delay before guard power-off remain.
+- Only the new Studio movement calls use `continue_on_error: true`, so an
+  unavailable motor does not prevent the remaining room commands or shutdown.
+  This does not silently retry an unsuccessful Studio movement.
+
+The old LocalTuya entity and inverted template remain available for manual
+rollback. No active automation or script targets them. Their inversion is not
+applied to the new cover, whose direction was already calibrated as **Back**.
+No registry identities or dashboard controls are changed by this migration.
+For rollback, restore the commented evening action and remove the newly added
+morning Studio open action; retain the shared guard power actions.
+
+Validate both rules in an isolated HA instance with recorded services, including
+Studio failure cases and daylight/manual-override checks. Deploy only the two
+changed automation files, run the installed HA configuration checker, then reload
+each by its stable automation ID. Verify loaded configuration, enabled state and
+unchanged motor state without firing the household schedules. These checks do not
+constitute a new physical movement or cold-start recovery test.

@@ -612,13 +612,13 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "6fa0c917e7eb1c92014ce1537d1470232b14e092cb419d2271b8f8e75de317d6",
+      "behavior_sha256": "aefa93ee700932abf5fa659c3bcb82610546db9b5b73ae8310049e56fedc63a8",
       "references": [
         "cover.close_cover",
         "cover.dining_curtains_l",
         "cover.kitchen_curtains_l",
         "cover.living_curtains_l",
-        "cover.office_curtains_r",
+        "cover.studio_curtains",
         "input_boolean.curtains_sticky",
         "sun.sun",
         "switch.dining_guard",
@@ -629,18 +629,22 @@
       ],
       "imported_behavior_sha256": "84d51ba30817ea4d0555c50e97d00983718dd1447298eb41cdf6650c26360357",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Replace Studio guard 1 with the canonical ESPHome Studio guard relay; retain all timing, conditions, curtain actions, and other power guards.",
+        "date": "2026-10-12",
+        "reason": "Migrate Studio movement to the calibrated ZHA cover: explicit morning open and evening close, retaining Studio guard power, schedules, delays and manual override. A Studio movement error does not abort the other rooms. Keep the legacy Wi-Fi command commented for rollback.",
         "previous_change": {
           "date": "2026-10-10",
-          "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome Mishka guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
+          "reason": "Replace Studio guard 1 with the canonical ESPHome Studio guard relay; retain all timing, conditions, curtain actions, and other power guards.",
           "previous_change": {
             "date": "2026-10-10",
-            "reason": "Replace the retired Dining guard 3 with the verified ESPHome Dining guard for curtain power. Preserve schedules, conditions, delays and all other actions.",
+            "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome Mishka guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
             "previous_change": {
-              "date": "2026-10-06",
-              "reason": "Start living-room main/sheer movement by learned RF three seconds after shared socket power, then independently repeat the same target over Wi-Fi with a 180-second bound and manual-override rechecks. Preserve schedules, identities, unrelated rooms and their power-off timing.",
-              "previous_change": null
+              "date": "2026-10-10",
+              "reason": "Replace the retired Dining guard 3 with the verified ESPHome Dining guard for curtain power. Preserve schedules, conditions, delays and all other actions.",
+              "previous_change": {
+                "date": "2026-10-06",
+                "reason": "Start living-room main/sheer movement by learned RF three seconds after shared socket power, then independently repeat the same target over Wi-Fi with a 180-second bound and manual-override rechecks. Preserve schedules, identities, unrelated rooms and their power-off timing.",
+                "previous_change": null
+              }
             }
           }
         }
@@ -2062,11 +2066,12 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "ca9ae08836d3f51a8c0461913e08dd8662f35191daf178f3ae818595e8e4bd9e",
+      "behavior_sha256": "00585cf07159bdfcfcf0b5111fd967bfff91cbda4a663d7ad6678ec9cafb8a5e",
       "references": [
         "cover.dining_curtains_l",
         "cover.kitchen_curtains_l",
         "cover.open_cover",
+        "cover.studio_curtains",
         "input_boolean.curtains_sticky",
         "switch.dining_guard",
         "switch.kitchen_guard",
@@ -2076,17 +2081,21 @@
       ],
       "imported_behavior_sha256": "d4eb53793f125d569d4372ec385cdfe41f0ef3856d67434d92f5d60e53ccae16",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Replace Studio guard 1 with the canonical ESPHome Studio guard relay; retain all timing, conditions, curtain actions, and other power guards.",
+        "date": "2026-10-12",
+        "reason": "Migrate Studio movement to the calibrated ZHA cover: explicit morning open and evening close, retaining Studio guard power, schedules, delays and manual override. A Studio movement error does not abort the other rooms. Keep the legacy Wi-Fi command commented for rollback.",
         "previous_change": {
           "date": "2026-10-10",
-          "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome Mishka guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
+          "reason": "Replace Studio guard 1 with the canonical ESPHome Studio guard relay; retain all timing, conditions, curtain actions, and other power guards.",
           "previous_change": {
             "date": "2026-10-10",
-            "reason": "Replace the retired Dining guard 3 with the verified ESPHome Dining guard for curtain power. Preserve schedules, conditions, delays and all other actions.",
+            "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome Mishka guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
             "previous_change": {
-              "date": "2026-10-07",
-              "reason": "Wait until sunrise or 06:35, whichever is later, for kitchen/dining morning curtains; retain the manual override, original power and Wi-Fi sequence, and add the same noon cutoff as the living-room schedule."
+              "date": "2026-10-10",
+              "reason": "Replace the retired Dining guard 3 with the verified ESPHome Dining guard for curtain power. Preserve schedules, conditions, delays and all other actions.",
+              "previous_change": {
+                "date": "2026-10-07",
+                "reason": "Wait until sunrise or 06:35, whichever is later, for kitchen/dining morning curtains; retain the manual override, original power and Wi-Fi sequence, and add the same noon cutoff as the living-room schedule."
+              }
             }
           }
         }
