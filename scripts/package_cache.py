@@ -46,18 +46,18 @@ def snapshot(root: Path, destination: Path) -> None:
 
 def environment(root: Path, destination: Path) -> Path:
     subprocess.run(
-        ["uv", "--no-config", "venv", "--python", sys.executable, str(destination)],
+        [sys.executable, "-I", "-m", "venv", str(destination)],
         check=True,
     )
     python = destination / "bin/python"
     subprocess.run(
         [
-            "uv",
-            "--no-config",
-            "pip",
-            "install",
-            "--python",
             str(python),
+            "-I",
+            "-m",
+            "pip",
+            "--isolated",
+            "install",
             "--require-hashes",
             "--only-binary=:all:",
             "-r",
@@ -100,12 +100,12 @@ def verify_install(artifact: Path, root: Path, version: str, destination: Path) 
     python = environment(root, destination / "venv")
     subprocess.run(
         [
-            "uv",
-            "--no-config",
-            "pip",
-            "install",
-            "--python",
             str(python),
+            "-I",
+            "-m",
+            "pip",
+            "--isolated",
+            "install",
             "--no-deps",
             "--no-build-isolation",
             f"{PACKAGE} @ {artifact.as_uri()}",

@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -9,6 +10,7 @@ import tempfile
 import unittest
 import zipfile
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -77,9 +79,11 @@ class CachePackageTests(unittest.TestCase):
         for channel in ("beta", "rc"):
             with self.subTest(channel=channel):
                 plan = self.freeze(channel)
-                artifacts = package_cache.build(
-                    self.root, "0.1.0", channel, self.root / channel
-                )
+                # No globally installed uv or package frontend is needed.
+                with mock.patch.dict(os.environ, {"PATH": os.defpath}):
+                    artifacts = package_cache.build(
+                        self.root, "0.1.0", channel, self.root / channel
+                    )
                 self.assertEqual(len(artifacts), 2)
                 staged = stage_release_assets.stage(
                     self.root, channel, [channel + "/*"]

@@ -79,3 +79,8 @@ Any source, dependency, policy or workflow change requires a new candidate.
 Never alter existing release assets or evidence. Rollback reinstalls previously
 accepted immutable package bytes plus compatible application configuration; it
 does not reset allocation state or run the repository's stage/promote tools.
+
+The builder and isolated installation checks use `python -I -m venv` and
+that environment’s `python -I -m pip --isolated`. The checked-in build lock
+is installed with `--require-hashes --only-binary=:all:`; `uv` is needed
+only to regenerate that lock, not to package or verify a release.
