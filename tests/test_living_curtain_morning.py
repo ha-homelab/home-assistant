@@ -11,9 +11,11 @@ import yaml
 try:
     from homeassistant import loader
     from homeassistant.bootstrap import async_load_base_functionality
+    from homeassistant.components.automation.config import async_validate_config_item
+    from homeassistant.helpers.script import Script
     from homeassistant.config import async_hass_config_yaml
     from homeassistant.config_entries import ConfigEntries
-    from homeassistant.core import HomeAssistant
+    from homeassistant.core import Context, HomeAssistant
     from homeassistant.exceptions import HomeAssistantError
     from homeassistant.setup import async_setup_component
 except ImportError:
@@ -286,6 +288,9 @@ class LivingCurtainCallerContractTest(unittest.TestCase):
             self.assertEqual(len(guard_actions), 2)
             for action in guard_actions:
                 action['entity_id'] = new_guard
+        # The calibrated ZHA motor replaces only the old Studio motor.
+        studio = next(a for a in expected if a.get('entity_id') == 'cover.office_curtains_r')
+        studio.update(entity_id='cover.studio_curtains', continue_on_error=True)
         actual = self.config['027']['actions'][0]['parallel'][0]['sequence']
         self.assertEqual(actual, expected)
 
@@ -296,6 +301,83 @@ class LivingCurtainCallerContractTest(unittest.TestCase):
             {'action': 'script.living_curtains_move', 'data': {'curtain': 'sheer', 'command': 'close'}}])
         self.assertEqual(self.config['027']['actions'][0]['parallel'][1]['sequence'], [
             {'action': 'script.living_curtains_move', 'data': {'curtain': 'main', 'command': 'close'}}])
+
+
+@unittest.skipUnless(HA_AVAILABLE, 'Home Assistant runtime is not installed')
+class StudioCurtainMigrationTest(unittest.IsolatedAsyncioTestCase):
+    async def asyncSetUp(self):
+        self.temp = tempfile.TemporaryDirectory(prefix='studio-curtain-test-')
+        self.hass = HomeAssistant(self.temp.name)
+        loader.async_setup(self.hass)
+        self.hass.config_entries = ConfigEntries(self.hass, {})
+        self.hass.config.skip_pip = True
+        self.assertTrue(await async_load_base_functionality(self.hass))
+        self.events = []
+        self.fail_studio = False
+        for domain, service in [('switch', 'turn_on'), ('switch', 'turn_off'),
+                                ('cover', 'open_cover'), ('cover', 'close_cover'),
+                                ('script', 'living_curtains_move')]:
+            self.hass.services.async_register(domain, service, self.record)
+
+    async def asyncTearDown(self):
+        await self.hass.async_stop(force=True)
+        self.temp.cleanup()
+
+    async def record(self, call):
+        target = call.data.get('entity_id')
+        if isinstance(target, list):
+            target = target[0]
+        self.events.append((call.domain, call.service, target))
+        if self.fail_studio and target == 'cover.studio_curtains':
+            raise HomeAssistantError('Simulated unavailable Studio Zigbee motor')
+
+    async def run_rule(self, number):
+        path = next((ROOT / 'dependencies/automations/config').glob(f'{number}_*.yaml'))
+        rule = yaml.safe_load(path.read_text())[0]
+        runtime = deepcopy(rule)
+        def skip_delays(value):
+            if isinstance(value, list):
+                for item in value:
+                    skip_delays(item)
+            elif isinstance(value, dict):
+                if 'delay' in value:
+                    value['delay'] = 0
+                for item in value.values():
+                    skip_delays(item)
+        skip_delays(runtime['actions'])
+        config = await async_validate_config_item(self.hass, 'automation', runtime)
+        script = Script(self.hass, config['actions'], config['alias'], 'automation')
+        await script.async_run(context=Context())
+        self.assertFalse(any(target in ('cover.office_curtains_r',
+                                        'cover.office_curtains_office_curtains')
+                             for _, _, target in self.events))
+
+    async def test_morning_explicitly_opens_new_cover_after_power(self):
+        await self.run_rule('078')
+        power = self.events.index(('switch', 'turn_on', 'switch.studio_guard'))
+        opened = self.events.index(('cover', 'open_cover', 'cover.studio_curtains'))
+        self.assertLess(power, opened)
+        self.assertIn(('cover', 'open_cover', 'cover.kitchen_curtains_l'), self.events)
+        self.assertIn(('cover', 'open_cover', 'cover.dining_curtains_l'), self.events)
+
+    async def test_evening_closes_new_cover_before_existing_power_off(self):
+        await self.run_rule('027')
+        closed = self.events.index(('cover', 'close_cover', 'cover.studio_curtains'))
+        off = self.events.index(('switch', 'turn_off', 'switch.studio_guard'))
+        self.assertLess(closed, off)
+        self.assertIn(('script', 'living_curtains_move', None), self.events)
+
+    async def test_unavailable_studio_does_not_abort_other_morning_targets(self):
+        self.fail_studio = True
+        await self.run_rule('078')
+        self.assertIn(('cover', 'open_cover', 'cover.dining_curtains_l'), self.events)
+        self.assertIn(('switch', 'turn_off', 'switch.dining_guard'), self.events)
+
+    async def test_unavailable_studio_does_not_abort_evening_power_off(self):
+        self.fail_studio = True
+        await self.run_rule('027')
+        self.assertIn(('cover', 'close_cover', 'cover.dining_curtains_l'), self.events)
+        self.assertIn(('switch', 'turn_off', 'switch.studio_guard'), self.events)
 
 
 if __name__ == '__main__':

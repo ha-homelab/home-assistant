@@ -4,7 +4,7 @@
   alias: 'Curtains: Close in the evening'
   description: Below 0.2 degrees sun elevation, start living-room main RF closing after three seconds
     with a bounded Wi-Fi fallback. Preserve other rooms, their 90-second warm-up, one-hour power-off delay,
-    and the manual override.
+    and the manual override. Studio closes through its calibrated ZHA cover.
   triggers:
   - platform: numeric_state
     entity_id: sun.sun
@@ -26,8 +26,12 @@
       - delay: 00:01:30
       - service: cover.close_cover
         entity_id: cover.kitchen_curtains_l
+      # Legacy Wi-Fi motor; retained for a manual rollback only.
+      # - service: cover.close_cover
+      #   entity_id: cover.office_curtains_r
       - service: cover.close_cover
-        entity_id: cover.office_curtains_r
+        entity_id: cover.studio_curtains
+        continue_on_error: true
       - service: cover.close_cover
         entity_id: cover.dining_curtains_l
       - delay: 01:00:00
