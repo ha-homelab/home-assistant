@@ -78,7 +78,7 @@ class RunnerBoundaryTests(unittest.TestCase):
             self.assertEqual(set(workflow['on']), expected[path.name])
             self.assertNotIn('pull_request_target', workflow['on'])
             if path.name == 'auto-approve.yml':
-                self.assertEqual(workflow['on']['workflow_run']['workflows'], ['Quality gate'])
+                self.assertEqual(workflow['on']['workflow_run'], {'workflows': ['Quality gate'], 'types': ['completed']})
                 steps = workflow['jobs']['approve']['steps']
                 self.assertFalse(any('checkout' in step.get('uses', '') for step in steps))
                 source = next(step['run'] for step in steps if 'run' in step)
