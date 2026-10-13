@@ -12,3 +12,4 @@ __pycache__/
 build/
 .DS_Store
 **/home-media-service-account.json
+tools/lg_tv_wol_relay.json

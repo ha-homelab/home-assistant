@@ -28,6 +28,12 @@ requests during the 45-second confirmation window are ignored.
 2. Copy `tools/lg_tv_wol_relay.py` to the home worker at
    `/home/OPERATOR/.local/lib/home-assistant/lg_tv_wol_relay.py` (mode `0700`).
    It uses only Python's standard library and needs no root permissions.
+   Before replacing an existing relay, provision `lg_tv_wol_relay.json` beside
+   the script (mode `0600`) with exactly `mac` and `broadcast` string fields.
+   Set `mac` to the TV's colon-separated Ethernet MAC and `broadcast` to the
+   IPv4 broadcast for its LAN. Both values are private installation data;
+   do not commit this JSON file. Missing or invalid configuration returns
+   exit code 3 without opening a network socket. Back up this file privately.
 3. Append the dedicated public key to the operator's `~/.ssh/authorized_keys`
    (mode `0600`) with this exact prefix, on the same line as the public key:
 
@@ -58,7 +64,7 @@ after losing `syn`; restoring only the HA configuration is insufficient.
 The relay lets the kernel choose the source interface for the fixed LAN
 broadcast; it does not bind to a worker IP that may change. An address change
 within the same LAN is handled by the node DNS record and this route selection.
-After a subnet change, recheck the fixed broadcast address in the relay. Never
+After a subnet change, update the broadcast address in the local JSON file. Never
 run another LAN broadcast service in OCI as a substitute.
 
 The TV already accepted Wake-on-LAN during commissioning. If a firmware reset
