@@ -34,5 +34,44 @@ existing household light/media shutdown list. Its other targets and host
 shutdown helper are unchanged. No whole-house scenario is executed as a test.
 
 The Matter device identity, pairing and supplied four-lamp remote binding are
-unchanged. The existing Lovelace brightness tile is retained. There is no
+unchanged. The Lovelace brightness control is retained. There is no
 bedroom light group or floorplan binding to replace in the active configuration.
+
+## Dashboard location
+
+The storage-mode Overview dashboard exposes **Bedroom 2 — Lamp** at the top of
+both **Home** and **Lighting**. It targets the same `light.bedroom_lamp` entity
+and includes the standard brightness control. The former tile at the bottom of
+the Lighting stack, beside the porch/balcony controls, has been moved; there is
+only one tile for this lamp in each view. This display name does not rename the
+entity or change its Matter pairing.
+
+```yaml
+type: tile
+entity: light.bedroom_lamp
+name: Bedroom 2 — Lamp
+icon: mdi:desk-lamp
+features:
+  - type: light-brightness
+```
+
+Dashboard edits are saved through `lovelace/config/save`, after re-reading the
+current storage configuration. Preserve all unrelated cards and verify the
+saved configuration and rendered tile. Dashboard storage is installation data
+and is not committed to this public repository.
+
+## Diagnosing a missed motion activation
+
+Check `binary_sensor.rf_bedroom_motion` history and the trace of
+`automation.bedroom_motion_triggered` before changing entity references. A
+recorded trigger ending at `condition/0` means that the solar-elevation guard
+rejected the event; it does not mean that Matter communication failed. A daytime
+motion event does not remain queued until the evening window opens: another
+motion event is required.
+
+The MQTT mirror `binary_sensor.sonoff_rf_bridge_bedroom_motion` can help check
+reception, but unavailable historical duplicates are not replacement trigger
+entities. If there is no new ON event, perform a controlled walk in front of the
+physical detector and identify the sensor that actually changes. Keep the
+18:00–23:00 activation window, daylight guard, three-minute shutdown and manual
+override unless a separate behavior change is requested.
