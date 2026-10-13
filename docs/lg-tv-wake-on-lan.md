@@ -1,7 +1,7 @@
 # Living-room LG: Ethernet Wake-on-LAN
 
-The LG OLED77C5 (`media_player.living_room_tv_77`) is at `192.168.161.9`.
-Its Ethernet MAC is `d0:cd:bf:66:70:b2`. A local magic-packet test on
+The LG OLED77C5 (`media_player.living_room_tv_77`) uses an installation-specific
+IP and Ethernet MAC kept in the local network and relay configuration. A local magic-packet test on
 2026-10-02 woke it from standby: HA changed from `off` to `on` in about three
 seconds. The other LG (`media_player.lg2`) is not part of this configuration.
 
@@ -9,9 +9,9 @@ HA runs in OCI, outside the Ethernet broadcast domain. The package
 `config/packages/lg_tv_wake_on_lan.yaml` handles the official
 [`webostv.turn_on` trigger](https://www.home-assistant.io/triggers/webostv.turn_on/)
 and sends one SSH command to the existing home worker `syn` through its cluster DNS name. CoreDNS maintains that name
-from the Kubernetes node address (currently `192.168.160.130`).
+from the Kubernetes node address (resolved at runtime).
 There, `tools/lg_tv_wol_relay.py` emits three 102-byte UDP packets to the LAN
-broadcast `192.168.175.255:9` (`192.168.160.0/20`). This requires no daemon,
+broadcast configured for the installation, on UDP port 9. This requires no daemon,
 container, router broadcast forwarding or cloud audio/video transport.
 
 The normal HA power button and `media_player.turn_on` use the relay. SSH
@@ -26,13 +26,13 @@ requests during the 45-second confirmation window are ignored.
    Transfer the private key into HA at `/config/.ssh/living_room_tv_wol`
    with mode `0600`; keep `/config/.ssh` at `0700`. Never commit the key.
 2. Copy `tools/lg_tv_wol_relay.py` to the home worker at
-   `/home/alvit/.local/lib/home-assistant/lg_tv_wol_relay.py` (mode `0700`).
+   `/home/OPERATOR/.local/lib/home-assistant/lg_tv_wol_relay.py` (mode `0700`).
    It uses only Python's standard library and needs no root permissions.
-3. Append the dedicated public key to `alvit`'s `~/.ssh/authorized_keys`
+3. Append the dedicated public key to the operator's `~/.ssh/authorized_keys`
    (mode `0600`) with this exact prefix, on the same line as the public key:
 
    ```text
-   restrict,command="/usr/bin/python3 /home/alvit/.local/lib/home-assistant/lg_tv_wol_relay.py"
+   restrict,command="/usr/bin/python3 /home/OPERATOR/.local/lib/home-assistant/lg_tv_wol_relay.py"
    ```
 
    `restrict` disables forwarding, PTY and user rc execution. The forced

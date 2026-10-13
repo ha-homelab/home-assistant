@@ -173,7 +173,7 @@
           "service": "notify.pushbullet",
           "data": {
             "title": "Front Porch",
-            "target": "email/californian.tiramisu@gmail.com",
+            "target": "email/recipient@example.invalid",
             "message": "Motion detected"
           }
         },
