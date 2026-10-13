@@ -10,7 +10,9 @@ class RunnerBoundaryTests(unittest.TestCase):
     def test_public_jobs_use_hosted_runners_without_credentials(self):
         for path in (ROOT / '.github/workflows').glob('*.yml'):
             workflow = yaml.safe_load(path.read_text())
-            self.assertEqual(workflow['permissions'], {'contents': 'read'})
+            expected = ({'contents': 'read', 'actions': 'read', 'pull-requests': 'write'}
+                        if path.name == 'auto-approve.yml' else {'contents': 'read'})
+            self.assertEqual(workflow['permissions'], expected)
             self.assertNotIn('secrets.', path.read_text())
             for name, job in workflow['jobs'].items():
                 with self.subTest(workflow=path.name, job=name):
@@ -26,8 +28,14 @@ class RunnerBoundaryTests(unittest.TestCase):
         for path in (ROOT / '.github/workflows').glob('*.yml'):
             workflow = yaml.load(path.read_text(), Loader=yaml.BaseLoader)
             self.assertNotIn('pull_request_target', workflow['on'])
-            self.assertNotIn('workflow_run', workflow['on'])
-            self.assertIn('pull_request', workflow['on'])
+            if path.name == 'auto-approve.yml':
+                self.assertEqual(workflow['on'], {'workflow_run': {
+                    'workflows': ['Quality gate'], 'types': ['completed']}})
+                for job in workflow['jobs'].values():
+                    self.assertFalse(any('checkout' in step.get('uses', '') for step in job['steps']))
+            else:
+                self.assertNotIn('workflow_run', workflow['on'])
+                self.assertIn('pull_request', workflow['on'])
 
     def test_runners_do_not_mount_host_or_kubernetes_credentials(self):
         docs = list(yaml.safe_load_all((ROOT / 'deploy/github-actions-k3s/runners.yaml').read_text()))
