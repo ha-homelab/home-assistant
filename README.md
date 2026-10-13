@@ -361,3 +361,8 @@ counter and tea-table IDs, preserved motion guards, and mixed-domain shutdown.
 The [Bedroom Lamp rules](docs/bedroom-matter-lamp.md) restore bedroom motion for
 the relocated Matter lamp and include it in both global shutdown controls,
 without changing the separate Living lamp or dining-room loads.
+
+## Candidate validation preparation
+
+The [bounded fuzzing preparation](docs/fuzzing.md) documents synthetic targets,
+local replay, acceptance limits and the planned source-release boundary.
