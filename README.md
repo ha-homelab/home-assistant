@@ -1,5 +1,7 @@
 # Home Assistant · ha-homelab
 
+[![Fuzzing: RC only](https://img.shields.io/badge/fuzzing-RC_only-blue)](docs/fuzzing.md)
+
 ## Core update approvals
 
 The [Core updates package and dashboard](docs/core-updates.md) show stable Home
@@ -362,10 +364,15 @@ The [Bedroom Lamp rules](docs/bedroom-matter-lamp.md) restore bedroom motion for
 the relocated Matter lamp and include it in both global shutdown controls,
 without changing the separate Living lamp or dining-room loads.
 
-## Candidate validation preparation
+## RC fuzz qualification
 
-The [bounded fuzzing preparation](docs/fuzzing.md) documents synthetic targets,
-local replay, acceptance limits and the planned source-release boundary.
+The published [v0.1.0-rc.1 release](https://github.com/ha-homelab/home-assistant/releases/tag/v0.1.0-rc.1)
+contains the qualification report for that tag's exact source commit.
+
+[Bounded Linux fuzzing](docs/fuzzing.md) qualifies release candidates with synthetic
+inputs and a source-bound report. The guide documents targets, local replay and
+acceptance limits. The badge identifies RC-only capability; beta publication and
+hardware acceptance remain separate.
 
 ## Portable library releases
 
