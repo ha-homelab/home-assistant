@@ -49,6 +49,7 @@ class CachePackageTests(unittest.TestCase):
             "Synthetic package fixture",
         )
         self.policy = json.loads((self.root / ".release-policy.json").read_text())
+        self.base_version = version_plan.read_base_version(ROOT, self.policy)
 
     def command(self, *args):
         return subprocess.check_output(
@@ -58,7 +59,7 @@ class CachePackageTests(unittest.TestCase):
     def freeze(self, channel):
         shutil.copyfile(ROOT / "pyproject.toml", self.root / "pyproject.toml")
         plan = version_plan.create_plan(
-            "0.1.0",
+            self.base_version,
             channel,
             7,
             self.command("git", "rev-parse", "HEAD").strip(),
@@ -82,7 +83,7 @@ class CachePackageTests(unittest.TestCase):
                 # No globally installed uv or package frontend is needed.
                 with mock.patch.dict(os.environ, {"PATH": os.defpath}):
                     artifacts = package_cache.build(
-                        self.root, "0.1.0", channel, self.root / channel
+                        self.root, self.base_version, channel, self.root / channel
                     )
                 self.assertEqual(len(artifacts), 2)
                 staged = stage_release_assets.stage(
