@@ -29,7 +29,23 @@
         "-max_len=4096"
       ],
       "seconds": 60,
-      "corpus": "fuzz/corpus/notification-frames"
+      "corpus": "fuzz/corpus/notification-frames",
+      "instrumentation": [
+        {
+          "module": "notification_frame_cache",
+          "functions": [
+            "NotificationFrameCache.feed",
+            "NotificationFrameCache.close"
+          ]
+        }
+      ]
     }
+  ],
+  "preflight-paths": [
+    ".github/requirements-fuzz.in",
+    "config",
+    "fuzz",
+    "pyproject.toml",
+    "requirements.txt"
   ]
 }
