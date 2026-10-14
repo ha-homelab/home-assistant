@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "repository": "ha-homelab/home-assistant",
+  "visibility": "public",
+  "mode": "release",
+  "default_branch": "main",
+  "version_file": "pyproject.toml",
+  "validation_workflows": [
+    "ci.yml"
+  ],
+  "artifact_pattern": "release-assets*",
+  "local_checks": [
+    "python3 tools/validate.py",
+    "python3 -m unittest discover -s tests -p test_fuzz_oracle.py"
+  ],
+  "single_entry_ci": true,
+  "release_notes": "CHANGELOG.md",
+  "container_assets": {},
+  "notes": [
+    "Only the existing portable notification_frame_cache library is packaged. The household configuration, endpoint-bearing helpers, credentials, runtime cache and child automation/script libraries are outside the distribution inventory.",
+    "Both existing configuration and pinned HA runtime validation jobs remain required, including the existing configuration-overlay build. No deploy, stage, promote, live camera or device operation is part of release publication.",
+    "The optional maintainer auto-approval is metadata-only after successful Quality gate completion and matching current PR head; it remains separate from callable validation permissions."
+  ],
+  "versioning": {
+    "schema": 1,
+    "promotion": "promote-bytes",
+    "toolkit_revision": "5e413f80a4353d328b4529eae57992ac3987e2dd",
+    "files": [
+      {
+        "path": "pyproject.toml",
+        "format": "toml",
+        "field": "project.version",
+        "package": "ha-notification-frame-cache",
+        "value": "package",
+        "ecosystem": "pep440"
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "ha_notification_frame_cache-*.whl",
+        "format": "wheel",
+        "package": "ha-notification-frame-cache",
+        "value": "package",
+        "ecosystem": "pep440"
+      },
+      {
+        "path": "ha_notification_frame_cache-*.tar.gz",
+        "format": "sdist",
+        "package": "ha-notification-frame-cache",
+        "value": "package",
+        "ecosystem": "pep440"
+      }
+    ]
+  },
+  "fuzzing": {
+    "toolkit_ref": "5e413f80a4353d328b4529eae57992ac3987e2dd"
+  }
+}

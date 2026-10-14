@@ -1,4 +1,5 @@
 """Keep public CI off private runners and preserve legacy runner isolation."""
+import json
 from pathlib import Path
 import unittest
 import yaml
@@ -7,35 +8,82 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class RunnerBoundaryTests(unittest.TestCase):
-    def test_public_jobs_use_hosted_runners_without_credentials(self):
-        for path in (ROOT / '.github/workflows').glob('*.yml'):
+    def test_public_jobs_preserve_scoped_runner_and_token_boundaries(self):
+        permissions = {
+            'ci.yml': {'contents': 'read'},
+            'quality-gate.yml': {'contents': 'read'},
+            'release-pipeline.yml': {'contents': 'read'},
+            'release-build.yml': {'contents': 'read', 'actions': 'read'},
+            'auto-approve.yml': {'contents': 'read', 'actions': 'read', 'pull-requests': 'write'},
+        }
+        paths = list((ROOT / '.github/workflows').glob('*.yml'))
+        self.assertEqual({path.name for path in paths}, set(permissions))
+        calls = {
+            ('quality-gate.yml', 'check-0'): './.github/workflows/ci.yml',
+            ('release-pipeline.yml', 'checks'): './.github/workflows/quality-gate.yml',
+            ('release-pipeline.yml', 'build'): './.github/workflows/release-build.yml',
+        }
+        job_permissions = {
+            ('quality-gate.yml', 'check-0'): {'contents': 'read', 'actions': 'read'},
+            ('release-pipeline.yml', 'checks'): {'contents': 'read', 'actions': 'read', 'security-events': 'write'},
+            ('release-pipeline.yml', 'build'): {'contents': 'read', 'actions': 'read'},
+            ('release-pipeline.yml', 'fuzz'): {'contents': 'read'},
+        }
+        for job in ('prepare', 'candidate', 'stable', 'final'):
+            job_permissions[('release-pipeline.yml', job)] = {'contents': 'write', 'actions': 'read'}
+        for path in paths:
             workflow = yaml.safe_load(path.read_text())
-            expected = ({'contents': 'read', 'actions': 'read', 'pull-requests': 'write'}
-                        if path.name == 'auto-approve.yml' else {'contents': 'read'})
-            self.assertEqual(workflow['permissions'], expected)
+            self.assertEqual(workflow['permissions'], permissions[path.name])
             self.assertNotIn('secrets.', path.read_text())
             for name, job in workflow['jobs'].items():
                 with self.subTest(workflow=path.name, job=name):
-                    self.assertEqual(job['runs-on'], 'ubuntu-24.04')
-                    self.assertNotIn('repository.private', job.get('if', ''))
-                    for step in job['steps']:
+                    self.assertEqual(job.get('permissions'), job_permissions.get((path.name, name)))
+                    self.assertNotIn('secrets', job)
+                    if 'uses' in job:
+                        self.assertNotIn('runs-on', job)
+                        if name == 'fuzz':
+                            policy = json.loads((ROOT / '.release-policy.json').read_text())
+                            self.assertEqual(job['uses'], 'victron-venus/venus-os-ci-toolkit/.github/workflows/fuzz.yml@' + policy['fuzzing']['toolkit_ref'])
+                            self.assertEqual(job['permissions'], {'contents': 'read'})
+                        else:
+                            self.assertEqual(job['uses'], calls[(path.name, name)])
+                        continue
+                    if path.name in {'ci.yml', 'auto-approve.yml'}:
+                        self.assertEqual(job['runs-on'], 'ubuntu-24.04')
+                    else:
+                        runner = job['runs-on']
+                        self.assertIn("|| '[\"ubuntu-latest\"]'", runner)
+                        self.assertIn("github.ref == format('refs/heads/{0}', github.event.repository.default_branch)", runner)
+                        self.assertIn("vars.CI_RUNNER_MODE == 'self-hosted'", runner)
+                        if path.name == 'quality-gate.yml':
+                            self.assertIn('github.event.pull_request.head.repo.full_name == github.repository', runner)
+                        else:
+                            self.assertNotIn('pull_request', runner)
+                    for step in job.get('steps', []):
                         if step.get('uses', '').startswith('actions/checkout@'):
                             self.assertFalse(step['with']['persist-credentials'])
                             self.assertNotIn('token', step['with'])
                             self.assertNotIn('submodules', step['with'])
 
-    def test_public_ci_does_not_use_privileged_pull_request_triggers(self):
+    def test_triggers_separate_validation_publication_and_metadata_only_approval(self):
+        expected = {
+            'ci.yml': {'workflow_call'},
+            'quality-gate.yml': {'pull_request', 'merge_group', 'workflow_call'},
+            'release-build.yml': {'workflow_call'},
+            'release-pipeline.yml': {'push', 'schedule', 'workflow_dispatch'},
+            'auto-approve.yml': {'workflow_run'},
+        }
         for path in (ROOT / '.github/workflows').glob('*.yml'):
             workflow = yaml.load(path.read_text(), Loader=yaml.BaseLoader)
+            self.assertEqual(set(workflow['on']), expected[path.name])
             self.assertNotIn('pull_request_target', workflow['on'])
             if path.name == 'auto-approve.yml':
-                self.assertEqual(workflow['on'], {'workflow_run': {
-                    'workflows': ['Quality gate'], 'types': ['completed']}})
-                for job in workflow['jobs'].values():
-                    self.assertFalse(any('checkout' in step.get('uses', '') for step in job['steps']))
-            else:
-                self.assertNotIn('workflow_run', workflow['on'])
-                self.assertIn('pull_request', workflow['on'])
+                self.assertEqual(workflow['on']['workflow_run'], {'workflows': ['Quality gate'], 'types': ['completed']})
+                steps = workflow['jobs']['approve']['steps']
+                self.assertFalse(any('checkout' in step.get('uses', '') for step in steps))
+                source = next(step['run'] for step in steps if 'run' in step)
+                self.assertIn("pr['head']['sha'] == head", source)
+                self.assertIn("run['conclusion'] == 'success'", source)
 
     def test_runners_do_not_mount_host_or_kubernetes_credentials(self):
         docs = list(yaml.safe_load_all((ROOT / 'deploy/github-actions-k3s/runners.yaml').read_text()))

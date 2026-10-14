@@ -48,7 +48,7 @@ Camera hardware/address-to-room inventories are deliberately excluded.
 
 Public pull requests run on GitHub-hosted Ubuntu runners with a read-only
 `GITHUB_TOKEN`. CI has no `BOT_PAT`, private submodule access, HA token, SSH key,
-home-network runner or deployment step. Home Assistant runtime tests mock device
+home-network runner or deployment step. Keep CI_RUNNER_MODE and all CI_RUNNER_*_LABELS variables unset for this public repository; the generated orchestration must use its hosted fallback. Home Assistant runtime tests mock device
 services and run in containers with networking disabled.
 
 The legacy private runner manifests under `deploy/github-actions-k3s` are
@@ -69,3 +69,9 @@ working copies at the private predecessor before reusing the original name.
 
 Future contributions belong in a fresh clone of this repository. Keep secret
 scanning and push protection enabled and run the source scanner in CI.
+
+The versioned library release workflow has narrowly scoped contents-write jobs
+for allocation and publication. Validation and package building retain read-only
+tokens. The opt-in approval workflow uses only PR metadata after a successful
+Quality gate and never checks out or executes PR code with its write token.
+Neither workflow receives deployment or private-runner credentials.

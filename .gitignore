@@ -13,3 +13,15 @@ build/
 .DS_Store
 **/home-media-service-account.json
 tools/lg_tv_wol_relay.json
+
+# Local bounded fuzz runner
+.fuzz-venv/
+fuzz-results/
+
+# Frozen release overlays and verified package outputs
+.release-plan.json
+.release-inputs.json
+release-dist/
+release-assets/
+.releases/
+*.egg-info/
