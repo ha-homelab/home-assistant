@@ -311,7 +311,7 @@ is retired. Rule 085 drops only the 450 W heater candidate; rule 098 drops only
 its obsolete heater-off condition. All other load controls are preserved.
 The new bathroom outlet is deliberately absent from these energy rules.
 
-Mishka guard and Kitchen guard use the canonical ESPHome entities
+Room guard and Kitchen guard use the canonical ESPHome entities
 `switch.mishka_guard` and `switch.kitchen_guard`. Rules 024, 025, 076, and 112
 replace the old Laser target; rules 027 and 078 replace Kitchen guard 1.
 The existing schedules, overrides, action order, and delays are retained.

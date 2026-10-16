@@ -558,7 +558,7 @@
       "imported_behavior_sha256": "19d34356f008eed50c52aa02ee867ccea49ff3f5e7bcd98dfc2df8602ed6ccae",
       "behavior_change": {
         "date": "2026-10-10",
-        "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome Mishka guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
+        "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
         "previous_change": null
       }
     },
@@ -591,7 +591,7 @@
       "imported_behavior_sha256": "ffea72ea539e1f799397ccfe4bbcfb8a9797e72f94da03306441230d3c415149",
       "behavior_change": {
         "date": "2026-10-10",
-        "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome Mishka guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
+        "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
         "previous_change": null
       }
     },
@@ -638,7 +638,7 @@
           "reason": "Replace Studio guard 1 with the canonical ESPHome Studio guard relay; retain all timing, conditions, curtain actions, and other power guards.",
           "previous_change": {
             "date": "2026-10-10",
-            "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome Mishka guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
+            "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
             "previous_change": {
               "date": "2026-10-10",
               "reason": "Replace the retired Dining guard 3 with the verified ESPHome Dining guard for curtain power. Preserve schedules, conditions, delays and all other actions.",
@@ -1605,7 +1605,7 @@
       "source_file": "automations/mishka_room_motion_triggered.yaml",
       "source_index": 0,
       "previous_alias": "Mishka Room Motion triggered",
-      "alias": "Mishka room: Turn on lights after motion",
+      "alias": "Room 2: Turn on lights after motion",
       "entity_id": "automation.mishka_room_motion_triggered",
       "previous_id": null,
       "id": "ha_homelab_mishka_room_turn_on_lights_after_motion",
@@ -2002,7 +2002,7 @@
         "reason": "Replace only the old Bedroom guard 3 outlet with canonical ESPHome Bedroom guard. Preserve schedules, overrides, delays, action order and unrelated loads.",
         "previous_change": {
           "date": "2026-10-10",
-          "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome Mishka guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
+          "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
           "previous_change": null
         }
       }
@@ -2090,7 +2090,7 @@
           "reason": "Replace Studio guard 1 with the canonical ESPHome Studio guard relay; retain all timing, conditions, curtain actions, and other power guards.",
           "previous_change": {
             "date": "2026-10-10",
-            "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome Mishka guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
+            "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
             "previous_change": {
               "date": "2026-10-10",
               "reason": "Replace the retired Dining guard 3 with the verified ESPHome Dining guard for curtain power. Preserve schedules, conditions, delays and all other actions.",
@@ -3071,7 +3071,7 @@
                       "reason": "Retarget the converted bedroom lamp outlet as Living lamp; retain the existing global shutdown and notification behavior.",
                       "previous_change": {
                         "date": "2026-10-10",
-                        "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome Mishka guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
+                        "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
                         "previous_change": {
                           "date": "2026-10-10",
                           "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities.",

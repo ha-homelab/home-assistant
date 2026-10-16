@@ -5,7 +5,7 @@ mode: restart
 
 triggers:
   # Button press (toggle/play)
-  - device_id: 1d449a5dda9436ac7d96f4b482a9d9c1
+  - device_id: 00000000000000000000000000000000
     domain: zha
     type: remote_button_short_press
     subtype: turn_on
@@ -13,7 +13,7 @@ triggers:
     id: "press"
 
   # Turn clockwise (increase volume)
-  - device_id: 1d449a5dda9436ac7d96f4b482a9d9c1
+  - device_id: 00000000000000000000000000000000
     domain: zha
     type: device_rotated
     subtype: right
@@ -21,7 +21,7 @@ triggers:
     id: "right"
 
   # Turn counterclockwise (decrease volume)
-  - device_id: 1d449a5dda9436ac7d96f4b482a9d9c1
+  - device_id: 00000000000000000000000000000000
     domain: zha
     type: device_rotated
     subtype: left
