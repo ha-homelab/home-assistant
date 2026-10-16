@@ -1,5 +1,9 @@
 # Bounded notification frame validation
 
+See the [illustrated RC fuzzing process and verified rollout results](https://github.com/victron-venus/venus-os-ci-toolkit/blob/main/docs/rc-fuzzing-results.md)
+for the shared release flow, evidence requirements and a dated cross-project
+snapshot. The project-specific scope and reproduction guidance below still apply.
+
 The `notification-frames` target calls the repository-owned
 `NotificationFrameCache.feed` parser with arbitrary bounded chunks. Every input
 gets a new explicitly supplied temporary root; the default runtime cache path is
