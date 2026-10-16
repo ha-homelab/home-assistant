@@ -1,5 +1,9 @@
 # Home Assistant · ha-homelab
 
+[**Visual guide: process, boundaries and evidence**](docs/process-and-evidence.md)
+
+![Process overview; detailed steps and verification limits are in the visual guide.](docs/diagrams/configuration-flow.svg)
+
 [![Fuzzing: RC only](https://img.shields.io/badge/fuzzing-RC_only-blue)](docs/fuzzing.md)
 
 ## Core update approvals
