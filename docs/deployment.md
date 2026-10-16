@@ -1,5 +1,23 @@
 # Deployment and rollback
 
+## Installation bindings are required
+
+The public configuration contains nonfunctional example device IDs. Before any
+installation or source-pin update, follow [installation device bindings](site-device-bindings.md):
+keep the two automation files and matching `mqtt.yaml` in the operator's reviewed
+private override directory. A saved audit copy is not proof that the operator's
+build command uses those files.
+
+The build commands below use `/private/path/assembly/tools/build.py` to denote the
+installation's separately maintained composition wrapper, which accepts explicit
+`--overrides`, validates its committed public-source pin and records override
+hashes in `release.json`. This is **not** this repository's standalone
+`tools/build.py`: the standalone builder deliberately assembles public examples
+and does not apply private overrides. Do not stage that uncustomized output on an
+existing installation. Verify all three binding-file hashes in the assembled
+receipt against the selected private files before staging or promotion; preserve
+any other existing overrides as well.
+
 ## Before the first migration
 
 1. Keep an off-box, private backup of the complete running `/config`, including `.storage`, secrets and installed integration code. The selective task snapshot is useful for comparison but does not replace a full disaster-recovery backup.
@@ -17,7 +35,8 @@ set -euo pipefail
 umask 077
 hass-cli -o json raw get /api/states > /private/path/before-states.json
 python dependencies/automations/tools/verify_runtime.py /private/path/before-states.json --phase before
-python tools/build.py /private/path/ha-seed --seed --secrets /private/path/secrets.yaml
+python /private/path/assembly/tools/build.py /private/path/ha-seed --seed \
+  --overrides /private/path/ha-overrides --secrets /private/path/secrets.yaml
 python tools/stage.py /private/path/ha-seed /private/path/seed-receipt.json
 ```
 
@@ -52,7 +71,8 @@ After verifying all 130 automation identities, build and **stage again**. The se
 ```bash
 set -euo pipefail
 umask 077
-python tools/build.py /private/path/ha-final --secrets /private/path/secrets.yaml
+python /private/path/assembly/tools/build.py /private/path/ha-final \
+  --overrides /private/path/ha-overrides --secrets /private/path/secrets.yaml
 python tools/stage.py /private/path/ha-final /private/path/final-receipt.json
 python tools/promote.py /private/path/final-receipt.json --scope automations
 hass-cli -o json raw get /api/states > /private/path/before-final-reload.json && \
@@ -77,7 +97,7 @@ Private backups are deliberately retained; do not prune them until the release h
 
 ## Later releases
 
-Edit the bundled library in `dependencies/` through a root PR, then build the single reviewed commit, stage, promote and verify. IDs remain immutable. Use `--scope automations` for automation-only changes and `--scope overlay` when both libraries and root configuration are intentionally part of the reviewed release. Changes to non-reloadable integration settings require a separately planned HA restart; do not assume a domain reload applies every possible root change.
+Edit the bundled library in `dependencies/` through a root PR, review and commit that exact source pin in the installation assembly, then build with its reviewed private override directory, stage, promote and verify. IDs remain immutable. Use `--scope automations` for automation-only changes and `--scope overlay` when both libraries and root configuration are intentionally part of the reviewed release. Changes to non-reloadable integration settings require a separately planned HA restart; do not assume a domain reload applies every possible root change.
 
 The [Victron MQTT keepalive runbook](victron-mqtt-keepalive.md) documents its
 suppressed periodic keepalive, exact freshness reads, bundled source and guarded
