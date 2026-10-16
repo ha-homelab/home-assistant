@@ -1,9 +1,11 @@
+# Example device binding: the all-zero portal identifier is synthetic, not functional.
+# Keep this file and the telemetry automation bound to the same installation outside Git.
 # Home Assistant configuration; retain stable entity identifiers.
 switch:
   - name: Victron Quattro
     unique_id: victron_quattro
-    state_topic: victron/N/b827ebea1ece/vebus/290/Mode
-    command_topic: victron/W/b827ebea1ece/vebus/290/Mode
+    state_topic: victron/N/000000000000/vebus/290/Mode
+    command_topic: victron/W/000000000000/vebus/290/Mode
     payload_on: '{"value":3}'
     payload_off: '{"value":4}'
   - name: Inverter Only Charging
@@ -58,12 +60,12 @@ binary_sensor:
   - name: Victron Grid Connected
     unique_id: victron_grid_connected
     device_class: connectivity
-    state_topic: victron/N/b827ebea1ece/vebus/290/Ac/ActiveIn/Connected
+    state_topic: victron/N/000000000000/vebus/290/Ac/ActiveIn/Connected
     value_template: >-
       {% set sample = value_json | default({}) %}
       {% set v = sample.get('value') if sample is mapping else none %}
       {{ 'ON' if v is not boolean and is_number(v) and v | float == 1 else 'OFF' }}
-    availability_topic: victron/N/b827ebea1ece/vebus/290/Ac/ActiveIn/Connected
+    availability_topic: victron/N/000000000000/vebus/290/Ac/ActiveIn/Connected
     availability_template: >-
       {% set sample = value_json | default({}) %}
       {% set v = sample.get('value') if sample is mapping else none %}
@@ -72,223 +74,223 @@ binary_sensor:
 sensor:
   # Cerbo /Cell indices are zero-based; displayed cell numbers are one-based.
   - name: Battery Cell 1 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/0/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/0/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 2 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/1/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/1/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 3 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/2/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/2/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 4 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/3/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/3/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 5 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/4/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/4/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 6 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/5/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/5/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 7 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/6/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/6/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 8 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/7/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/7/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 9 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/8/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/8/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 10 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/9/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/9/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 11 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/10/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/10/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 12 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/11/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/11/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 13 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/12/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/12/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 14 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/13/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/13/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 15 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/14/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/14/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery Cell 16 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/512/Cell/15/Voltage
+    state_topic: victron/N/000000000000/battery/512/Cell/15/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 1 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/0/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/0/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 2 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/1/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/1/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 3 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/2/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/2/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 4 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/3/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/3/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 5 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/4/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/4/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 6 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/5/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/5/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 7 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/6/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/6/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 8 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/7/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/7/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 9 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/8/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/8/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 10 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/9/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/9/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 11 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/10/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/10/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 12 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/11/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/11/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 13 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/12/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/12/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 14 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/13/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/13/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 15 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/14/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/14/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
   - name: Battery 2 Cell 16 Voltage
-    state_topic: victron/N/b827ebea1ece/battery/513/Cell/15/Voltage
+    state_topic: victron/N/000000000000/battery/513/Cell/15/Voltage
     value_template: '{{ value_json.value }}'
     unit_of_measurement: V
     device_class: voltage
     state_class: measurement
-  - state_topic: victron/N/b827ebea1ece/system/0/Batteries
+  - state_topic: victron/N/000000000000/system/0/Batteries
     name: Battery Percent
     unique_id: battery_percent
     device_class: battery
     value_template: '{{ value_json.value[0].soc | round(2) }}'
     unit_of_measurement: '%'
-  - state_topic: victron/N/b827ebea1ece/battery/1/Soc
+  - state_topic: victron/N/000000000000/battery/1/Soc
     name: Battery Percent BT
     unique_id: battery_percent_bt
     device_class: battery
     value_template: '{{ value_json.value }}'
     unit_of_measurement: '%'
-  - state_topic: victron/N/b827ebea1ece/battery/2/Soc
+  - state_topic: victron/N/000000000000/battery/2/Soc
     name: Battery 2 Percent BT
     unique_id: battery_2_percent_bt
     device_class: battery
     value_template: '{{ value_json.value }}'
     unit_of_measurement: '%'
-  - state_topic: victron/N/b827ebea1ece/system/0/Ac/ActiveIn/L1/Power
+  - state_topic: victron/N/000000000000/system/0/Ac/ActiveIn/L1/Power
     name: AC In Power
     unique_id: ac_in_power
     device_class: power
     value_template: '{{ value_json.value }}'
     unit_of_measurement: W
     icon: mdi:power-socket-uk
-  - state_topic: victron/N/b827ebea1ece/system/0/Ac/Consumption/L1/Power
+  - state_topic: victron/N/000000000000/system/0/Ac/Consumption/L1/Power
     name: AC Loads
     unique_id: ac_loads
     device_class: power
@@ -298,96 +300,96 @@ sensor:
   - name: DC Loads
     device_class: power
     unique_id: dc_loads
-    state_topic: victron/N/b827ebea1ece/system/0/Dc/System/Power
+    state_topic: victron/N/000000000000/system/0/Dc/System/Power
     value_template: '{{ value_json.value|float(0)|round(0) }}'
     unit_of_measurement: W
     icon: mdi:power
   - name: Current Solar Production
     unique_id: net_solar_production
     device_class: power
-    state_topic: victron/N/b827ebea1ece/system/0/Dc/Pv/Power
+    state_topic: victron/N/000000000000/system/0/Dc/Pv/Power
     value_template: '{{ value_json.value|float(0)|round(0) }}'
     unit_of_measurement: W
     icon: mdi:solar-power
   - name: battery_w
     unique_id: battery_w
     device_class: power
-    state_topic: victron/N/b827ebea1ece/system/0/Dc/Battery/Power
+    state_topic: victron/N/000000000000/system/0/Dc/Battery/Power
     value_template: '{{ value_json.value|float(0)|round(0) }}'
     unit_of_measurement: W
     icon: mdi:solar-power
   - name: ppv1_w
     unique_id: ppv1_w
     device_class: power
-    state_topic: victron/N/b827ebea1ece/solarcharger/290/Yield/Power
+    state_topic: victron/N/000000000000/solarcharger/290/Yield/Power
     value_template: '{{ value_json.value|float(0)|round(0) }}'
     unit_of_measurement: W
     icon: mdi:solar-power
   - name: ppv2_w
     unique_id: ppv2_w
     device_class: power
-    state_topic: victron/N/b827ebea1ece/solarcharger/291/Yield/Power
+    state_topic: victron/N/000000000000/solarcharger/291/Yield/Power
     value_template: '{{ value_json.value|float(0)|round(0) }}'
     unit_of_measurement: W
     icon: mdi:solar-power
   - name: ppv3_w
     unique_id: ppv3w
     device_class: power
-    state_topic: victron/N/b827ebea1ece/solarcharger/292/Yield/Power
+    state_topic: victron/N/000000000000/solarcharger/292/Yield/Power
     value_template: '{{ value_json.value|float(0)|round(0) }}'
     unit_of_measurement: W
     icon: mdi:solar-power
   - name: ppv1_c
     unique_id: ppv1_c
     device_class: current
-    state_topic: victron/N/b827ebea1ece/solarcharger/290/Dc/0/Current
+    state_topic: victron/N/000000000000/solarcharger/290/Dc/0/Current
     value_template: '{{ value_json.value|float(0)|round(2) }}'
     unit_of_measurement: A
     icon: mdi:solar-power
   - name: ppv2_c
     unique_id: ppv2_c
     device_class: current
-    state_topic: victron/N/b827ebea1ece/solarcharger/291/Dc/0/Current
+    state_topic: victron/N/000000000000/solarcharger/291/Dc/0/Current
     value_template: '{{ value_json.value|float(0)|round(2) }}'
     unit_of_measurement: A
     icon: mdi:solar-power
   - name: ppv3_c
     unique_id: ppv3_c
     device_class: current
-    state_topic: victron/N/b827ebea1ece/solarcharger/292/Dc/0/Current
+    state_topic: victron/N/000000000000/solarcharger/292/Dc/0/Current
     value_template: '{{ value_json.value|float(0)|round(2) }}'
     unit_of_measurement: A
     icon: mdi:solar-power
   - name: ppv1_kwh
     unique_id: ppv1_kwh
     device_class: energy
-    state_topic: victron/N/b827ebea1ece/solarcharger/290/History/Daily/0/Yield
+    state_topic: victron/N/000000000000/solarcharger/290/History/Daily/0/Yield
     value_template: '{{ value_json.value|float(0)|round(4) }}'
     unit_of_measurement: kWh
     icon: mdi:solar-power
   - name: ppv2_kwh
     unique_id: ppv2_kwh
     device_class: energy
-    state_topic: victron/N/b827ebea1ece/solarcharger/291/History/Daily/0/Yield
+    state_topic: victron/N/000000000000/solarcharger/291/History/Daily/0/Yield
     value_template: '{{ value_json.value|float(0)|round(4) }}'
     unit_of_measurement: kWh
     icon: mdi:solar-power
   - name: ppv3_kwh
     unique_id: ppv3_kwh
     device_class: energy
-    state_topic: victron/N/b827ebea1ece/solarcharger/292/History/Daily/0/Yield
+    state_topic: victron/N/000000000000/solarcharger/292/History/Daily/0/Yield
     value_template: '{{ value_json.value|float(0)|round(4) }}'
     unit_of_measurement: kWh
     icon: mdi:solar-power
   - name: Battery Voltage
     unique_id: battery_voltage
     device_class: voltage
-    state_topic: victron/N/b827ebea1ece/system/0/Dc/Battery/Voltage
+    state_topic: victron/N/000000000000/system/0/Dc/Battery/Voltage
     value_template: >-
       {% set sample = value_json | default({}) %}
       {% set v = sample.get('value') if sample is mapping else none %}
       {{ v | float | round(2) if v is not boolean and is_number(v) and 0 < v | float <= 70 else none }}
-    availability_topic: victron/N/b827ebea1ece/system/0/Dc/Battery/Voltage
+    availability_topic: victron/N/000000000000/system/0/Dc/Battery/Voltage
     availability_template: >-
       {% set sample = value_json | default({}) %}
       {% set v = sample.get('value') if sample is mapping else none %}
@@ -397,18 +399,18 @@ sensor:
   - name: Battery Temp
     device_class: temperature
     unique_id: battery_temperature
-    state_topic: victron/N/b827ebea1ece/system/0/Dc/Battery/Temperature
+    state_topic: victron/N/000000000000/system/0/Dc/Battery/Temperature
     value_template: '{{ ((value_json.value * 9/5) + 32) | round(2) }}'
     unit_of_measurement: °F
   - name: Battery Load
     unique_id: battery_load
     device_class: power
-    state_topic: victron/N/b827ebea1ece/system/0/Batteries
+    state_topic: victron/N/000000000000/system/0/Batteries
     value_template: '{{ value_json.value[0].power|float(0)|round(0) }}'
     unit_of_measurement: W
   - name: Inverter State
     unique_id: inverter_state
-    state_topic: victron/N/b827ebea1ece/system/0/SystemState/State
+    state_topic: victron/N/000000000000/system/0/SystemState/State
     value_template: "{% if value_json.value == 0 %}\n  Off\n{% elif value_json.value == 2 %}\n  VE.Bus Fault condition\n\
       {% elif value_json.value == 3 %}\n  Bulk\n{% elif value_json.value == 4 %}\n  Absorption\n{% elif value_json.value\
       \ == 5 %}\n  Float\n{% elif value_json.value == 6 %}\n  Storage\n{% elif value_json.value == 7 %}\n  Equalize\n\
@@ -418,7 +420,7 @@ sensor:
       {% endif %}\n"
   - name: Solar Charger State
     unique_id: solar_charger_state
-    state_topic: victron/N/b827ebea1ece/solarcharger/289/State
+    state_topic: victron/N/000000000000/solarcharger/289/State
     value_template: "{% if value_json.value == 0 %}\n  Off\n{% elif value_json.value == 2 %}\n  Fault\n{% elif value_json.value\
       \ == 3 %}\n  Bulk\n{% elif value_json.value == 4 %}\n  Absorption\n{% elif value_json.value == 5 %}\n  Float\n\
       {% elif value_json.value == 6 %}\n  Storage\n{% elif value_json.value == 7 %}\n  Equalize\n{% else %}\n  Error\
@@ -426,7 +428,7 @@ sensor:
   - name: Battery Remaining
     unique_id: battery_remaining
     icon: mdi:timer-sand
-    state_topic: victron/N/b827ebea1ece/system/0/Dc/Battery/TimeToGo
+    state_topic: victron/N/000000000000/system/0/Dc/Battery/TimeToGo
     value_template: "{% set battery_load = states('sensor.battery_load') | int(0) %}\n{% if value is not defined\
       \ %}\n  Error\n{% elif value == '{\"value\": null}' or battery_load > 0 %}\n  ∞\n{% else %}\n  {% set seconds\
       \ = value_json.value | round(0) | int %}\n  {% set days = (seconds / 86400) | round(0, 'floor') | int %}\n\
@@ -441,9 +443,9 @@ number:
     max: 4000
     step: 10
     mode: box
-    command_topic: victron/W/b827ebea1ece/settings/0/Settings/CGwacs/AcPowerSetPoint
+    command_topic: victron/W/000000000000/settings/0/Settings/CGwacs/AcPowerSetPoint
     command_template: '{"value": {{ value }} }'
-    state_topic: victron/N/b827ebea1ece/settings/0/Settings/CGwacs/AcPowerSetPoint
+    state_topic: victron/N/000000000000/settings/0/Settings/CGwacs/AcPowerSetPoint
     value_template: '{{value_json.value | round(0) }}'
     device_class: power
     unit_of_measurement: W
@@ -460,9 +462,9 @@ number:
     max: 25
     step: 1
     mode: box
-    command_topic: victron/W/b827ebea1ece/vebus/276/Ac/ActiveIn/CurrentLimit
+    command_topic: victron/W/000000000000/vebus/276/Ac/ActiveIn/CurrentLimit
     command_template: '{"value": {{ value }} }'
-    state_topic: victron/N/b827ebea1ece/vebus/276/Ac/ActiveIn/CurrentLimit
+    state_topic: victron/N/000000000000/vebus/276/Ac/ActiveIn/CurrentLimit
     value_template: '{{ value_json.value }}'
     device_class: current
     unit_of_measurement: A
@@ -479,9 +481,9 @@ number:
     max: 100
     step: 5
     mode: box
-    command_topic: victron/W/b827ebea1ece/settings/0/Settings/CGwacs/BatteryLife/MinimumSocLimit
+    command_topic: victron/W/000000000000/settings/0/Settings/CGwacs/BatteryLife/MinimumSocLimit
     command_template: '{"value": {{ value }} }'
-    state_topic: victron/N/b827ebea1ece/settings/0/Settings/CGwacs/BatteryLife/MinimumSocLimit
+    state_topic: victron/N/000000000000/settings/0/Settings/CGwacs/BatteryLife/MinimumSocLimit
     value_template: '{{value_json.value | round(0) }}'
     device_class: battery
     icon: mdi:battery-20
@@ -498,9 +500,9 @@ number:
     max: 100
     step: 5
     mode: box
-    command_topic: victron/W/b827ebea1ece/settings/0/Settings/CGwacs/MaxChargePercentage
+    command_topic: victron/W/000000000000/settings/0/Settings/CGwacs/MaxChargePercentage
     command_template: '{"value": {{ value }} }'
-    state_topic: victron/N/b827ebea1ece/settings/0/Settings/CGwacs/MaxChargePercentage
+    state_topic: victron/N/000000000000/settings/0/Settings/CGwacs/MaxChargePercentage
     value_template: '{{value_json.value | round(0) }}'
     device_class: battery
     icon: mdi:battery-90
@@ -518,9 +520,9 @@ number:
     max: 100
     step: 5
     mode: box
-    command_topic: victron/W/b827ebea1ece/settings/0/Settings/CGwacs/BatteryLife/SocLimit
+    command_topic: victron/W/000000000000/settings/0/Settings/CGwacs/BatteryLife/SocLimit
     command_template: '{"value": {{ value }} }'
-    state_topic: victron/N/b827ebea1ece/settings/0/Settings/CGwacs/BatteryLife/SocLimit
+    state_topic: victron/N/000000000000/settings/0/Settings/CGwacs/BatteryLife/SocLimit
     value_template: '{{value_json.value | round(0) }}'
     device_class: battery
     icon: mdi:battery-60
@@ -537,9 +539,9 @@ number:
     max: 10000
     step: 50
     mode: box
-    command_topic: victron/W/b827ebea1ece/settings/0/Settings/CGwacs/MaxDischargePower
+    command_topic: victron/W/000000000000/settings/0/Settings/CGwacs/MaxDischargePower
     command_template: '{"value": {{ value }} }'
-    state_topic: victron/N/b827ebea1ece/settings/0/Settings/CGwacs/MaxDischargePower
+    state_topic: victron/N/000000000000/settings/0/Settings/CGwacs/MaxDischargePower
     value_template: "{% if value_json.value == -1 %}\n  10000\n{% else %}\n  {{value_json.value | round(0) }}\n\
       {% endif %}\n"
     device_class: power

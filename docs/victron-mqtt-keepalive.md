@@ -6,7 +6,7 @@ every five seconds. Its entity ID, five-second schedule and five stored traces
 remain unchanged. Execution changes from `single` to `queued` with `max: 2`.
 
 The previous scheduled request published `{}` to the legacy
-`victron/R/b827ebea1ece/system/0/Serial` keepalive topic. That alias also requests
+`victron/R/000000000000/system/0/Serial` keepalive topic. That alias also requests
 a full item republish. Repeating it can fill a slow subscriber's receive queue
 and delay control packets, including MQTT PINGRESP, behind telemetry.
 
@@ -32,9 +32,9 @@ Each accepted five-second heartbeat and birth invocation also issues two exact
 read requests to refresh the existing 90-second expiry measurements even when
 their values do not change:
 
-- `victron/R/b827ebea1ece/system/0/Dc/Battery/Voltage` supplies
+- `victron/R/000000000000/system/0/Dc/Battery/Voltage` supplies
   `sensor.battery_voltage`.
-- `victron/R/b827ebea1ece/vebus/290/Ac/ActiveIn/Connected` supplies
+- `victron/R/000000000000/vebus/290/Ac/ActiveIn/Connected` supplies
   `binary_sensor.victron_grid_connected`.
 
 Keep these topics aligned with [the MQTT entity definitions](../config/mqtt.yaml).

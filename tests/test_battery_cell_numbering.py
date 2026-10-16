@@ -6,7 +6,7 @@ import yaml
 
 
 CONFIG = Path(__file__).resolve().parents[1] / "config/mqtt.yaml"
-PREFIX = "victron/N/b827ebea1ece/battery"
+PREFIX = "victron/N/000000000000/battery"
 
 
 class BatteryCellNumberingTest(unittest.TestCase):
