@@ -3012,11 +3012,11 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "1681c9a513a9551696a4676e3cd6bf50726309038d58b3d3eb6db87ee426327a",
+      "behavior_sha256": "8d4a8dd12118f75305e422e358388aee2b40bde8d865befaec4619176413344f",
       "references": [
         "light.fireplace_led_ll",
         "media_player.living_room_tv_77",
-        "notify.almbpo",
+        "notify.household_laptop",
         "notify.imac21",
         "notify.roomba",
         "notify.send_message",
@@ -3113,7 +3113,7 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "bfd0bd8e0aec60d0f1364346ca3013b1f3ba4e8e3e97d879f2c1014446ad6578",
+      "behavior_sha256": "2b0c24214f99ec9783bae7fe8db0859fd7e8158f33a1bdef08725b01f22dd9e4",
       "references": [
         "cover.bedroom_curtains_l",
         "cover.dining_curtains_l",
@@ -3123,7 +3123,7 @@
         "cover.mishka_curtains_one_l",
         "cover.mishka_curtains_two_l",
         "media_player.living_room_tv_77",
-        "notify.almbpo",
+        "notify.household_laptop",
         "notify.imac21",
         "notify.roomba",
         "notify.send_message"
@@ -3149,7 +3149,7 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "b81469a7b197a4a9112110a4a13057b336646d3c938a58589317c5fb0ab2f7a3",
+      "behavior_sha256": "6686758002dae277e34f97ff3fc0dac690d025c45763a67afa8e99a67ff8f5bc",
       "references": [
         "cover.bedroom_curtains_l",
         "cover.dining_curtains_l",
@@ -3159,7 +3159,7 @@
         "cover.mishka_curtains_one_l",
         "cover.mishka_curtains_two_l",
         "media_player.living_room_tv_77",
-        "notify.almbpo",
+        "notify.household_laptop",
         "notify.imac21",
         "notify.roomba",
         "notify.send_message"

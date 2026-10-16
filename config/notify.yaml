@@ -1,28 +1,28 @@
-# Home Assistant configuration; retain stable entity identifiers.
+# Fictional notification destinations; existing installations require reviewed private overrides.
 - platform: kodi
-  name: h3
-  host: 192.168.160.1
+  name: household_gateway
+  host: 192.0.2.40
 - platform: kodi
   name: roomba
-  host: 192.168.161.65
+  host: 192.0.2.41
 - platform: kodi
-  name: almini
-  host: 192.168.161.65
+  name: household_mini
+  host: 192.0.2.41
 - platform: kodi
   name: iNew
-  host: 192.168.161.67
+  host: 192.0.2.42
 - platform: kodi
   name: imac21
-  host: 192.168.161.67
+  host: 192.0.2.42
 - platform: kodi
-  name: alair
-  host: 192.168.160.7
+  name: household_air
+  host: 192.0.2.43
 - platform: kodi
-  name: alombp
-  host: 192.168.151.133
+  name: household_pro_laptop
+  host: 192.0.2.44
 - platform: kodi
-  name: almbpo
-  host: 192.168.151.36
+  name: household_laptop
+  host: 192.0.2.45
 - name: toall
   platform: group
   services:

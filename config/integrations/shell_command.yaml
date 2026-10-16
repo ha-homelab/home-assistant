@@ -1,8 +1,8 @@
 # Existing host and media commands. These are invoked only by explicit HA actions.
 query_comcast_data_usage: python3 /config/comcast.py
 kk: bash /config/kodi {{ sta }} - {{ pla }}
-random_on_inew: /usr/bin/timeout 45 /config/kodi al-o-mbp r
-shutdown_inew: /usr/bin/timeout 45 /config/kodi al-o-mbp shutdown
+random_on_inew: /usr/bin/timeout 45 /config/kodi household-pro-laptop r
+shutdown_inew: /usr/bin/timeout 45 /config/kodi household-pro-laptop shutdown
 random_on_an2: /usr/bin/timeout 45 /config/kodi an2 rf
 shuffle_songs: cd /config/www;rm -f today.mp3;cp $(find /share/Music2/ -name "*.mp3"|shuf -n 1) today.mp3
 porch_camera_alert_copy: cd /config/www;cp porch_camera_alert3.jpg porch_camera_alert4.jpg;cp porch_camera_alert2.jpg

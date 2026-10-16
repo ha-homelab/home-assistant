@@ -60,7 +60,7 @@
         message: '{{ trigger.to_state.attributes.friendly_name }} turned {{ trigger.to_state.state }}'
   - action: script.notify_optional
     data:
-      notify_service: notify.almbpo
+      notify_service: notify.household_laptop
       notify_data:
         message: '{{ trigger.to_state.attributes.friendly_name }} turned {{ trigger.to_state.state }}'
   mode: single

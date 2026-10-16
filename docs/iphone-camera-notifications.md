@@ -44,7 +44,7 @@ The delivery policy is centralized in this helper:
   stays in Chrome, but is excluded from phone mirroring to prevent duplicates.
   Other eligible Chrome messages retain their phone copy.
 
-`notify.alair` is an unrelated Kodi destination. Maria's phones are unchanged.
+`notify.household_air` is an unrelated Kodi destination. Maria's phones are unchanged.
 Existing motion filters, quiet periods, cooldowns and optional-provider error
 handling still apply. Browser-specific action buttons and TV icons are not sent
 to iOS. A failed phone delivery cannot stop the household action that follows it.
