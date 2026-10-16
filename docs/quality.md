@@ -18,3 +18,9 @@ Python/network application vulnerabilities, and no bug, feature or vulnerability
 reports outside GitHub in the preceding twelve months as of 2026-10-16. These are
 human attestations, not automated findings. Public issue history and current
 diagnostics must also be reviewed for each assessment update.
+
+The required quality gate runs CodeQL security-extended and security-and-quality
+analysis for maintained Python and JavaScript, plus every Pyflakes-derived Ruff
+F rule with inline suppressions ignored. Only Home Assistant python_script files
+receive the four documented injected names as builtins; other source does not.
+Substantive findings must be investigated and fixed before merge.

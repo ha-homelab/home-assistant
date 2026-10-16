@@ -12,6 +12,7 @@ from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 import json
 import logging
+from importlib import import_module
 import os
 from pathlib import Path
 import tempfile
@@ -19,7 +20,7 @@ import unittest
 from unittest.mock import patch
 
 try:
-    import homeassistant
+    import_module("homeassistant")
 except ImportError:
     HA_AVAILABLE = False
 else:
