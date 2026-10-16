@@ -18,6 +18,12 @@ jobs:
       with:
         python-version: '3.13'
     - run: pip install -r requirements.txt
+    - name: Check Python common errors without suppressing inline findings
+      run: |
+        python -m pip install -r requirements-lint.txt
+        python -m ruff check --select F --ignore-noqa --exclude config/python_scripts .
+        # Home Assistant injects these names only into python_script snippets.
+        python -m ruff check --select F --ignore-noqa --config 'builtins=["hass","data","logger","output"]' config/python_scripts
     - run: python tools/validate.py
     - name: Validate bundled automation and script contracts
       run: 'python dependencies/automations/tools/validate.py

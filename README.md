@@ -382,3 +382,10 @@ for the explicit source-and-license inventory, version plans and installation te
 ## License
 
 Original project code and documentation are available under the [MIT license](LICENSE). [Third-party notices](THIRD_PARTY_NOTICES.md) preserve separate terms for included or referenced upstream material. This grant does not relicense firmware, models, recordings, datasets or other third-party artifacts.
+
+
+## Project maintenance
+
+[Contribution guide](CONTRIBUTING.md) · [Security policy](SECURITY.md) ·
+[Governance](GOVERNANCE.md) · [Code of Conduct](CODE_OF_CONDUCT.md) ·
+[Roadmap](ROADMAP.md) · [Quality evidence and limits](docs/quality.md)

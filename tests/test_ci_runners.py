@@ -11,6 +11,7 @@ class RunnerBoundaryTests(unittest.TestCase):
     def test_public_jobs_preserve_scoped_runner_and_token_boundaries(self):
         permissions = {
             'ci.yml': {'contents': 'read'},
+            'codeql.yml': {'contents': 'read'},
             'quality-gate.yml': {'contents': 'read'},
             'release-pipeline.yml': {'contents': 'read'},
             'release-build.yml': {'contents': 'read', 'actions': 'read'},
@@ -20,11 +21,14 @@ class RunnerBoundaryTests(unittest.TestCase):
         self.assertEqual({path.name for path in paths}, set(permissions))
         calls = {
             ('quality-gate.yml', 'check-0'): './.github/workflows/ci.yml',
+            ('quality-gate.yml', 'check-1'): './.github/workflows/codeql.yml',
             ('release-pipeline.yml', 'checks'): './.github/workflows/quality-gate.yml',
             ('release-pipeline.yml', 'build'): './.github/workflows/release-build.yml',
         }
         job_permissions = {
             ('quality-gate.yml', 'check-0'): {'contents': 'read', 'actions': 'read'},
+            ('quality-gate.yml', 'check-1'): {'contents': 'read', 'actions': 'read', 'security-events': 'write'},
+            ('codeql.yml', 'analyze'): {'contents': 'read', 'actions': 'read', 'security-events': 'write'},
             ('release-pipeline.yml', 'checks'): {'contents': 'read', 'actions': 'read', 'security-events': 'write'},
             ('release-pipeline.yml', 'build'): {'contents': 'read', 'actions': 'read'},
             ('release-pipeline.yml', 'fuzz'): {'contents': 'read'},
@@ -48,7 +52,9 @@ class RunnerBoundaryTests(unittest.TestCase):
                         else:
                             self.assertEqual(job['uses'], calls[(path.name, name)])
                         continue
-                    if path.name in {'ci.yml', 'auto-approve.yml'}:
+                    if path.name == 'codeql.yml':
+                        self.assertEqual(job['runs-on'], 'ubuntu-latest')
+                    elif path.name in {'ci.yml', 'auto-approve.yml'}:
                         self.assertEqual(job['runs-on'], 'ubuntu-24.04')
                     else:
                         runner = job['runs-on']
@@ -68,6 +74,7 @@ class RunnerBoundaryTests(unittest.TestCase):
     def test_triggers_separate_validation_publication_and_metadata_only_approval(self):
         expected = {
             'ci.yml': {'workflow_call'},
+            'codeql.yml': {'workflow_call'},
             'quality-gate.yml': {'pull_request', 'merge_group', 'workflow_call'},
             'release-build.yml': {'workflow_call'},
             'release-pipeline.yml': {'push', 'schedule', 'workflow_dispatch'},
