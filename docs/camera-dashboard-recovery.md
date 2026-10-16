@@ -22,8 +22,7 @@ editing or HA restart is needed. Existing camera entity IDs and automation
 callers are preserved. Friendly names now identify the camera instead of an old
 IP address.
 
-The Kubernetes manifests and Secret examples live in
-[04-kerberos](https://github.com/4alvit/k3s-self-healing/tree/main/deployments/04-kerberos).
+The deployment operator maintains the Kubernetes manifests and Secret examples.
 All three go2rtc Deployments select Oracle node h7; they are not public services.
 Front, Garage and Backdoor use native RTSP without video encoding. Porch retains
 its FFmpeg copy/remux because the camera's SDP is invalid for the native Agent

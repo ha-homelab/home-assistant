@@ -156,8 +156,7 @@ owners and must not be moved into the transport hotfix:
   without a percentage. Missing actual position renders `none`; actual values
   retain the existing `100 - actual` transformation. Open/Close remain reversed
   for this particular motor. See the [HA template regression](../../tests/test_office_cover_template.py).
-- The private floorplan repository, commit
-  [`dc709a7`](https://github.com/ha-homelab/home-floorplan-3d/commit/dc709a7ec7d8d6747d9ccc2250f4641d83f423e3),
+- The separately deployed floorplan integration
   separates motor availability from position, retains measured positions across
   power loss, labels remembered values, and keeps the recorded 45-second warm-up
   when a guard becomes unavailable. Its `curtains.py`, `curtain-state.js` and

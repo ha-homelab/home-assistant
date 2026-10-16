@@ -27,7 +27,7 @@ images, Supervisor, or device firmware.
    latest completed export already staged in `/config/recorder_backup`; its
    manifest records the SQL export time independently of the archive time. See
    the [weekly backup schedule](../README.md#weekly-backups-and-maintenance) and
-   [recorder recovery instructions](https://github.com/4alvit/home-assistant-k3s/blob/main/docs/native-backup-recovery.md).
+   the installation's recorder recovery instructions.
 4. When creating a new backup, wait up to 30 minutes for the backup worker to finish, the manager to become
    idle, and `sensor.backup_last_successful_automatic_backup` to contain a fresh
    timestamp from this attempt. A service return alone is insufficient: remote

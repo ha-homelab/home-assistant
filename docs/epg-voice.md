@@ -20,11 +20,9 @@ launch sustained playback in receiver checks where the combined explicit LIVE
 and metadata payload terminated early; those checks did not isolate which extra
 field caused the difference. Programme selection still uses the current EPG.
 
-The reusable package, API contracts, and YAML/Jinja behavior tests live in the
-[`epg-voice-gateway`](https://github.com/4alvit/epg-voice-gateway) repository.
-Start with its [ordered setup checklist](https://github.com/4alvit/epg-voice-gateway/blob/main/docs/setup-checklist.md).
-The catalogue API requires gateway commit
-`6dda2a7e10301690257fa38bb6a5759f639a33df` or a later compatible revision.
+The voice gateway operator supplies the reusable package, API contracts,
+YAML/Jinja behavior tests and ordered setup checklist. Match the deployed
+catalogue API to that contract before enabling this configuration.
 
 ## Private configuration
 
@@ -62,8 +60,7 @@ failure separately. Neither outcome is fixed by changing EPG title matching.
 `config/packages/google_assistant.yaml` configures the manual integration with
 exposure disabled by default. Only Home TV and the three fixed shortcuts are
 exposed. Both private dispatcher scripts and all bookkeeping helpers remain
-unexposed. Follow the complete
-[Google Console and OAuth setup](https://github.com/4alvit/epg-voice-gateway/blob/main/examples/home-assistant/README.md#first-time-manual-google-linking)
+unexposed. Follow the gateway deployment's Google Console and OAuth procedure
 for the client ID, URLs, scopes, icon, and draft settings.
 Select Scene and Sensor as device categories in Google Home Developer
 Console. Configure trusted HTTPS `/auth/authorize`, `/auth/token`, and
@@ -74,9 +71,8 @@ service account for HA. Save its JSON key as `home-media-service-account.json`
 next to `secrets.yaml`, mode 0600. The secret
 `epg_voice_google_service_account` includes that file. Keep it outside source
 control, public diagnostics, and shared backups. No HA Cloud subscription or
-billing activation is required for this manual integration. The reusable
-[HomeGraph procedure](https://github.com/4alvit/epg-voice-gateway/blob/main/examples/home-assistant/README.md#homegraph-and-the-service-account-key)
-covers Console steps, key handling, and obtaining the linking user's HA ID
+billing activation is required for this manual integration. The gateway
+operator's HomeGraph procedure covers Console steps, key handling, and obtaining the linking user's HA ID
 without printing credentials. This repository uses
 `service_account: !secret epg_voice_google_service_account`, with
 `epg_voice_google_service_account: !include home-media-service-account.json`
@@ -160,8 +156,8 @@ identifier, provider URL, credential, or service-account key.
 `config/custom_sentences/{en,ru}/epg_voice.yaml` add the `EPGVoicePlayMedia`
 intent. They require the `epg_voice_channels` custom integration version 0.2.0
 or later and the gateway's authenticated `/v1/play-text` API. The integration
-source, installation procedure, and detailed behavior are maintained in the
-[gateway Assist guide](https://github.com/4alvit/epg-voice-gateway/blob/main/examples/home-assistant/assist-README.md).
+source, installation procedure, and detailed behavior are maintained with the
+gateway deployment.
 
 Examples: `play Example News on home channels`, `играй Кукутики`, and
 `включи канал Example News`. Russian turn-on commands require a media noun or

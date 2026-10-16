@@ -80,7 +80,7 @@ sends no restart, charging, discharge or protection commands.
 
 ESPHome's [birth and last-will messages](https://esphome.io/components/mqtt/#last-will-and-birth-messages)
 explain the availability contract. The [firmware repository](https://github.com/victron-venus/esphome-jbd-bms-mqtt#readme)
-documents discovery identities; `4alvit/k3s-self-healing` owns the bridge routes.
+documents discovery identities; cluster configuration owns the bridge routes.
 
 ## Acceptance checks
 

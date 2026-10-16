@@ -1,6 +1,6 @@
 # Living curtain caller baseline
 
-These files are byte-for-byte snapshots of `ha-homelab/automations` commit
+These files are byte-for-byte snapshots of the automation migration baseline commit
 `692d615a32bdafd9f26ab3b56d2ed3cc1dc0dc64`, before the living-curtain caller changes.
 They let contract tests compare the pinned current rules with their original
 behavior without fetching old Git history or changing Git ownership trust.

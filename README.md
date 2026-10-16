@@ -148,10 +148,9 @@ The Sunday schedule uses **America/Los_Angeles**, including daylight-saving time
   only when updates are pending and no sufficiently recent success is available.
   With no updates or pending restart, do nothing.
 
-The infrastructure repository contains the [native backup and recorder restore
-instructions](https://github.com/4alvit/home-assistant-k3s/blob/main/docs/native-backup-recovery.md),
-the [full-stack recovery runbook](https://github.com/4alvit/home-assistant-k3s/blob/main/disaster_recovery/RUNBOOK.md),
-and the [September 25 recovery verification record](https://github.com/4alvit/home-assistant-k3s/blob/main/docs/native-backup-verification-2026-09-25.md).
+The deployment operator maintains the native backup and recorder restore
+instructions, full-stack recovery runbook and installation verification records.
+Obtain those installation-specific procedures before operating recovery jobs.
 All three scheduled backup jobs run weekly. Manual backups and the HACS fallback
 can add uploads; each Oracle-to-Synology transfer consumes outbound traffic.
 

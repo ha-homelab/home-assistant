@@ -45,7 +45,7 @@ There is no preload, recorder or permanent consumer in this relay.
 The relay is a separate deployment so adding it requires no restart of the
 existing Front/Ring/Porch/Garage/Backdoor relay. Their capture/recording pipelines
 are unchanged. Manifest and private Secret template live in
-[k3s-self-healing](https://github.com/4alvit/k3s-self-healing/blob/main/deployments/04-kerberos/025-go2rtc-onvif.yaml).
+cluster configuration.
 
 ## HA camera entry
 

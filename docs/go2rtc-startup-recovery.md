@@ -35,5 +35,5 @@ this installed binary (no cameras, temporary sockets/ports) produced 18 incomple
 scheme lists and two HTTP 404 responses. After adding a managed-server readiness
 barrier, all 30 starts returned all 14 schemes and working streams/preload APIs.
 The persistent startup guard and native recovery wiring live in
-[home-assistant-k3s PR 9](https://github.com/4alvit/home-assistant-k3s/pull/9).
+deployment and recovery configuration.
 This supersedes the earlier reload-only recovery; see its deployment verification.
