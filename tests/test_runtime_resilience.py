@@ -722,7 +722,7 @@ class RuntimeResilienceTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.events[-1][0], 'switch.turn_off')
         self.assertEqual(len(self.mobile_events), 1)
 
-    async def test_other_html5_targets_do_not_notify_vitaly(self):
+    async def test_other_html5_targets_do_not_notify_owner_phone(self):
         await self.helper.async_run({'notify_service': 'html5.send_message',
             'notify_data': {'entity_id': 'notify.another_browser', 'message': 'Private'}}, context=Context())
         self.assertEqual(self.mobile_events, [])

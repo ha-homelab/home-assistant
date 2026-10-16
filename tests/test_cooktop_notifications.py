@@ -126,7 +126,7 @@ class CooktopNotificationsTest(unittest.IsolatedAsyncioTestCase):
         ])
         self.assertFalse(any(service == MARIA for service, _ in self.deliveries))
 
-    async def test_confirmed_start_sends_exactly_chrome_and_vitaly_once(self):
+    async def test_confirmed_start_sends_exactly_chrome_and_owner_phone_once(self):
         await self.load()
         self.assertIsNone(self.last_triggered())
         await self.state(COOKTOP, 'on')
@@ -217,13 +217,13 @@ class CooktopNotificationsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.router_calls), 2)
         self.assertEqual(self.deliveries, expected + expected)
 
-    async def test_browser_delivery_failure_still_sends_vitaly_copy(self):
+    async def test_browser_delivery_failure_still_sends_owner_phone_copy(self):
         self.fail_browser = True
         await self.load()
         await self.state(COOKTOP, 'on')
         self.assert_one_delivery_pair()
 
-    async def test_missing_browser_service_still_sends_vitaly_copy(self):
+    async def test_missing_browser_service_still_sends_owner_phone_copy(self):
         self.hass.services.async_remove('html5', 'send_message')
         await self.load()
         await self.state(COOKTOP, 'on')
