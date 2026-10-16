@@ -8,6 +8,8 @@ version = "0.1.1"
 description = "Bounded private JPEG notification cache extracted from Home Assistant tooling"
 readme = "docs/notification-frame-cache.md"
 requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
 classifiers = ["Operating System :: POSIX", "Programming Language :: Python :: 3"]
 
 [tool.setuptools]
