@@ -79,7 +79,7 @@ The five existing outdoor notification cameras use the built-in **MJPEG IP Camer
   the native HA backup, not checked into Git as `.storage` files.
 
 The matching go2rtc configuration is documented in
-[the Kerberos Secret template](https://github.com/4alvit/k3s-self-healing/blob/main/docs/templates/kerberos-secrets.example.yaml).
+the deployment operator's Secret template.
 MJPEG encoding runs on Oracle h7 at 640 pixels wide, approximately one frame per
 second and one encoder/filter thread. All five encoders start on demand. Front/Backdoor
 reuse their existing local producers; Garage/Porch read their Oracle relays;
@@ -113,7 +113,7 @@ MJPEG response for iOS; single-frame conversion also proved intermittent. The
 dedicated notification streams preserve dashboard/snapshot quality and avoid
 starting a conversion for every notification video frame. The relays use buffered
 RTSP input, as documented in
-[the infrastructure configuration](https://github.com/4alvit/k3s-self-healing/blob/main/docs/templates/kerberos-secrets.example.yaml).
+the separately maintained deployment configuration.
 Porch has also shown upstream camera connection timeouts and packet loss. Its
 notification video can time out while the source is unavailable; this is separate
 from successful delivery of the phone notification.

@@ -4,7 +4,7 @@
 
 Home Assistant Container 2026.9.1 runs as `homeassistant/home-assistant-0`, a StatefulSet on `h7` in the `k3s-heaven` context. Its existing persistent `/config`, `/share`, host networking, recorder database, MQTT connection and Zigbee radio remain in place.
 
-This repository owns the human-maintained YAML configuration and its two bundled libraries. The existing private `4alvit/home-assistant-k3s` and `4alvit/k3s-self-healing` repositories own cluster manifests, companion services and recovery configuration. Do not create a second HA Core or MQTT bridge when consuming this configuration.
+This repository owns the human-maintained YAML configuration and its two bundled libraries. Separately maintained deployment configuration owns cluster manifests, companion services and recovery settings. Do not create a second HA Core or MQTT bridge when consuming this configuration.
 
 ## Boundaries
 
@@ -15,7 +15,7 @@ This repository owns the human-maintained YAML configuration and its two bundled
 - The existing IGW voice package remains in the root repository because its scripts and REST command share a blueprint and transport contract.
 - UI integration entries, entity/device registries, credentials, voice exposure and storage-mode dashboards remain runtime data. Back them up privately; do not commit `.storage`.
 - HACS/custom integration source remains installed in `/config/custom_components`; staging links to the installed code for the real schema check. Review custom component updates separately.
-- `home_floorplan: {}` enables the existing authenticated 3D floorplan panel. Its custom integration, static assets and floorplan data are deployed separately from [home-floorplan-3d](https://github.com/ha-homelab/home-floorplan-3d/blob/main/docs/home-assistant.md); this overlay preserves them and does not provision them. Keep the root declaration when rebuilding a release.
+- `home_floorplan: {}` enables the existing authenticated 3D floorplan panel. Its custom integration, static assets and floorplan data are provided by a separately deployed floorplan integration; this overlay preserves them and does not provision them. Keep the root declaration when rebuilding a release.
 - Existing helper commands `/config/kodi` and `/config/comcast.py`, media and camera snapshot directories are external runtime dependencies. A configuration bundle does not provision or execute them.
 
 ## Known inherited behavior

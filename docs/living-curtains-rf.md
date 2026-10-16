@@ -14,11 +14,9 @@ adds daylight and local-time guards to the living-room opening schedule.
 
 ## Installed revision and deployment
 
-The running helper comes from private root revision
-[`3228fb34d565d5dd4639ba2c3d3a93f3cc76789c`](https://github.com/ha-homelab/home-assistant/commit/3228fb34d565d5dd4639ba2c3d3a93f3cc76789c),
-with the automation component pinned to
-[`7c1e2de6cabcac164576fdcb8866093ea8df6cbb`](https://github.com/ha-homelab/automations/commit/7c1e2de6cabcac164576fdcb8866093ea8df6cbb).
-The merged root tree is identical to the staged and checked revision
+The historical root and automation revision records remain with the deployment
+operator. The public bundle contains the [current helper source](https://github.com/ha-homelab/home-assistant/blob/b10fa9a87a356f8942aef383042c6a23e6cebcbd/config/packages/living_curtains_rf.yaml).
+In that historical deployment, the merged root tree was identical to the staged and checked revision
 `2253c31232875c62c1a17325a3bcf0bbf2856bf8`. The installed package
 `/config/packages/living_curtains_rf.yaml` has SHA-256
 `c6fe18d19cc8d2c85df5ea77efe1a577d01da4e812561f7cd62642cb2bd19413`.

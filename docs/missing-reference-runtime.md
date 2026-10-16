@@ -13,7 +13,7 @@ The installed Home Assistant 2026.9.1 entity-service handler filters missing/una
 - `switch.mishka_bedroom_desk_lamp_l`
 - `switch.fireplace_led_ll`
 
-These four targets occur in [05:35 lighting shutdown](https://github.com/ha-homelab/automations/blob/0ace04d06ec1ec973f6236f77444a36f27d98f64/config/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml), [05:45 lighting shutdown](https://github.com/ha-homelab/automations/blob/0ace04d06ec1ec973f6236f77444a36f27d98f64/config/075_lighting_turn_off_scheduled_lights_except_the_living_room.yaml), or [household shutdown](https://github.com/ha-homelab/scripts/blob/8d9f8e8b5e1073ecbcdb8b25371018ee8e43e76e/config/lighting/household_lights_and_media_off.yaml). The morning actions already run in parallel. The household script additionally retains `continue_on_error` on both target batches, followed by the iNew shutdown helper. Missing members do not prevent existing lights/switches or the later helper from receiving their calls. Three of these IDs also appear as harmless dormant state-trigger IDs in automation 112.
+These four targets occur in [05:35 lighting shutdown](https://github.com/ha-homelab/home-assistant/blob/b10fa9a87a356f8942aef383042c6a23e6cebcbd/dependencies/automations/config/074_lighting_turn_off_scheduled_lights_in_the_morning.yaml), [05:45 lighting shutdown](https://github.com/ha-homelab/home-assistant/blob/b10fa9a87a356f8942aef383042c6a23e6cebcbd/dependencies/automations/config/075_lighting_turn_off_scheduled_lights_except_the_living_room.yaml), or [household shutdown](https://github.com/ha-homelab/home-assistant/blob/b10fa9a87a356f8942aef383042c6a23e6cebcbd/dependencies/scripts/config/lighting/household_lights_and_media_off.yaml). The morning actions already run in parallel. The household script additionally retains `continue_on_error` on both target batches, followed by the iNew shutdown helper. Missing members do not prevent existing lights/switches or the later helper from receiving their calls. Three of these IDs also appear as harmless dormant state-trigger IDs in automation 112.
 
 - `media_player.kitchen_speaker_2`
 - `media_player.family_room_speaker_2`
@@ -21,11 +21,11 @@ These four targets occur in [05:35 lighting shutdown](https://github.com/ha-home
 - `media_player.mishka_bedroom_google_mini`
 - `media_player.living_room_google_home`
 
-[Household media shutdown](https://github.com/ha-homelab/scripts/blob/8d9f8e8b5e1073ecbcdb8b25371018ee8e43e76e/config/media/stop_household_players.yaml) calls each target separately and already continues after individual runtime errors. These absent players are skipped by the service handler; subsequent existing players are still processed.
+[Household media shutdown](https://github.com/ha-homelab/home-assistant/blob/b10fa9a87a356f8942aef383042c6a23e6cebcbd/dependencies/scripts/config/media/stop_household_players.yaml) calls each target separately and already continues after individual runtime errors. These absent players are skipped by the service handler; subsequent existing players are still processed.
 
-- `media_player.vitaly_s_echo` — the sole target of [the volume preset](https://github.com/ha-homelab/scripts/blob/8d9f8e8b5e1073ecbcdb8b25371018ee8e43e76e/config/media/set_household_volume_presets.yaml).
-- `media_player.plex_plex_for_android_tv_chromecast_google_tv_hd` — the sole target of [the Ants Plex playlist](https://github.com/ha-homelab/scripts/blob/8d9f8e8b5e1073ecbcdb8b25371018ee8e43e76e/config/media/plex_ants_android_tv.yaml).
-- `switch.smart_toilet_2` — the sole target of [warm-water pump start](https://github.com/ha-homelab/automations/blob/0ace04d06ec1ec973f6236f77444a36f27d98f64/config/016_bathroom_start_the_warm_water_pump_after_motion.yaml) and [stop](https://github.com/ha-homelab/automations/blob/0ace04d06ec1ec973f6236f77444a36f27d98f64/config/014_bathroom_stop_the_warm_water_pump_after_motion_clears.yaml).
+- `media_player.vitaly_s_echo` — the sole target of [the volume preset](https://github.com/ha-homelab/home-assistant/blob/b10fa9a87a356f8942aef383042c6a23e6cebcbd/dependencies/scripts/config/media/set_household_volume_presets.yaml).
+- `media_player.plex_plex_for_android_tv_chromecast_google_tv_hd` — the sole target of [the Ants Plex playlist](https://github.com/ha-homelab/home-assistant/blob/b10fa9a87a356f8942aef383042c6a23e6cebcbd/dependencies/scripts/config/media/plex_ants_android_tv.yaml).
+- `switch.smart_toilet_2` — the sole target of [warm-water pump start](https://github.com/ha-homelab/home-assistant/blob/b10fa9a87a356f8942aef383042c6a23e6cebcbd/dependencies/automations/config/016_bathroom_start_the_warm_water_pump_after_motion.yaml) and [stop](https://github.com/ha-homelab/home-assistant/blob/b10fa9a87a356f8942aef383042c6a23e6cebcbd/dependencies/automations/config/014_bathroom_stop_the_warm_water_pump_after_motion_clears.yaml).
 
 Those three functions currently have no matching device to control. They can emit missing-target warnings when invoked, but do not block any other useful action in their sequences. Their intended hardware identity must be resolved before restoring or retiring the functions.
 
@@ -34,7 +34,7 @@ Those three functions currently have no matching device to control. They can emi
 - `media_player.mishka_bedroom_echo_dot`
 - `media_player.vitaly_s_portal_2`
 
-[Porch Alexa announcements](https://github.com/ha-homelab/automations/blob/0ace04d06ec1ec973f6236f77444a36f27d98f64/config/084_porch_announce_motion_through_alexa.yaml) retain three other configured targets. The installed Alexa Media Player provider converts notification targets with `filter_matches=True` before scheduling TTS, then calls available matched devices. Unmatched IDs do not invalidate the whole list. Verified in `/config/custom_components/alexa_media/notify.py:91–146,280–301`. No additional target filter is required to preserve delivery to existing devices.
+[Porch Alexa announcements](https://github.com/ha-homelab/home-assistant/blob/b10fa9a87a356f8942aef383042c6a23e6cebcbd/dependencies/automations/config/084_porch_announce_motion_through_alexa.yaml) retain three other configured targets. The installed Alexa Media Player provider converts notification targets with `filter_matches=True` before scheduling TTS, then calls available matched devices. Unmatched IDs do not invalidate the whole list. Verified in `/config/custom_components/alexa_media/notify.py:91–146,280–301`. No additional target filter is required to preserve delivery to existing devices.
 
 ## Six IDs used only as state triggers
 
@@ -45,13 +45,13 @@ Those three functions currently have no matching device to control. They can emi
 - `switch.ice_maker_l`
 - `switch.attic_dehumidifier_l`
 
-In [switch-state notifications](https://github.com/ha-homelab/automations/blob/0ace04d06ec1ec973f6236f77444a36f27d98f64/config/112_notifications_report_switch_state_changes.yaml), these IDs only watch for `off` → `on`. An absent entity cannot produce that transition. The other trigger IDs remain independent and functional. Retaining the dormant IDs produces no repeated service calls or missing-target warnings.
+In [switch-state notifications](https://github.com/ha-homelab/home-assistant/blob/b10fa9a87a356f8942aef383042c6a23e6cebcbd/dependencies/automations/config/112_notifications_report_switch_state_changes.yaml), these IDs only watch for `off` → `on`. An absent entity cannot produce that transition. The other trigger IDs remain independent and functional. Retaining the dormant IDs produces no repeated service calls or missing-target warnings.
 
 ## One ID already excluded during load selection
 
 - `light.garage_beam_light`
 
-The ID remains in [the self-consumption load map](https://github.com/ha-homelab/automations/blob/0ace04d06ec1ec973f6236f77444a36f27d98f64/config/085_self_consumption_select_controllable_loads_from_grid_power.yaml). [The selector](../config/python_scripts/select_devices.py) checks `hass.states.get(entity_id)` and skips missing states before calculating candidate combinations. No service call is generated for this missing target.
+The ID remains in [the self-consumption load map](https://github.com/ha-homelab/home-assistant/blob/b10fa9a87a356f8942aef383042c6a23e6cebcbd/dependencies/automations/config/085_self_consumption_select_controllable_loads_from_grid_power.yaml). [The selector](../config/python_scripts/select_devices.py) checks `hass.states.get(entity_id)` and skips missing states before calculating candidate combinations. No service call is generated for this missing target.
 
 ## Decision
 

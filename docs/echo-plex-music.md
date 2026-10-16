@@ -36,8 +36,8 @@ The package does not change volume, wake words, microphone settings or firmware.
 
 ## Restore and commission
 
-1. Restore Music Assistant using the infrastructure repository's
-   [local Plex and weekly recovery runbook](https://github.com/4alvit/home-assistant-k3s/blob/main/companions/README-music-assistant.md).
+1. Restore Music Assistant using the deployment operator's
+   local Plex and weekly recovery runbook.
    It runs on `syn` at `192.168.175.130`; Plex is `192.168.167.25:32400`.
    Audio must stay on this LAN path. HA's control connection may still use OCI.
 2. Enable EchoLocal Sendspin and register `192.168.163.44` in the Music Assistant
