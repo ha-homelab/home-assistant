@@ -23,3 +23,5 @@ The repository's **Allow GitHub Actions to create and approve pull requests**
 setting is managed in the homelab Terraform repository. Automated approval is a
 maintainer opt-in to the CI gate, not an independent human review; required checks,
 resolved discussions, current-branch requirements, and merge permissions still apply.
+
+Contributions to original project code and documentation are made under the [MIT license](LICENSE). Preserve upstream copyright, license and NOTICE files for third-party material.
