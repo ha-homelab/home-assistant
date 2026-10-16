@@ -1,7 +1,7 @@
-# Mishka room: Turn on lights after motion.
+# Room 2: Turn on lights after motion.
 # Stable entity: automation.mishka_room_motion_triggered.
 - id: ha_homelab_mishka_room_turn_on_lights_after_motion
-  alias: 'Mishka room: Turn on lights after motion'
+  alias: 'Room 2: Turn on lights after motion'
   description: Turn on lights after motion. Responds to binary_sensor.rf_mishka_motion changing to on.
     Runs only when all configured guards pass.
   triggers:
