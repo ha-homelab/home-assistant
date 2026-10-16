@@ -1,3 +1,5 @@
+# Example device binding: the all-zero identifier is synthetic, not functional.
+# Preserve and supply this installation-specific file outside Git before deployment.
 # Media: Start the Plex Hub playlist from the Sailor button.
 # Stable entity: automation.sailor_switch.
 - id: ha_homelab_media_start_the_plex_hub_playlist_from_the_sailor_button
@@ -5,7 +7,7 @@
   description: Start the Plex Hub playlist from the Sailor button. Responds to the configured zha device
     button event.
   triggers:
-  - device_id: 67b851d430a4f4e5ac9f97bbd7224d50
+  - device_id: '00000000000000000000000000000000'
     domain: zha
     type: remote_button_short_press
     subtype: button_1

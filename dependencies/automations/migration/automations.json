@@ -522,10 +522,12 @@
         "actions",
         "mode"
       ],
-      "behavior_sha256": "407694f1daa36969736934254ac4eb4fac8570d9f14f4571058a6a78b294078e",
+      "behavior_sha256": "e0f862b82f9636a4c8388b00b9112f6ab602016dc9c8df870665377228a01a9e",
       "references": [
         "script.run_playlist_on_plex_hub"
-      ]
+      ],
+      "imported_behavior_sha256": "407694f1daa36969736934254ac4eb4fac8570d9f14f4571058a6a78b294078e",
+      "behavior_change": "2026-10-16: use an explicitly synthetic example device identifier; preserve the installed binding in an external deployment override."
     },
     {
       "order": 24,
@@ -3247,10 +3249,10 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "5ae0196c6dc698c780f77f3a70d8abf1d0863e9897ef180061f213b67703ca93",
+      "behavior_sha256": "2e0a1e90cda09e538cee256aecd130396d20e2f401bdd5e006d4a6295298abf2",
       "references": [],
       "imported_behavior_sha256": "4b78141fbb0b0866a7fb023e6519a4e6f248c960d87c9d0606a052f67a752fe6",
-      "behavior_change": "2026-10-06: suppress periodic Venus full-tree republishing, refresh the two expiring safety inputs with exact reads, and bootstrap on Home Assistant MQTT birth; skip overlapping periodic ticks to reserve a bounded queue slot for connection bootstrap."
+      "behavior_change": "2026-10-06: suppress periodic Venus full-tree republishing, refresh the two expiring safety inputs with exact reads, and bootstrap on Home Assistant MQTT birth; skip overlapping periodic ticks to reserve a bounded queue slot for connection bootstrap. 2026-10-16: use an explicitly synthetic example device identifier; preserve the installed binding in an external deployment override."
     },
     {
       "order": 119,

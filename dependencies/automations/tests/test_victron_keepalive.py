@@ -29,9 +29,9 @@ else:
 
 ROOT = Path(__file__).resolve().parents[1]
 RULE_PATH = ROOT / 'config' / '118_victron_keep_mqtt_telemetry_active.yaml'
-SERIAL = 'victron/R/b827ebea1ece/system/0/Serial'
-GRID = 'victron/R/b827ebea1ece/vebus/290/Ac/ActiveIn/Connected'
-BATTERY = 'victron/R/b827ebea1ece/system/0/Dc/Battery/Voltage'
+SERIAL = 'victron/R/000000000000/system/0/Serial'
+GRID = 'victron/R/000000000000/vebus/290/Ac/ActiveIn/Connected'
+BATTERY = 'victron/R/000000000000/system/0/Dc/Battery/Voltage'
 SUPPRESSED = {'keepalive-options': ['suppress-republish']}
 ENTITY_ID = 'automation.victron_mqtt_keep_alive'
 
