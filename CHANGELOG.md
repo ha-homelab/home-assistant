@@ -1,5 +1,21 @@
 # Portable library changelog
 
+## [0.1.2] - 2026-10-17
+
+### Changed
+
+- Move installation-specific device identifiers and notification endpoints out of bundled examples into explicit external bindings.
+- Reduce installation presentation metadata, use portable source references and correct script and runner guidance.
+- License the original configuration and cache package under MIT and add required source-security checks and maintenance policies.
+
+### Upgrade
+
+Install the exact notification-frame cache wheel or source archive into an isolated Python environment and keep the private cache directory explicit. Existing installations must provide their own external device and notification bindings when adopting the examples. Preserve existing private configuration and the previous package for rollback.
+
+### Security
+
+Published examples avoid installation-specific endpoints and identifiers; packages retain the existing allowlisted portable cache inventory. Synthetic validation does not establish live camera, notification-delivery or household deployment acceptance.
+
 ## [0.1.1] - 2026-10-14
 
 ### Changed
