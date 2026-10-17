@@ -12,7 +12,10 @@ current delivery status.
 
 ## Scope
 
-The source folder contains 54 scripts; the live instance also has scripts from other configuration sources. This repository does not replace those other sources.
+The initial import contains 54 script identities. There are now 50 active
+folder scripts; four retired identities remain in the registry and immutable
+source baseline for history. The live instance also has scripts from other
+configuration sources. This repository does not replace those other sources.
 
 ## `backdoormotion`
 
@@ -69,15 +72,16 @@ Stream the garage camera to the Chromecast; the legacy script key still contains
 - Source file: `scripts/cast.yaml`
 - Review note: The public script key is retained for callers; the actual source is camera.garage_camera.
 
-## `flash`
+## `flash` (retired)
 
-**Arc lamp: run ten-second flash**
+**Arc lamp: former ten-second flash**
 
-Turn the arc lamp on, wait ten seconds, then send its existing turn-off command with a short flash.
-
-- Entity: `script.flash`
-- File: [config/lighting/flash_arc_lamp.yaml](../config/lighting/flash_arc_lamp.yaml)
-- Source file: `scripts/flash.yaml`
+The legacy `script.flash` was retired on 2026-09-25 because its arc-lamp
+target was retired. It is absent from the deployable `config/` tree. The
+original identity and source remain in
+[`script-registry.json`](../contracts/script-registry.json) and
+[`source-baseline.json`](../contracts/source-baseline.json); the retirement
+reason is recorded in [`reviewed-runtime.json`](../contracts/reviewed-runtime.json).
 
 ## `frontmotion`
 

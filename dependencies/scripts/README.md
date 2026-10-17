@@ -89,7 +89,10 @@ This validator establishes repository and behavior-contract consistency. It does
 
 For a metadata cleanup, keep the executable baseline unchanged. A behavior change needs a focused review covering the actual caller, action target, expected before/after result, failure behavior, and rollback. Record approved execution changes in `contracts/reviewed-runtime.json`; preserve the original import baseline. Never regenerate either contract merely to make CI pass.
 
-This is a private operational repository. Credentials belong in the deployment's `secrets.yaml` or existing secret store and are referenced with `!secret`. No live credentials were required for this import, and source scripts and comments were checked against the local secret inventory before committing.
+These scripts are bundled in the public Home Assistant source repository.
+Deployment credentials belong in the installation's private `secrets.yaml` or
+existing secret store and are referenced with `!secret`. Keep runtime exports and
+private configuration outside Git; see [public source and private runtime](../../docs/public-source.md).
 
 ## Camera snapshot recovery
 
