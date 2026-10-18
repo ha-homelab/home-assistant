@@ -50,6 +50,18 @@ class SnapshotFilesTest(unittest.TestCase):
         self.commit(frames[-1])
         self.assertEqual(self.slots(), list(reversed(frames[1:])))
 
+    def test_published_snapshots_keep_owner_only_permissions(self):
+        frame = self.jpeg('red')
+        self.commit(frame)
+        paths = [self.directory / f'front_camera_alert{s}.jpg' for s in ('', '2', '3', '4')]
+        self.assertEqual([path.stat().st_mode & 0o777 for path in paths], [0o600] * 4)
+        # An unchanged capture also repairs snapshots produced by older versions.
+        for path in paths:
+            path.chmod(0o644)
+        self.commit(frame)
+        self.assertEqual([path.stat().st_mode & 0o777 for path in paths], [0o600] * 4)
+        self.assertEqual(self.slots(), [frame] * 4)
+
     def test_invalid_or_truncated_capture_keeps_all_four_good_images(self):
         frame = self.jpeg('red')
         self.commit(frame)
