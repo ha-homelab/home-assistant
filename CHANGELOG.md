@@ -1,5 +1,21 @@
 # Portable library changelog
 
+## [0.1.3] - 2026-10-18
+
+### Changed
+
+- Document the notification cache and host-side maintenance flow with updated architecture and operations guidance.
+- Preserve owner-only snapshot permissions in the source-only camera helper, including existing snapshots retained during rotation.
+- Publish the unchanged portable notification-frame cache implementation under a new reviewed source revision.
+
+### Upgrade
+
+Install the exact notification-frame cache wheel or source archive into an isolated Python environment, keep the private cache directory explicit, and preserve the previous package for rollback. The camera helper is excluded from these distribution assets: operators who adopt that source change must update their separately managed helper. Its snapshot contract assumes the helper and snapshot-serving process use the same operating-system owner. No household configuration or service is deployed by this release.
+
+### Security
+
+The source-only camera helper retains temporary files at mode 0600 and repairs a retained snapshot to owner-only permissions instead of preserving mode 0644. A focused regression covers snapshot rotation and its permissions. The portable package inventory and runtime behavior remain unchanged; it still excludes endpoint-bearing helpers, household configuration and private state. Offline tests do not establish live camera or notification-delivery acceptance.
+
 ## [0.1.2] - 2026-10-17
 
 ### Changed

@@ -48,7 +48,8 @@ def atomic_write(path, data):
             output.write(data)
             output.flush()
             os.fsync(output.fileno())
-        os.chmod(temporary, 0o644)
+        # Home Assistant launches this helper and serves /local/ as the same
+        # owner. Keep mkstemp's private mode; other OS users need no access.
         os.replace(temporary, path)
     finally:
         Path(temporary).unlink(missing_ok=True)
@@ -89,10 +90,12 @@ def run(operation, key, directory=Path('/config/www')):
             if previous[index] == payload:
                 # Preserve successful-capture freshness without rewriting and
                 # fsyncing the same JPEG (or changing its inode) on every event.
+                path.chmod(0o600)
                 os.utime(path)
             else:
                 atomic_write(path, payload)
         if previous[0] == current:
+            slots[0].chmod(0o600)
             os.utime(slots[0])
         else:
             atomic_write(slots[0], current)
