@@ -1,5 +1,7 @@
 # Public source and private runtime
 
+For the illustrated workflow and evidence limits, see the [visual guide](process-and-evidence.md).
+
 This repository starts with a fresh source snapshot. Earlier Git history, pull
 requests, workflow logs and deployment records remain in the private predecessor;
 they are not imported into this repository. Historical runbooks describe earlier
