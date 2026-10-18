@@ -19,6 +19,7 @@ FILES = (
     "pyproject.toml",
     "docs/notification-frame-cache.md",
     "config/housekeeping/notification_frame_cache.py",
+    "LICENSE",
 )
 PACKAGE = "ha-notification-frame-cache"
 
