@@ -6,6 +6,28 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# Exact reviewed expressions prevent changing trust conditions or pool roles.
+CI_RUNNER = (
+    "${{ fromJSON((vars.CI_RUNNER_MODE == 'self-hosted' || vars.CI_RUNNER_MODE == "
+    "'k3s') && ((github.event_name == 'pull_request' && "
+    'github.event.pull_request.head.repo.full_name == github.repository) || '
+    '(contains(fromJSON(\'["push","schedule","workflow_dispatch"]\'), github.event_name) '
+    "&& github.ref == format('refs/heads/{0}', "
+    "github.event.repository.default_branch))) && (vars.CI_RUNNER_LABELS || '[]') || "
+    '\'["ubuntu-latest"]\') }}'
+)
+AUTOMATION_RUNNER = (
+    "${{ fromJSON((vars.CI_RUNNER_MODE == 'self-hosted' || vars.CI_RUNNER_MODE == "
+    "'k3s') && (github.event_name == 'workflow_run' && github.ref == "
+    "format('refs/heads/{0}', github.event.repository.default_branch) && "
+    "github.event.workflow_run.name == 'Quality gate' && "
+    "github.event.workflow_run.event == 'pull_request' && "
+    "github.event.workflow_run.status == 'completed' && "
+    "github.event.workflow_run.conclusion == 'success' && "
+    'github.event.workflow_run.head_repository.full_name == github.repository) && '
+    '(vars.CI_RUNNER_AUTOMATION_LABELS || \'[]\') || \'["ubuntu-24.04"]\') }}'
+)
+
 
 class RunnerBoundaryTests(unittest.TestCase):
     def test_public_jobs_preserve_scoped_runner_and_token_boundaries(self):
@@ -53,8 +75,10 @@ class RunnerBoundaryTests(unittest.TestCase):
                             self.assertEqual(job['uses'], calls[(path.name, name)])
                         continue
                     if path.name == 'codeql.yml':
-                        self.assertEqual(job['runs-on'], 'ubuntu-latest')
-                    elif path.name in {'ci.yml', 'auto-approve.yml'}:
+                        self.assertEqual(job['runs-on'], CI_RUNNER)
+                    elif path.name == 'auto-approve.yml':
+                        self.assertEqual(job['runs-on'], AUTOMATION_RUNNER)
+                    elif path.name == 'ci.yml':
                         self.assertEqual(job['runs-on'], 'ubuntu-24.04')
                     else:
                         runner = job['runs-on']
