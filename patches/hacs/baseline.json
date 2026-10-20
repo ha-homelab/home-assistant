@@ -1,0 +1,8 @@
+{
+  "upstream_repository": "https://github.com/hacs/integration",
+  "upstream_version": "2.0.5",
+  "upstream_commit": "c0dfd8b44297c3673c21973e2539375a53687a9c",
+  "path": "custom_components/hacs/update.py",
+  "original_sha256": "0b85cdca94d1b7cade7a89cfe00c165e5b2ab8d240123b48c2e66f0a7d66b1c0",
+  "patched_sha256": "d4be7478d4b3b364b9cfbd9534f23dabd8434a3008bb476d2aa2890b9dd496f8"
+}
