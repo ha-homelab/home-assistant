@@ -10,7 +10,7 @@ from unittest.mock import AsyncMock
 from tools.patch_hacs_release_notes import patch
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = (ROOT / "tests/fixtures/hacs/update.py").read_text()
+SOURCE = (ROOT / "tests/fixtures/hacs/update.py.txt").read_text()
 
 
 def release(tag, body):

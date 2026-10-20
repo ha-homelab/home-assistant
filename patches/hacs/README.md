@@ -17,7 +17,7 @@ instead of substituting notes from a different version.
 - [Behavior tests](../../tests/test_hacs_release_notes.py): run the actual patched
   method with synthetic releases, including stable/beta selection, an up-to-date
   installation, missing notes, and unrelated repositories.
-- [Pinned upstream test fixture](../../tests/fixtures/hacs/update.py), from
+- [Pinned upstream test fixture](../../tests/fixtures/hacs/update.py.txt), from
   [HACS 2.0.5](https://github.com/hacs/integration/blob/c0dfd8b44297c3673c21973e2539375a53687a9c/custom_components/hacs/update.py),
   distributed under its [MIT license](../../tests/fixtures/hacs/LICENSE).
 
