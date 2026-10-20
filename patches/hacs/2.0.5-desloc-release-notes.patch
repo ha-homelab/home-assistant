@@ -1,0 +1,26 @@
+--- a/custom_components/hacs/update.py
++++ b/custom_components/hacs/update.py
+@@ -106,8 +106,21 @@
+                 self.repository.data.last_version = next(iter(self.repository.data.published_tags))
+ 
+         release_notes = ""
+-        # Compile release notes from installed version up to the latest
+-        if self.installed_version in self.repository.data.published_tags:
++        # ha-homelab: keep DESLOC's update dialog limited to its offered release.
++        if self.repository.data.full_name == "ha-homelab/ha-desloc":
++            latest = next(
++                (release for release in self.repository.releases.objects
++                 if release.tag_name == self.latest_version),
++                None,
++            )
++            if latest is not None:
++                release_notes = f"# {latest.tag_name}\n\n{latest.body or ''}\n\n"
++            release_notes += (
++                "[Full release history]"
++                "(https://github.com/ha-homelab/ha-desloc/releases)\n\n"
++            )
++        # Preserve HACS behavior for all other repositories.
++        elif self.installed_version in self.repository.data.published_tags:
+             for release in self.repository.releases.objects:
+                 if release.tag_name == self.installed_version:
+                     break
