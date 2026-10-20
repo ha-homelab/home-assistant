@@ -19,6 +19,10 @@
         - binary_sensor.rf_lobby_motion
       target_entities:
       - switch.dining_wall_light_2
+      target_sticky_helpers:
+        switch.dining_wall_light_2:
+        - input_boolean.dining_room_sticky
+        - input_boolean.lobby_sticky
       guards:
       - condition: template
         value_template: '{{ state_attr("sun.sun", "elevation") < 0.20 }}'

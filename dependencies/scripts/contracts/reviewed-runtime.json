@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "change": "2026-09-22 runtime resilience audit; 2026-09-23 owner retired the LocalTuya TV power switch; 2026-09-23 validated camera snapshot capture; 2026-09-24 confirmed entity references; 2026-09-25 owner-retired lights; 2026-10-02 owner moved the Home Assistant public origin from h2 to h7; 2026-10-07 owner renamed five ZHA garage bulbs and included the fifth in household shutdown; 2026-10-10 Bath2 migrated from the old Tuya light to the ESPHome relay; 2026-10-10 owner retired the former Studio wall-lamp role after moving the controller to Dining Arc lamp; remove only its old household shutdown target; 2026-10-10 Kitchen ESPHome migration: retain both lighting targets using their switch entities and generic homeassistant.turn_off for the mixed list; preserve the remaining sequence. 2026-10-10: add the relocated Matter Bedroom Lamp to household shutdown; preserve every other target and the iNew shutdown helper. 2026-10-10: the owner repurposed the second KMC audio output as Living lamp; retain it in household shutdown using switch.living_lamp, leaving all other targets and failure handling unchanged. 2026-10-10: remove only the first KMC former Fireplace and Stage LED targets from household shutdown after reassignment to water equipment power and Laundry; do not substitute the new power controls. 2026-10-11: owner retired Sockets behind fireplace two; remove its three obsolete shutdown targets, preserving all other targets, error handling and host shutdown. Public source migration: tv_pic uses the configured input_text.base_url; historical URL samples use example.invalid.",
+  "change": "2026-09-22 runtime resilience audit; 2026-09-23 owner retired the LocalTuya TV power switch; 2026-09-23 validated camera snapshot capture; 2026-09-24 confirmed entity references; 2026-09-25 owner-retired lights; 2026-10-02 owner moved the Home Assistant public origin from h2 to h7; 2026-10-07 owner renamed five ZHA garage bulbs and included the fifth in household shutdown; 2026-10-10 Bath2 migrated from the old Tuya light to the ESPHome relay; 2026-10-10 owner retired the former Studio wall-lamp role after moving the controller to Dining Arc lamp; remove only its old household shutdown target; 2026-10-10 Kitchen ESPHome migration: retain both lighting targets using their switch entities and generic homeassistant.turn_off for the mixed list; preserve the remaining sequence. 2026-10-10: add the relocated Matter Bedroom Lamp to household shutdown; preserve every other target and the iNew shutdown helper. 2026-10-10: the owner repurposed the second KMC audio output as Living lamp; retain it in household shutdown using switch.living_lamp, leaving all other targets and failure handling unchanged. 2026-10-10: remove only the first KMC former Fireplace and Stage LED targets from household shutdown after reassignment to water equipment power and Laundry; do not substitute the new power controls. 2026-10-11: owner retired Sockets behind fireplace two; remove its three obsolete shutdown targets, preserving all other targets, error handling and host shutdown. Public source migration: tv_pic uses the configured input_text.base_url; historical URL samples use example.invalid. 2026-10-20: the legacy backdoor motion pulse checks Porch Sticky immediately before each light command, including delayed dimming and final shutdown; notification delivery remains unchanged.",
   "scripts": {
     "tv_pic2": {
       "alias": "Living room TV: notify with front-camera snapshot",
@@ -300,6 +300,11 @@
           }
         },
         {
+          "condition": "state",
+          "entity_id": "input_boolean.porch_sticky",
+          "state": "off"
+        },
+        {
           "service": "light.turn_on",
           "entity_id": "light.backdoor_porch",
           "data": {
@@ -320,6 +325,11 @@
             ],
             "sequence": [
               {
+                "condition": "state",
+                "entity_id": "input_boolean.porch_sticky",
+                "state": "off"
+              },
+              {
                 "action": "light.turn_on",
                 "target": {
                   "entity_id": "light.backdoor_porch"
@@ -335,6 +345,11 @@
           }
         },
         {
+          "condition": "state",
+          "entity_id": "input_boolean.porch_sticky",
+          "state": "off"
+        },
+        {
           "service": "light.turn_on",
           "entity_id": "light.backdoor_porch",
           "data": {
@@ -343,6 +358,11 @@
         },
         {
           "delay": "00:00:05"
+        },
+        {
+          "condition": "state",
+          "entity_id": "input_boolean.porch_sticky",
+          "state": "off"
         },
         {
           "service": "light.turn_off",

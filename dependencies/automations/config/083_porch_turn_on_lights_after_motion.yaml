@@ -19,18 +19,28 @@
     entity_id: input_boolean.porch_sticky
     state: 'off'
   actions:
-  - service: light.turn_on
-    entity_id: light.porch_one
-    continue_on_error: true
-    data_template:
-      brightness: '{{ 100 if now().strftime("%H")|int < 16 or now().strftime("%H")|int > 22 else 100 }}'
-      transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'
-  - service: light.turn_on
-    entity_id: light.porch_two
-    continue_on_error: true
-    data_template:
-      brightness: '{{ 100 if now().strftime("%H")|int < 16 or now().strftime("%H")|int > 22 else 100 }}'
-      transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'
+  - if:
+    - condition: state
+      entity_id: input_boolean.porch_sticky
+      state: 'off'
+    then:
+    - service: light.turn_on
+      entity_id: light.porch_one
+      continue_on_error: true
+      data_template:
+        brightness: '{{ 100 if now().strftime("%H")|int < 16 or now().strftime("%H")|int > 22 else 100 }}'
+        transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'
+  - if:
+    - condition: state
+      entity_id: input_boolean.porch_sticky
+      state: 'off'
+    then:
+    - service: light.turn_on
+      entity_id: light.porch_two
+      continue_on_error: true
+      data_template:
+        brightness: '{{ 100 if now().strftime("%H")|int < 16 or now().strftime("%H")|int > 22 else 100 }}'
+        transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'
   mode: single
   trace:
     stored_traces: 5

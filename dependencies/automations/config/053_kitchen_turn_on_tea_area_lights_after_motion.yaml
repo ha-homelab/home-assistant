@@ -15,8 +15,13 @@
     entity_id: input_boolean.kitchen_sticky
     state: 'off'
   actions:
-  - service: switch.turn_on
-    entity_id: switch.tea_table
+  - if:
+    - condition: state
+      entity_id: input_boolean.kitchen_sticky
+      state: 'off'
+    then:
+    - service: switch.turn_on
+      entity_id: switch.tea_table
   mode: single
   trace:
     stored_traces: 5

@@ -38,6 +38,10 @@ class IndependentDeviceRecoveryTest(unittest.IsolatedAsyncioTestCase):
         for domain in ['light', 'switch']:
             self.hass.services.async_register(domain, 'turn_on', self.turn_on)
         self.hass.services.async_register('script', 'notify_mqtt_log', self.notify)
+        # Device-failure scenarios require automatic lighting to be allowed,
+        # including the other room's override for each shared light.
+        for room in ('dining_room', 'lobby', 'hallway', 'mishka_room', 'porch'):
+            self.set(f'input_boolean.{room}_sticky', 'off')
         await self.hass.async_start()
         await self.hass.async_block_till_done()
 

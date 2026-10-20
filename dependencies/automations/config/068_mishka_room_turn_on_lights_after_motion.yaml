@@ -16,11 +16,19 @@
     entity_id: input_boolean.mishka_room_sticky
     state: 'off'
   actions:
-  - service: light.turn_on
-    entity_id: light.hall_2_m
-    data_template:
-      brightness: '{{ 15 if now().strftime("%H")|int < 16 or now().strftime("%H")|int > 22 else 255 }}'
-      transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'
+  - if:
+    - condition: state
+      entity_id: input_boolean.hallway_sticky
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.mishka_room_sticky
+      state: 'off'
+    then:
+    - service: light.turn_on
+      entity_id: light.hall_2_m
+      data_template:
+        brightness: '{{ 15 if now().strftime("%H")|int < 16 or now().strftime("%H")|int > 22 else 255 }}'
+        transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'
   mode: single
   trace:
     stored_traces: 5

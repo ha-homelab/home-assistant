@@ -18,8 +18,13 @@
     entity_id: input_boolean.bedroom_sticky
     state: 'off'
   actions:
-  - service: light.turn_on
-    entity_id: light.bedroom_lamp
+  - if:
+    - condition: state
+      entity_id: input_boolean.bedroom_sticky
+      state: 'off'
+    then:
+    - service: light.turn_on
+      entity_id: light.bedroom_lamp
   mode: single
   trace:
     stored_traces: 5

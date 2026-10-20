@@ -13,8 +13,13 @@
     entity_id: input_boolean.bathroom_sticky
     state: 'off'
   actions:
-  - service: switch.turn_on
-    entity_id: switch.bath2
+  - if:
+    - condition: state
+      entity_id: input_boolean.bathroom_sticky
+      state: 'off'
+    then:
+    - service: switch.turn_on
+      entity_id: switch.bath2
   mode: single
   trace:
     stored_traces: 5

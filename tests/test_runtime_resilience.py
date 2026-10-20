@@ -901,6 +901,8 @@ class RuntimeResilienceTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_refactored_script_sequences_preserve_commands_and_delays(self):
         self.source_script('backdoormotion')  # Require the private dependency.
+        # Compare the allowed lighting sequence; sticky behavior has separate tests.
+        self.hass.states.async_set('input_boolean.porch_sticky', 'off')
         baseline = json.loads((ROOT / 'dependencies/scripts/contracts/source-baseline.json').read_text())['scripts']
         for name in ['backdoormotion']:
             with self.subTest(script=name), patch('homeassistant.util.dt.now', return_value=datetime(2026, 9, 22, 21, tzinfo=timezone.utc)):

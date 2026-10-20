@@ -1,5 +1,9 @@
 # Motion-light timeout recovery
 
+Room overrides also cover activation and dimming. See
+[Motion lighting overrides](motion-light-sticky.md) for shared-light ownership,
+action-time checks and the existing morning reset schedule.
+
 The shared `config/blueprints/automation/ha_homelab/motion_light_off.yaml`
 blueprint controls 11 motion-timeout rules covering 14 distinct lights and
 lighting switches. Instances in `dependencies/automations` supply their motion

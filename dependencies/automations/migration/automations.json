@@ -236,7 +236,7 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "4f0359c51b0ecb116ccc821dc51eb8ceefdb58d072c8f02ddfc5e420808149df",
+      "behavior_sha256": "0ad9d3507583e65a0703f2e2d01fa0d68c496a2c9854f57ab0f88e9e4cfd97b6",
       "references": [
         "binary_sensor.rf_restroom_one_motion",
         "input_boolean.bathroom_sticky",
@@ -244,7 +244,11 @@
         "light.turn_on"
       ],
       "imported_behavior_sha256": "c679d0a878e736e3b09df14ad459c5a400d2beac7d2215bff74d13836334609a",
-      "behavior_change": "; 2026-09-22: owner-approved retirement of missing entities; TV guards use the same local Tuya device/channel."
+      "behavior_change": {
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "previous_change": "; 2026-09-22: owner-approved retirement of missing entities; TV guards use the same local Tuya device/channel."
+      }
     },
     {
       "order": 16,
@@ -333,7 +337,7 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "50b5f0976134b240a2dde43386648e20192edc20d70993a43a6f40bdabf1bad5",
+      "behavior_sha256": "cd0acd49aada5c44f0e7529ac8255d7e15e5f8bc7a3539d25fb450e66aa5fd4d",
       "references": [
         "binary_sensor.rf_studio_motion",
         "input_boolean.bathroom_sticky",
@@ -342,8 +346,12 @@
       ],
       "imported_behavior_sha256": "29811aab962cfd58bab039e5fa4e43c1ce65de9d157c6b6e942b3774a4072d12",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities."
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "previous_change": {
+          "date": "2026-10-10",
+          "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities."
+        }
       }
     },
     {
@@ -448,7 +456,7 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "019303410b93d22549e912e7f205c52e6f9eb4ae62cfbbd4d9445f838cb90cef",
+      "behavior_sha256": "ba038772cca74cd1ca1898cd940cab851cf2f2d8f48416c7d69db96d6170d298",
       "references": [
         "binary_sensor.rf_bedroom_motion",
         "input_boolean.bedroom_sticky",
@@ -465,9 +473,13 @@
         }
       },
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Restore bedroom motion with its original sensor, solar/time guards, three-minute delay and sticky override, targeting the relocated Matter Bedroom Lamp. Include that lamp in both requested shutdown scenarios and remove only its former dining motion action.",
-        "previous_change": null
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "previous_change": {
+          "date": "2026-10-10",
+          "reason": "Restore bedroom motion with its original sensor, solar/time guards, three-minute delay and sticky override, targeting the relocated Matter Bedroom Lamp. Include that lamp in both requested shutdown scenarios and remove only its former dining motion action.",
+          "previous_change": null
+        }
       },
       "imported_behavior_sha256": "b0b300d6bf6271ff623c66f0f2c6062ff83b8cd150f4509f12bc5054961a688a"
     },
@@ -747,31 +759,36 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "06fe2218ff1335f74e319627033ec4089de58a7cac7009535c6d8b66cd60040e",
+      "behavior_sha256": "2b8b72cc6052ef86bb5f8e589805505f7320b044d5f2db67099b4e441742f488",
       "references": [
         "binary_sensor.rf_dinner_motion",
         "binary_sensor.rf_dinner_motion_two",
         "input_boolean.dining_room_sticky",
+        "input_boolean.lobby_sticky",
         "light.adining_lamp_m",
         "light.dining_lights_dimmer_l",
         "light.turn_off",
         "script.notify_mqtt_log",
         "sun.sun",
+        "switch.dining_arc_lamp",
         "switch.dining_wall_light_2",
-        "switch.turn_off",
-        "switch.dining_arc_lamp"
+        "switch.turn_off"
       ],
       "imported_behavior_sha256": "2e710cffb943aa8c788b0359168df859c4aabf30b7e76d80fc88363928479d32",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
         "previous_change": {
           "date": "2026-10-10",
-          "reason": "Add Dining Arc lamp to the existing Dining room wall-light motion on/off pair. Preserve sensors, sun guards, dining sticky override, five-minute off delay, recovery behavior, and all current targets.",
+          "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
           "previous_change": {
-            "date": "2026-09-24",
-            "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged.",
-            "previous_change": "2026-09-22 motion-light availability recovery; 2026-09-22 runtime resilience audit"
+            "date": "2026-10-10",
+            "reason": "Add Dining Arc lamp to the existing Dining room wall-light motion on/off pair. Preserve sensors, sun guards, dining sticky override, five-minute off delay, recovery behavior, and all current targets.",
+            "previous_change": {
+              "date": "2026-09-24",
+              "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged.",
+              "previous_change": "2026-09-22 motion-light availability recovery; 2026-09-22 runtime resilience audit"
+            }
           }
         }
       }
@@ -797,11 +814,12 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "2b59c07d01e73688d48dfb6a75523db9de7f03ea7daa29105e7934cc8e4464fe",
+      "behavior_sha256": "2050d37739c6ea746dcee0cf831e8a631b60bd1aed426f7345fdfe04c8aa0ee4",
       "references": [
         "binary_sensor.rf_dinner_motion",
         "binary_sensor.rf_dinner_motion_two",
         "input_boolean.dining_room_sticky",
+        "input_boolean.lobby_sticky",
         "light.adining_lamp_m",
         "light.turn_on",
         "script.notify_mqtt_log",
@@ -812,18 +830,22 @@
       ],
       "imported_behavior_sha256": "614f8816247fd14abce3c770d2bfe5976616f0c654259492d58682a1ee7cbc93",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Restore bedroom motion with its original sensor, solar/time guards, three-minute delay and sticky override, targeting the relocated Matter Bedroom Lamp. Include that lamp in both requested shutdown scenarios and remove only its former dining motion action.",
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
         "previous_change": {
           "date": "2026-10-10",
-          "reason": "Add Dining Arc lamp to the existing Dining room wall-light motion on/off pair. Preserve sensors, sun guards, dining sticky override, five-minute off delay, recovery behavior, and all current targets.",
+          "reason": "Restore bedroom motion with its original sensor, solar/time guards, three-minute delay and sticky override, targeting the relocated Matter Bedroom Lamp. Include that lamp in both requested shutdown scenarios and remove only its former dining motion action.",
           "previous_change": {
-            "date": "2026-09-28",
-            "reason": "Continue to independent room lighting targets after a device service failure; preserve action order, targets, payloads, triggers and guards.",
+            "date": "2026-10-10",
+            "reason": "Add Dining Arc lamp to the existing Dining room wall-light motion on/off pair. Preserve sensors, sun guards, dining sticky override, five-minute off delay, recovery behavior, and all current targets.",
             "previous_change": {
-              "date": "2026-09-24",
-              "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged.",
-              "previous_change": "2026-09-22 runtime resilience audit"
+              "date": "2026-09-28",
+              "reason": "Continue to independent room lighting targets after a device service failure; preserve action order, targets, payloads, triggers and guards.",
+              "previous_change": {
+                "date": "2026-09-24",
+                "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged.",
+                "previous_change": "2026-09-22 runtime resilience audit"
+              }
             }
           }
         }
@@ -919,16 +941,23 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "451aff703e76c706420579917d8ff3c04c2c6c0c71c21bc923b8edf048687380",
+      "behavior_sha256": "6808ce9623bc8a99665a0828ada491b1c4264feb0aa27634e695cdfb1b130db2",
       "references": [
         "binary_sensor.rf_hallway_motion",
         "binary_sensor.rf_hallway_two_motion",
         "input_boolean.hallway_sticky",
+        "input_boolean.mishka_room_sticky",
         "light.hall_1_m",
         "light.hall_2_m",
         "light.turn_on",
         "sun.sun"
-      ]
+      ],
+      "imported_behavior_sha256": "451aff703e76c706420579917d8ff3c04c2c6c0c71c21bc923b8edf048687380",
+      "behavior_change": {
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "previous_change": null
+      }
     },
     {
       "order": 38,
@@ -951,11 +980,12 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "629cb20641a2fbabb838d98f459d87968a78c85d032c9219e4b68e324e953919",
+      "behavior_sha256": "5602e058d0465d0cb7a92a9c415802fc1a6d6807dd8b3e749a227ce149fd79bb",
       "references": [
         "binary_sensor.rf_hallway_motion",
         "binary_sensor.rf_hallway_two_motion",
         "input_boolean.hallway_sticky",
+        "input_boolean.mishka_room_sticky",
         "light.hall_1_m",
         "light.hall_2_m",
         "light.turn_off",
@@ -963,9 +993,13 @@
       ],
       "imported_behavior_sha256": "8bb136dc967026ef2c22357cd9c555da84ed42cf50813a4c49751b1cda46c321",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
-        "previous_change": "2026-09-22 motion-light availability recovery"
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "previous_change": {
+          "date": "2026-10-10",
+          "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
+          "previous_change": "2026-09-22 motion-light availability recovery"
+        }
       }
     },
     {
@@ -1014,11 +1048,12 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "a677499ae107c85809623593c71fe60062ee66128809b4d9f25bbbe84596de38",
+      "behavior_sha256": "5815370febcd39000a0addb5e12ea7dd4264a5ec4c2653a82b4f604f48f7194d",
       "references": [
         "binary_sensor.rf_hallway_motion",
         "binary_sensor.rf_hallway_two_motion",
         "input_boolean.hallway_sticky",
+        "input_boolean.mishka_room_sticky",
         "light.hall_1_m",
         "light.hall_2_m",
         "light.turn_on",
@@ -1027,9 +1062,13 @@
       ],
       "imported_behavior_sha256": "2f3338d15465f0582db5a6d662498932477babdb2bbe25387ffa935395c7b19e",
       "behavior_change": {
-        "date": "2026-09-28",
-        "reason": "Continue to independent room lighting targets after a device service failure; preserve action order, targets, payloads, triggers and guards.",
-        "previous_change": "2026-09-22 runtime resilience audit"
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "previous_change": {
+          "date": "2026-09-28",
+          "reason": "Continue to independent room lighting targets after a device service failure; preserve action order, targets, payloads, triggers and guards.",
+          "previous_change": "2026-09-22 runtime resilience audit"
+        }
       }
     },
     {
@@ -1160,7 +1199,7 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "d33da768a3257707d5d8d50042cf98eff31fe2345536f74b9adaa6d20a1ce653",
+      "behavior_sha256": "d598f9855460a2c84c35d271b54ebd28a482b4fce9c6646ee59c6a4aadd8bb24",
       "references": [
         "binary_sensor.rf_counter_motion",
         "binary_sensor.rf_tea_motion",
@@ -1172,9 +1211,13 @@
       ],
       "imported_behavior_sha256": "a04868e10a1ee8d069e5d222826b8fb5b505e7189d3612c02122a2e9ad59b2ba",
       "behavior_change": {
-        "date": "2026-09-24",
-        "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
-        "previous_change": "2026-09-22 runtime resilience audit"
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "previous_change": {
+          "date": "2026-09-24",
+          "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
+          "previous_change": "2026-09-22 runtime resilience audit"
+        }
       }
     },
     {
@@ -1198,7 +1241,7 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "892498231e64335df28d2d6065dd1ab31a87831df498a5deada5536ebb6b3574",
+      "behavior_sha256": "55f809f9ab88591b4616c3b8c4691ccc5a60c627b2d9f2a24866c9656df8f166",
       "references": [
         "group.kitchen_motion",
         "input_boolean.kitchen_sticky",
@@ -1208,7 +1251,11 @@
         "sun.sun"
       ],
       "imported_behavior_sha256": "63270a84c9763521a64a2ad0af03f0f827116a1cd206b24a2f17c045f5ee9454",
-      "behavior_change": "2026-09-22 runtime resilience audit"
+      "behavior_change": {
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "previous_change": "2026-09-22 runtime resilience audit"
+      }
     },
     {
       "order": 47,
@@ -1332,7 +1379,7 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "e715aac928f608b486e3797362a7d1abdebc4cad0151388f5ce09f569a2b666f",
+      "behavior_sha256": "86cd972abd4dd0967574ec1fc915108ffea0cca7f66d094d63970082a6c8ebca",
       "references": [
         "binary_sensor.rf_counter_motion",
         "input_boolean.kitchen_sticky",
@@ -1342,12 +1389,16 @@
       ],
       "imported_behavior_sha256": "862404e8c2400e985c92ba49e33841611d14b3175a9441af6e1b81dbae336f52",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
         "previous_change": {
-          "date": "2026-09-24",
-          "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
-          "previous_change": "2026-09-22 runtime resilience audit"
+          "date": "2026-10-10",
+          "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
+          "previous_change": {
+            "date": "2026-09-24",
+            "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
+            "previous_change": "2026-09-22 runtime resilience audit"
+          }
         }
       }
     },
@@ -1448,7 +1499,7 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "765af44028219a3432bba8d4c98770565317ea67e6f3f774c3e18e0908cf7c27",
+      "behavior_sha256": "515bea93639a65d83eb2cff3fea7190e9ab4945c417935038409bc92ba48d5dd",
       "references": [
         "binary_sensor.rf_tea_motion",
         "input_boolean.kitchen_sticky",
@@ -1458,12 +1509,16 @@
       ],
       "imported_behavior_sha256": "4451c5e928b8690f246d81f6f43aa7541cae8b2034714031dd80e194b46171ec",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
         "previous_change": {
-          "date": "2026-09-24",
-          "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
-          "previous_change": null
+          "date": "2026-10-10",
+          "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
+          "previous_change": {
+            "date": "2026-09-24",
+            "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
+            "previous_change": null
+          }
         }
       }
     },
@@ -1531,9 +1586,10 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "124a58766fefe22df5231d88d43752f058c24e9f1e6747d236d4dce9025d3a84",
+      "behavior_sha256": "0ab4a3e95f74f232f0f4ea0d5695ba3fb48eb176681db3cc55491e82d11be26e",
       "references": [
         "binary_sensor.rf_lobby_motion",
+        "input_boolean.dining_room_sticky",
         "input_boolean.lobby_sticky",
         "sun.sun",
         "switch.dining_wall_light_2",
@@ -1541,9 +1597,13 @@
       ],
       "imported_behavior_sha256": "9e24fef098ba921ed2e0b74252d4dadf50306637be94cdba2eebc8d5da899cfc",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
-        "previous_change": "2026-09-22 motion-light availability recovery"
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "previous_change": {
+          "date": "2026-10-10",
+          "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
+          "previous_change": "2026-09-22 motion-light availability recovery"
+        }
       }
     },
     {
@@ -1567,14 +1627,21 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "60218c54fb9143c0329aa5992ad581e94f941c95db9aad120ed16e5e2bead769",
+      "behavior_sha256": "e898e40d0471ab9f0b83be8900955a274a250e56d5159781f0901512d506ce77",
       "references": [
         "binary_sensor.rf_lobby_motion",
+        "input_boolean.dining_room_sticky",
         "input_boolean.lobby_sticky",
         "sun.sun",
         "switch.dining_wall_light_2",
         "switch.turn_on"
-      ]
+      ],
+      "imported_behavior_sha256": "60218c54fb9143c0329aa5992ad581e94f941c95db9aad120ed16e5e2bead769",
+      "behavior_change": {
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "previous_change": null
+      }
     },
     {
       "order": 65,
@@ -1620,17 +1687,22 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "44c9e42216e4a113c5271462212aaff9d00c44b6df100377d31fa8cd99697054",
+      "behavior_sha256": "8cb790627ab02e4408a3b1d30c8f20516e462dd82fd4ee1fdccaca971b3a053f",
       "references": [
         "binary_sensor.rf_mishka_motion",
+        "input_boolean.hallway_sticky",
         "input_boolean.mishka_room_sticky",
         "light.hall_2_m",
         "light.turn_on"
       ],
       "imported_behavior_sha256": "96900fc2831d12116487e1ba8a82f49ef7346367504ac323dc057336720b513c",
       "behavior_change": {
-        "date": "2026-09-24",
-        "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged."
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "previous_change": {
+          "date": "2026-09-24",
+          "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged."
+        }
       }
     },
     {
@@ -2262,7 +2334,7 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "fa83fdba645b4bd4cba6545eaba70d392ba5734567db090aa5f715faaf0b88db",
+      "behavior_sha256": "d4583172470bb0ad4f96161de5d0a9f75b4d7a85cda6d7e1cf1111ffedf35709",
       "references": [
         "binary_sensor.rf_porch_one_motion",
         "binary_sensor.rf_porch_two_motion",
@@ -2274,8 +2346,12 @@
       ],
       "imported_behavior_sha256": "59f7186bec14517502968fa1cd72a87acc2485dbf716cf192424ecd5a3c8e147",
       "behavior_change": {
-        "date": "2026-09-28",
-        "reason": "Continue to independent room lighting targets after a device service failure; preserve action order, targets, payloads, triggers and guards."
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "previous_change": {
+          "date": "2026-09-28",
+          "reason": "Continue to independent room lighting targets after a device service failure; preserve action order, targets, payloads, triggers and guards."
+        }
       }
     },
     {
@@ -2952,7 +3028,7 @@
         "conditions",
         "action"
       ],
-      "behavior_sha256": "d1888138db59463fe3b221af4714d348b8be23073e6124845206021663104cde",
+      "behavior_sha256": "240ad0c6fa63dc00e8706bcc9ef48bd6aea7e2c42031b4edb3b4c048c0e326da",
       "references": [
         "binary_sensor.rf_dinner_motion",
         "binary_sensor.rf_dinner_two_motion",
@@ -2964,12 +3040,16 @@
       ],
       "imported_behavior_sha256": "28b6ba6f4e969ff4cffefa729802298ad40f68d8d8eded1689207a9aa7eeeb64",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Restore the converted Dining Media guard to dining-room motion. Run its isolated turn-on action before legacy device actions so their failures cannot block it, and continue if the media relay itself fails. Preserve existing triggers, living-room sticky guard, legacy actions and curtain behavior. The root HA package separately handles media-only evening power-off using the owner-selected Living lamp.",
+        "date": "2026-10-20",
+        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
         "previous_change": {
           "date": "2026-10-10",
-          "reason": "Remove only the retired Dining guard 2 action from the mixed motion automation. Preserve fireplace and Living guard 2 actions and do not turn on the new curtain supply from motion.",
-          "previous_change": null
+          "reason": "Restore the converted Dining Media guard to dining-room motion. Run its isolated turn-on action before legacy device actions so their failures cannot block it, and continue if the media relay itself fails. Preserve existing triggers, living-room sticky guard, legacy actions and curtain behavior. The root HA package separately handles media-only evening power-off using the owner-selected Living lamp.",
+          "previous_change": {
+            "date": "2026-10-10",
+            "reason": "Remove only the retired Dining guard 2 action from the mixed motion automation. Preserve fireplace and Living guard 2 actions and do not turn on the new curtain supply from motion.",
+            "previous_change": null
+          }
         }
       }
     },
@@ -3059,7 +3139,7 @@
               "reason": "The first KMC now supplies Moen Flo monitor power, pump power enable and Laundry. Remove its old lighting actions without substituting new power controls; update notification-only references. Preserve all other actions, guards and timing.",
               "previous_change": {
                 "date": "2026-10-10",
-                "reason": "Follow the owner-assigned Recliner role on the second KMC first physical output; preserve the already-live Flare mapping from the first KMC migration. Keep all other notification targets, triggers, conditions and delivery behavior unchanged. Old standalone roles remain registered as Switch01\u201303 and are not control targets.",
+                "reason": "Follow the owner-assigned Recliner role on the second KMC first physical output; preserve the already-live Flare mapping from the first KMC migration. Keep all other notification targets, triggers, conditions and delivery behavior unchanged. Old standalone roles remain registered as Switch01–03 and are not control targets.",
                 "previous_change": {
                   "date": "2026-10-10",
                   "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
@@ -3179,7 +3259,7 @@
       "id": "ha_homelab_heating_lower_a_sustained_high_thermostat_setpoint",
       "previous_metadata": {
         "alias": "Thermostat Temperature Control",
-        "description": "Lower thermostat temperature as it stays above 19\u00b0C for 6 minutes.",
+        "description": "Lower thermostat temperature as it stays above 19°C for 6 minutes.",
         "mode": "single"
       },
       "previous_top_level_keys": [
@@ -3207,7 +3287,7 @@
       "id": "ha_homelab_heating_reduce_the_setpoint_after_prolonged_heating",
       "previous_metadata": {
         "alias": "Decrease Thermostat Temperature Gradually",
-        "description": "Furnace is heating for more than 5 minutes, reducing temperature by 1\u00b0C with a cooldown period",
+        "description": "Furnace is heating for more than 5 minutes, reducing temperature by 1°C with a cooldown period",
         "mode": "single"
       },
       "previous_top_level_keys": [

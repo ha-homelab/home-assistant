@@ -24,11 +24,16 @@
     data:
       message: Kitchen table lamp dim {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
     continue_on_error: true
-  - service: light.turn_on
-    entity_id: light.kitchen_lamp_m
-    data_template:
-      brightness: '{{ 60 if trigger.from_state.state == "off" else 180 }}'
-      transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'
+  - if:
+    - condition: state
+      entity_id: input_boolean.kitchen_sticky
+      state: 'off'
+    then:
+    - service: light.turn_on
+      entity_id: light.kitchen_lamp_m
+      data_template:
+        brightness: '{{ 60 if trigger.from_state.state == "off" else 180 }}'
+        transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'
   mode: single
   trace:
     stored_traces: 5
