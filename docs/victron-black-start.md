@@ -87,6 +87,12 @@ zero, malformed and non-finite values become unavailable, never synthetic 0 V.
 Its MQTT `expire_after: 90` makes a silent source unavailable. The grid binary
 sensor has the same expiry. The keepalive issues exact reads every five seconds.
 
+The minimum and maximum cell-voltage sensors for both batteries are unavailable
+when none of their 16 cells has a finite numeric reading. When some cells are
+available, extrema use those readings and continue to ignore missing or
+non-finite cells. Their state templates return `none` for an empty input set
+instead of sending the text `unavailable` through HA's numeric sensor handling.
+
 Neither grid nor battery `last_reported` is a receipt clock. HA MQTT entities
 can renew expiry on an identical message without writing a new state. Therefore
 these shutdown rules use availability and validated values, not a 90-second
@@ -100,7 +106,10 @@ rules inside isolated HA with recorded switch services. Cases include Off-grid
 blocking, Winter without telemetry, Summer precedence, unchanged live readings,
 invalid/recovered voltage and the low-battery exception. The root
 `tests/test_victron_battery_telemetry.py` checks invalid MQTT data, expiry and
-restoration of both helper states across isolated HA instances. The dedicated
+restoration of both helper states across isolated HA instances.
+`tests/test_victron_cell_extrema.py` checks missing, non-finite and partial cell
+readings, including an actual template sensor becoming unavailable and recovering.
+The dedicated
 `test_victron_low_battery_triggers.py` suite attaches real HA triggers, including
 an actual automation reload, and verifies startup, lost telemetry, mode changes,
 and restored inverter availability. It shortens a copy of the five-minute window
