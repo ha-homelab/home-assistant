@@ -96,9 +96,12 @@ def main():
         script_registry = json.loads((sources['scripts'] / 'contracts/script-registry.json').read_text())['scripts']
         script_contract = json.loads((sources['scripts'] / 'contracts/reviewed-runtime.json').read_text())
         retired_scripts = script_contract.get('retired_scripts', {})
-        assert set(retired_scripts) <= set(script_registry), 'Unknown script retirement'
-        assert len(config["automation"]) == automation_manifest['automation_count'], "Unexpected automation count"
-        assert set(config["script"]) == set(script_registry) - set(retired_scripts), "Unexpected folder script inventory"
+        if not set(retired_scripts) <= set(script_registry):
+            raise ValueError('Unknown script retirement')
+        if len(config["automation"]) != automation_manifest['automation_count']:
+            raise ValueError("Unexpected automation count")
+        if set(config["script"]) != set(script_registry) - set(retired_scripts):
+            raise ValueError("Unexpected folder script inventory")
         (output / "release.json").write_text(json.dumps({"root_revision": root_revision, "components": revisions, "component_revision_type": "git-tree", "home_assistant_version": "2026.9.1", "identity_seed": args.seed}, indent=2) + "\n")
         print(f"Built {output}: {len(config['automation'])} automations, {len(config['script'])} folder scripts; package scripts remain included")
     except Exception:

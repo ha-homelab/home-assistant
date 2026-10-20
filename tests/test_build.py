@@ -4,6 +4,7 @@ from contextlib import redirect_stdout
 import importlib.util
 import io
 import json
+import os
 from pathlib import Path
 import shutil
 import stat
@@ -149,8 +150,45 @@ class BuildTest(unittest.TestCase):
         payload['unexpected'] = payload.pop('script_0')
         write(child, 'config/rules.yaml', json.dumps(payload))
         self.commit_child_change('scripts')
-        with self.assertRaisesRegex(AssertionError, 'Unexpected folder script inventory'):
+        with self.assertRaisesRegex(ValueError, 'Unexpected folder script inventory'):
             self.run_build()
+
+    def test_inventory_checks_survive_python_optimization(self):
+        for name in ('build.py', 'ha_yaml.py'):
+            write(self.root, 'tools/' + name, (TOOLS / name).read_text())
+        git(self.root, 'add', 'tools')
+        git(self.root, 'commit', '--quiet', '-m', 'Build command fixture')
+        renamed_scripts = json.loads((self.children['scripts'] / 'config/rules.yaml').read_text())
+        renamed_scripts['unexpected'] = renamed_scripts.pop('script_0')
+        cases = [
+            ('dependencies/automations/migration/automations.json',
+             {'automation_count': 129}, 'Unexpected automation count'),
+            ('dependencies/scripts/contracts/reviewed-runtime.json',
+             {'retired_scripts': {'unexpected': {'reason': 'Unknown'}}}, 'Unknown script retirement'),
+            ('dependencies/scripts/config/rules.yaml',
+             renamed_scripts, 'Unexpected folder script inventory'),
+        ]
+        originals = {name: (self.root / name).read_text() for name, _, _ in cases}
+        for index, (name, payload, error) in enumerate(cases):
+            for original, content in originals.items():
+                write(self.root, original, content)
+            write(self.root, name, json.dumps(payload))
+            git(self.root, 'add', 'dependencies')
+            git(self.root, 'commit', '--quiet', '-m', 'Invalid inventory fixture')
+            for flags, optimized in ((['-O'], None), (['-OO'], None), ([], '1')):
+                with self.subTest(error=error, flags=flags, environment=optimized):
+                    environment = os.environ.copy()
+                    environment.pop('PYTHONOPTIMIZE', None)
+                    if optimized:
+                        environment['PYTHONOPTIMIZE'] = optimized
+                    output = self.workspace / f"rejected-{index}-{'-'.join(flags)}-{optimized}"
+                    result = subprocess.run(
+                        [sys.executable, *flags, str(self.root / 'tools/build.py'), str(output)],
+                        env=environment, capture_output=True, text=True, check=False,
+                    )
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn(error, result.stderr)
+                    self.assertFalse((output / 'release.json').exists())
 
     def test_rejects_tracked_symlink_file(self):
         outside = self.workspace / 'outside.yaml'
