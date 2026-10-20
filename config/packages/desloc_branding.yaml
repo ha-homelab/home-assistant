@@ -1,0 +1,6 @@
+# HACS 2.0.5 uses the external brands service for update pictures; the DESLOC
+# image can be unavailable there even when the integration bundles its icon.
+homeassistant:
+  customize:
+    update.desloc_experimental_update:
+      entity_picture: /local/desloc/icon.png

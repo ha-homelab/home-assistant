@@ -175,6 +175,19 @@ availability reported by HACS. It does not upgrade Home Assistant Core, the k3s
 container image, Supervisor, or device firmware. Those have separate owners and
 deployment procedures.
 
+The [DESLOC branding package](config/packages/desloc_branding.yaml) supplies the
+local [project icon](config/www/desloc/icon.png) for this installation's existing
+`update.desloc_experimental_update` entity. HACS 2.0.5 obtains update pictures
+from the external brands service, which can return a placeholder even when the
+integration already bundles the icon. Deploy both files, check the assembled HA
+configuration, then reload **Location & customizations** and refresh the update
+entity. The customization affects its picture only; it does not change the HACS
+catalog, selected release channel or installed version. Other installations must
+use their own update entity ID. Remove this package when the installed HACS or
+Marketplace supplies the correct picture. The icon is public artwork; `/local/`
+must not contain credentials, diagnostics or backups. Asset attribution is in
+[Third-party notices](THIRD_PARTY_NOTICES.md).
+
 ### Where the implementation lives and runs
 
 - **Source:** [config/packages/hacs_maintenance.yaml](config/packages/hacs_maintenance.yaml)
