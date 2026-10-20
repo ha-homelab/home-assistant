@@ -3,14 +3,14 @@
 The beta/RC deliverables are the `ha-notification-frame-cache` Python wheel,
 source distribution and `SHA256SUMS`. They package the existing cache class,
 not the household configuration. `scripts/package_cache.py` copies exactly
-three tracked files into a temporary build tree: `pyproject.toml`,
-`docs/notification-frame-cache.md` and
-`config/housekeeping/notification_frame_cache.py`. It rejects missing or linked
+four tracked files into a temporary build tree: `pyproject.toml`,
+`docs/notification-frame-cache.md`,
+`config/housekeeping/notification_frame_cache.py` and `LICENSE`. It rejects missing or linked
 inputs. No directory glob can add household configuration or operator state.
 
 ## Version and provenance
 
-The library's initial source base is `0.1.0` in `pyproject.toml`. Child automation
+The library's current source base is declared in `pyproject.toml`. Child automation
 and script libraries, upstream components and installation versions retain
 their independent identities. The runtime module has no independent version
 literal; installed distribution metadata provides its package version.
@@ -30,7 +30,7 @@ distribution metadata. Failed allocations may leave gaps and must not be reset.
 ## Build and verification
 
 Build tools are installed from the hash-locked requirements in a fresh
-environment. The backend runs only in the three-file temporary source tree.
+environment. The backend runs only in the four-file temporary source tree.
 The adapter checks wheel and source-distribution inventories and then installs
 each exact artifact separately in a new environment without runtime dependency
 resolution. An isolated interpreter verifies the installed distribution version,

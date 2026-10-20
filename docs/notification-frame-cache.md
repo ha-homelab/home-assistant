@@ -47,6 +47,12 @@ disables that instance's cache, and write errors stop its caching without
 interrupting the caller's notification flow. The parser recognizes JPEG
 markers; it is not an image-content validator.
 
+Network chunk boundaries do not limit frame size: a complete frame of up to
+one MiB is retained even when the same chunk also contains later data. Larger
+chunks are consumed in bounded segments. If an incomplete frame fills the
+buffer, parsing resumes at the next start marker, including markers split
+across chunks. Complete frames larger than one MiB are discarded.
+
 The distribution excludes the household configuration, endpoints, camera
 helpers, authentication data and notification-delivery integration. Installing
 it does not configure or update Home Assistant. Use [release packaging and

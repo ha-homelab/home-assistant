@@ -1,5 +1,21 @@
 # Portable library changelog
 
+## [0.1.4] - 2026-10-20
+
+### Fixed
+
+- Preserve complete notification frames up to one MiB when their network chunk also contains part of the next frame.
+- Consume larger incoming chunks in bounded segments and recover from oversized incomplete frames without losing a split next-frame start marker.
+- Correct the documented package source inventory to include its existing `LICENSE` input.
+
+### Upgrade
+
+Install the chosen beta wheel or source archive into an isolated Python environment and keep the private cache directory explicit. The cache API, private frame permissions, lock ownership, write throttle and cleanup behavior remain unchanged. Preserve the previous package for rollback. This release does not deploy Home Assistant configuration or services.
+
+### Validation
+
+Synthetic regression cases cover exact-limit frames, coalesced chunks and recovery at split markers. Package installation and source checks do not establish live camera or notification-delivery acceptance.
+
 ## [0.1.3] - 2026-10-18
 
 ### Changed
