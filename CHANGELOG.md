@@ -1,5 +1,27 @@
 # Portable library changelog
 
+## [0.1.4] - 2026-10-20
+
+### Fixed
+
+- Preserve complete notification frames up to one MiB when their network chunk also contains part of the next frame.
+- Consume larger incoming chunks in bounded segments and recover from oversized incomplete frames without losing a split next-frame start marker.
+- Correct the documented package source inventory to include its existing `LICENSE` input.
+- Keep the four source-only battery cell-extrema sensors unavailable when all readings are missing or non-finite, and preserve their partial-reading calculations and recovery.
+- Enforce configuration and assembled-inventory validation under Python `-O`, `-OO` and `PYTHONOPTIMIZE`; invalid recorder retention and changed script identities cannot pass by disabling assertions.
+
+### Upgrade
+
+Install the chosen beta wheel or source archive into an isolated Python environment and keep the private cache directory explicit. The cache API, private frame permissions, lock ownership, write throttle and cleanup behavior remain unchanged. Preserve the previous package for rollback. Configuration and validation-tool changes are source-only and require the separate reviewed overlay workflow. This release does not deploy Home Assistant configuration or services.
+
+### Validation
+
+Synthetic regression cases cover exact-limit frames, coalesced chunks and recovery at split markers. Subprocess tests cover configuration and build rejection with Python optimization enabled; isolated HA tests cover invalid cell readings and sensor recovery. Package installation and source checks do not establish live camera or notification-delivery acceptance.
+
+### Security
+
+Source validation no longer depends on removable Python assertions. Keep the cache directory private and retain the published package checksums. Frame files remain owner-only, the parser buffer stays bounded to one MiB, and distribution assets exclude household configuration, credentials, and private state.
+
 ## [0.1.3] - 2026-10-18
 
 ### Changed

@@ -15,6 +15,14 @@
 
     '
 - name: Battery Minimum Cell Voltage
+  availability: >-
+    {% set ns = namespace(valid=false) %}
+    {% for cell in range(1, 17) %}
+      {% if is_number(states('sensor.battery_cell_' ~ cell ~ '_voltage')) %}
+        {% set ns.valid = true %}
+      {% endif %}
+    {% endfor %}
+    {{ ns.valid }}
   unit_of_measurement: V
   state: "{% set voltages = [\n  states('sensor.battery_cell_1_voltage') | float(default=none),\n  states('sensor.battery_cell_2_voltage')\
     \ | float(default=none),\n  states('sensor.battery_cell_3_voltage') | float(default=none),\n  states('sensor.battery_cell_4_voltage')\
@@ -25,10 +33,18 @@
     \ | float(default=none),\n  states('sensor.battery_cell_13_voltage') | float(default=none),\n  states('sensor.battery_cell_14_voltage')\
     \ | float(default=none),\n  states('sensor.battery_cell_15_voltage') | float(default=none),\n  states('sensor.battery_cell_16_voltage')\
     \ | float(default=none)\n] | select('is_number') | list %} {% if voltages | count > 0 %}\n  {{ voltages | min\
-    \ }}\n{% else %}\n  unavailable\n{% endif %}\n"
+    \ }}\n{% else %}\n  {{ none }}\n{% endif %}\n"
   device_class: voltage
   state_class: measurement
 - name: Battery Maximum Cell Voltage
+  availability: >-
+    {% set ns = namespace(valid=false) %}
+    {% for cell in range(1, 17) %}
+      {% if is_number(states('sensor.battery_cell_' ~ cell ~ '_voltage')) %}
+        {% set ns.valid = true %}
+      {% endif %}
+    {% endfor %}
+    {{ ns.valid }}
   unit_of_measurement: V
   state: "{% set voltages = [\n  states('sensor.battery_cell_1_voltage') | float(default=none),\n  states('sensor.battery_cell_2_voltage')\
     \ | float(default=none),\n  states('sensor.battery_cell_3_voltage') | float(default=none),\n  states('sensor.battery_cell_4_voltage')\
@@ -39,10 +55,18 @@
     \ | float(default=none),\n  states('sensor.battery_cell_13_voltage') | float(default=none),\n  states('sensor.battery_cell_14_voltage')\
     \ | float(default=none),\n  states('sensor.battery_cell_15_voltage') | float(default=none),\n  states('sensor.battery_cell_16_voltage')\
     \ | float(default=none)\n] | select('is_number') | list %} {% if voltages | count > 0 %}\n  {{ voltages | max\
-    \ }}\n{% else %}\n  unavailable\n{% endif %}\n"
+    \ }}\n{% else %}\n  {{ none }}\n{% endif %}\n"
   device_class: voltage
   state_class: measurement
 - name: Battery 2 Minimum Cell Voltage
+  availability: >-
+    {% set ns = namespace(valid=false) %}
+    {% for cell in range(1, 17) %}
+      {% if is_number(states('sensor.battery_2_cell_' ~ cell ~ '_voltage')) %}
+        {% set ns.valid = true %}
+      {% endif %}
+    {% endfor %}
+    {{ ns.valid }}
   unit_of_measurement: V
   state: "{% set voltages = [\n  states('sensor.battery_2_cell_1_voltage') | float(default=none),\n  states('sensor.battery_2_cell_2_voltage')\
     \ | float(default=none),\n  states('sensor.battery_2_cell_3_voltage') | float(default=none),\n  states('sensor.battery_2_cell_4_voltage')\
@@ -53,10 +77,18 @@
     \ | float(default=none),\n  states('sensor.battery_2_cell_13_voltage') | float(default=none),\n  states('sensor.battery_2_cell_14_voltage')\
     \ | float(default=none),\n  states('sensor.battery_2_cell_15_voltage') | float(default=none),\n  states('sensor.battery_2_cell_16_voltage')\
     \ | float(default=none)\n] | select('is_number') | list %} {% if voltages | count > 0 %}\n  {{ voltages | min\
-    \ }}\n{% else %}\n  unavailable\n{% endif %}\n"
+    \ }}\n{% else %}\n  {{ none }}\n{% endif %}\n"
   device_class: voltage
   state_class: measurement
 - name: Battery 2 Maximum Cell Voltage
+  availability: >-
+    {% set ns = namespace(valid=false) %}
+    {% for cell in range(1, 17) %}
+      {% if is_number(states('sensor.battery_2_cell_' ~ cell ~ '_voltage')) %}
+        {% set ns.valid = true %}
+      {% endif %}
+    {% endfor %}
+    {{ ns.valid }}
   unit_of_measurement: V
   state: "{% set voltages = [\n  states('sensor.battery_2_cell_1_voltage') | float(default=none),\n  states('sensor.battery_2_cell_2_voltage')\
     \ | float(default=none),\n  states('sensor.battery_2_cell_3_voltage') | float(default=none),\n  states('sensor.battery_2_cell_4_voltage')\
@@ -67,7 +99,7 @@
     \ | float(default=none),\n  states('sensor.battery_2_cell_13_voltage') | float(default=none),\n  states('sensor.battery_2_cell_14_voltage')\
     \ | float(default=none),\n  states('sensor.battery_2_cell_15_voltage') | float(default=none),\n  states('sensor.battery_2_cell_16_voltage')\
     \ | float(default=none)\n] | select('is_number') | list %} {% if voltages | count > 0 %}\n  {{ voltages | max\
-    \ }}\n{% else %}\n  unavailable\n{% endif %}\n"
+    \ }}\n{% else %}\n  {{ none }}\n{% endif %}\n"
   device_class: voltage
   state_class: measurement
 - name: Battery in yesterday

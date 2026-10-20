@@ -36,36 +36,41 @@ class NotificationFrameCache:
         if self.lock is None:
             return
         try:
-            if len(self.buffer) + len(chunk) > MAX_BYTES:
-                self.buffer.clear()
-                return
-            self.buffer.extend(chunk)
-            while self.buffer:
-                start = self.buffer.find(b'\xff\xd8')
-                if start < 0:
-                    self.buffer[:] = self.buffer[-1:]
-                    return
-                end = self.buffer.find(b'\xff\xd9', start + 2)
-                if end < 0:
-                    del self.buffer[:start]
-                    return
-                frame = bytes(self.buffer[start:end + 2])
-                del self.buffer[:end + 2]
-                now = time.monotonic()
-                if now - self.last_write < 1:
-                    continue
-                self.last_write = now
-                payload = {'event_id': self.event_id, 'captured_at': time.time(),
-                           'jpeg': base64.b64encode(frame).decode('ascii')}
-                temporary = None
-                try:
-                    with tempfile.NamedTemporaryFile(mode='w', dir=self.root, prefix='.frame-', delete=False) as output:
-                        temporary = Path(output.name)
-                        json.dump(payload, output, separators=(',', ':'))
-                    os.replace(temporary, self.path)
-                finally:
-                    if temporary:
-                        temporary.unlink(missing_ok=True)
+            pending = memoryview(chunk)
+            while pending:
+                if len(self.buffer) == MAX_BYTES:
+                    # The incomplete frame is too large. Preserve only a possible
+                    # first marker byte so the next frame can start across reads.
+                    self.buffer[:] = b'\xff' if self.buffer.endswith(b'\xff') else b''
+                size = min(len(pending), MAX_BYTES - len(self.buffer))
+                self.buffer.extend(pending[:size])
+                pending = pending[size:]
+                while self.buffer:
+                    start = self.buffer.find(b'\xff\xd8')
+                    if start < 0:
+                        self.buffer[:] = b'\xff' if self.buffer.endswith(b'\xff') else b''
+                        break
+                    end = self.buffer.find(b'\xff\xd9', start + 2)
+                    if end < 0:
+                        del self.buffer[:start]
+                        break
+                    frame = bytes(self.buffer[start:end + 2])
+                    del self.buffer[:end + 2]
+                    now = time.monotonic()
+                    if now - self.last_write < 1:
+                        continue
+                    self.last_write = now
+                    payload = {'event_id': self.event_id, 'captured_at': time.time(),
+                               'jpeg': base64.b64encode(frame).decode('ascii')}
+                    temporary = None
+                    try:
+                        with tempfile.NamedTemporaryFile(mode='w', dir=self.root, prefix='.frame-', delete=False) as output:
+                            temporary = Path(output.name)
+                            json.dump(payload, output, separators=(',', ':'))
+                        os.replace(temporary, self.path)
+                    finally:
+                        if temporary:
+                            temporary.unlink(missing_ok=True)
         except (OSError, ValueError):
             self.close()
 

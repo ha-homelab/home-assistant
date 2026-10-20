@@ -52,6 +52,31 @@ class FrameCacheTest(unittest.TestCase):
         other.close()
         self.assertEqual(json.loads(self.cache.path.read_text())['event_id'], self.cache.event_id)
 
+    def test_limit_sized_frame_survives_next_frame_in_the_same_chunk(self):
+        frame = b'\xff\xd8' + b'x' * (cache_module.MAX_BYTES - 4) + b'\xff\xd9'
+        self.cache.feed(frame[:-1])
+        self.cache.feed(frame[-1:] + b'\xff\xd8next\xff\xd9')
+        data = json.loads(self.cache.path.read_text())
+        self.assertEqual(base64.b64decode(data['jpeg']), frame)
+        self.assertLessEqual(len(self.cache.buffer), cache_module.MAX_BYTES)
+
+    def test_large_chunk_preserves_complete_frames_and_trailing_marker(self):
+        frame = b'\xff\xd8first\xff\xd9'
+        self.cache.feed(frame + b'x' * cache_module.MAX_BYTES + b'\xff')
+        self.assertEqual(base64.b64decode(json.loads(self.cache.path.read_text())['jpeg']), frame)
+        self.cache.last_write -= 2
+        self.cache.feed(b'\xd8next\xff\xd9')
+        self.assertEqual(base64.b64decode(json.loads(self.cache.path.read_text())['jpeg']),
+                         b'\xff\xd8next\xff\xd9')
+
+    def test_oversized_incomplete_frame_recovers_at_split_start_marker(self):
+        self.cache.feed(b'\xff\xd8' + b'x' * (cache_module.MAX_BYTES - 3) + b'\xff')
+        self.assertEqual(len(self.cache.buffer), cache_module.MAX_BYTES)
+        self.cache.feed(b'\xd8recovered\xff\xd9')
+        self.assertEqual(base64.b64decode(json.loads(self.cache.path.read_text())['jpeg']),
+                         b'\xff\xd8recovered\xff\xd9')
+        self.assertLessEqual(len(self.cache.buffer), cache_module.MAX_BYTES)
+
     def test_oversized_and_incomplete_input_is_bounded_and_write_failures_are_optional(self):
         self.cache.feed(b'\xff\xd8' + b'x' * cache_module.MAX_BYTES)
         self.assertFalse(self.cache.path.exists())
