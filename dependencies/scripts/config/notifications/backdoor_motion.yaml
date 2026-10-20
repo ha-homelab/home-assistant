@@ -1,6 +1,7 @@
 # Stable entity: script.backdoormotion
 # Take a backdoor snapshot and notify desktops; between 20:30 and 22:00, also repeat the browser notification and run the existing porch-light fade.
-# The time condition stops only the remaining browser/light actions; desktop notifications happen first. Preserve the fade sequence and final off state.
+# The time condition stops only the remaining browser/light actions; desktop notifications happen first.
+# Porch Sticky is checked before each lighting command, including after every delay.
 backdoormotion:
   alias: 'Backdoor: notify and pulse porch light'
   description: Take a backdoor snapshot and notify desktops; between 20:30 and 22:00, also repeat the browser
@@ -50,6 +51,9 @@ backdoormotion:
         entity_id: notify.chrome
         data:
           url: /
+  - condition: state
+    entity_id: input_boolean.porch_sticky
+    state: 'off'
   - service: light.turn_on
     entity_id: light.backdoor_porch
     data:
@@ -63,16 +67,25 @@ backdoormotion:
       - 54
       - 42
       sequence:
+      - condition: state
+        entity_id: input_boolean.porch_sticky
+        state: 'off'
       - action: light.turn_on
         target:
           entity_id: light.backdoor_porch
         data:
           brightness: '{{ repeat.item }}'
       - delay: 00:00:01
+  - condition: state
+    entity_id: input_boolean.porch_sticky
+    state: 'off'
   - service: light.turn_on
     entity_id: light.backdoor_porch
     data:
       brightness: 30
   - delay: 00:00:05
+  - condition: state
+    entity_id: input_boolean.porch_sticky
+    state: 'off'
   - service: light.turn_off
     entity_id: light.backdoor_porch

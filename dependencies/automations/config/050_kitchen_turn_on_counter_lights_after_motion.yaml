@@ -17,8 +17,13 @@
     data:
       message: Counter motion triggered {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
     continue_on_error: true
-  - service: switch.turn_on
-    entity_id: switch.led_under_cabinet
+  - if:
+    - condition: state
+      entity_id: input_boolean.kitchen_sticky
+      state: 'off'
+    then:
+    - service: switch.turn_on
+      entity_id: switch.led_under_cabinet
   mode: single
   trace:
     stored_traces: 5

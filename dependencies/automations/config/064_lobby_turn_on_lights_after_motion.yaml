@@ -15,8 +15,16 @@
     entity_id: input_boolean.lobby_sticky
     state: 'off'
   actions:
-  - service: switch.turn_on
-    entity_id: switch.dining_wall_light_2
+  - if:
+    - condition: state
+      entity_id: input_boolean.dining_room_sticky
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.lobby_sticky
+      state: 'off'
+    then:
+    - service: switch.turn_on
+      entity_id: switch.dining_wall_light_2
   mode: single
   trace:
     stored_traces: 5

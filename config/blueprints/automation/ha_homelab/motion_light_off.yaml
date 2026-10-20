@@ -10,6 +10,7 @@ blueprint:
     older timers, including when sensors use different timeouts. Unavailable
     sensors cannot establish inactivity; another working sensor can still do so.
     Current manual overrides and other guards are checked before every device.
+    Shared lights may also require additional room sticky helpers to be off.
   domain: automation
   homeassistant:
     min_version: 2024.10.0
@@ -42,6 +43,16 @@ blueprint:
       default: []
       selector:
         condition: {}
+    target_sticky_helpers:
+      name: Additional sticky helpers for shared lights
+      description: >-
+        Map each shared light entity to a list of room sticky helper IDs.
+        Every listed helper must be explicitly off before that light is changed,
+        including availability recovery and retries. Other targets keep their
+        own guards and are not blocked by an unrelated room's override.
+      default: {}
+      selector:
+        object: {}
     entity_off_data:
       name: Optional turn-off parameters by entity ID
       description: A mapping such as light.dimmer to a mapping with transition in seconds.
@@ -64,6 +75,7 @@ variables:
   motion_triggers: !input motion_triggers
   target_entities: !input target_entities
   entity_off_data: !input entity_off_data
+  target_sticky_helpers: !input target_sticky_helpers
   # Capture provenance for this run, never an automation-wide last_triggered.
   recovery_entity: >-
     {% if trigger is defined and trigger.id | default('') == 'available_on'
@@ -183,6 +195,11 @@ actions:
                                   {{ ns.due and not ns.active }}
                               - condition: and
                                 conditions: !input guards
+                              - condition: template
+                                value_template: >-
+                                  {% set helpers = target_sticky_helpers.get(repeat.item, []) %}
+                                  {{ helpers | select('is_state', 'off') | list | count
+                                     == helpers | count }}
                             then:
                               - variables:
                                   attempted_shutdown: true

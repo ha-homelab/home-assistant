@@ -17,13 +17,28 @@
     entity_id: input_boolean.living_room_sticky
     state: 'off'
   actions:
-  - service: switch.turn_on
-    entity_id: switch.dining_media_guard
-    continue_on_error: true
-  - service: switch.turn_on
-    entity_id: switch.fireplace_switch
-  - service: switch.turn_on
-    entity_id: switch.living_guard2
+  - if:
+    - condition: state
+      entity_id: input_boolean.living_room_sticky
+      state: 'off'
+    then:
+    - service: switch.turn_on
+      entity_id: switch.dining_media_guard
+      continue_on_error: true
+  - if:
+    - condition: state
+      entity_id: input_boolean.living_room_sticky
+      state: 'off'
+    then:
+    - service: switch.turn_on
+      entity_id: switch.fireplace_switch
+  - if:
+    - condition: state
+      entity_id: input_boolean.living_room_sticky
+      state: 'off'
+    then:
+    - service: switch.turn_on
+      entity_id: switch.living_guard2
   mode: single
   trace:
     stored_traces: 5

@@ -7,6 +7,8 @@ automation:
       curtain threshold (descending sun below 0.2 degrees) until sunrise or 06:30,
       whichever is later. Switch off after 20 continuous minutes of confirmed
       absence, or at the morning boundary. Unknown sensor states never count as absence.
+      Living room sticky must be explicitly off before any automatic light command.
+      While sticky is on, manual on and off states are preserved.
     triggers:
       - trigger: state
         entity_id: binary_sensor.living_room_presence
@@ -64,6 +66,10 @@ automation:
                 and (is_state('sun.sun', 'below_horizon')
                      or now() < today_at('06:30')))) }}
     conditions:
+      - &automatic_lighting_allowed
+        condition: state
+        entity_id: input_boolean.living_room_sticky
+        state: 'off'
       - condition: template
         value_template: '{{ schedule_known }}'
     actions:
@@ -72,6 +78,7 @@ automation:
               {{ not overnight and trigger is defined and trigger.id == 'morning'
                  and is_state('switch.living_lamp', 'on') }}
             sequence:
+              - *automatic_lighting_allowed
               - action: switch.turn_off
                 target:
                   entity_id: switch.living_lamp
@@ -79,6 +86,7 @@ automation:
               {{ overnight and is_state('binary_sensor.living_room_presence', 'on')
                  and is_state('switch.living_lamp', 'off') }}
             sequence:
+              - *automatic_lighting_allowed
               - action: switch.turn_on
                 target:
                   entity_id: switch.living_lamp
@@ -88,6 +96,7 @@ automation:
                  and as_timestamp(now()) - as_timestamp(presence.last_changed) >= absence_seconds
                  and is_state('switch.living_lamp', 'on') }}
             sequence:
+              - *automatic_lighting_allowed
               - action: switch.turn_off
                 target:
                   entity_id: switch.living_lamp

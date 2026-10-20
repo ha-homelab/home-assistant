@@ -24,6 +24,10 @@
       target_entities:
       - light.hall_1_m
       - light.hall_2_m
+      target_sticky_helpers:
+        light.hall_2_m:
+        - input_boolean.hallway_sticky
+        - input_boolean.mishka_room_sticky
       guards:
       - condition: template
         value_template: '{{ state_attr("sun.sun", "elevation") < 1.95 }}'

@@ -15,7 +15,19 @@ presence cancels that timer. Unavailable or unknown readings never count as abse
 At the morning boundary the lamp turns off even if presence remains detected.
 Ordinary daytime use is not polled off. The shared 05:35 shutdown no longer includes
 this lamp. Other shared/manual shutdown scripts remain available; during overnight
-presence the controller will turn the lamp back on.
+presence the controller will turn the lamp back on only when Living room sticky
+is explicitly OFF.
+
+`input_boolean.living_room_sticky` pauses **all** commands from this presence
+controller: turning on, the absence timeout, the morning boundary, startup,
+reload and periodic reconciliation. With Sticky ON, manual OFF stays off and
+manual ON stays on. A missing, unknown or unavailable sticky helper also blocks
+automatic light commands. Sticky does not issue a light command itself.
+
+The guard is checked both when the automation starts and immediately before each
+command. Dining room sticky controls dining lights; it does not replace the
+living-room override. Shared lights and other motion paths are documented in
+[Motion lighting overrides](motion-light-sticky.md).
 
 Startup, automation reload, lamp availability recovery and a once-a-minute check
 reconcile the current state. If a reload loses the normal `for` timer, the current

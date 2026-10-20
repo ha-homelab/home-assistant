@@ -29,6 +29,7 @@ else:
 ROOT = Path(os.environ.get('PRESENCE_TEST_ROOT', Path(__file__).resolve().parents[1]))
 LAMP = 'switch.living_lamp'
 PRESENCE = 'binary_sensor.living_room_presence'
+STICKY = 'input_boolean.living_room_sticky'
 
 
 @unittest.skipUnless(HA_AVAILABLE, 'Home Assistant runtime is not installed')
@@ -47,6 +48,7 @@ class LivingRoomPresenceTest(unittest.IsolatedAsyncioTestCase):
         self.hass.services.async_register('switch', 'turn_off', self.command)
         self.hass.states.async_set(LAMP, 'off')
         self.hass.states.async_set(PRESENCE, 'off')
+        self.hass.states.async_set(STICKY, 'off')
         self.sun('below_horizon', -5, False)
         self.config = yaml.safe_load((ROOT / 'config/packages/living_room_presence_lamp.yaml').read_text())
         self.spec = self.config['automation'][0]
@@ -191,6 +193,78 @@ class LivingRoomPresenceTest(unittest.IsolatedAsyncioTestCase):
         self.sun('unavailable', None, None)
         await self.controller('morning', '2026-10-11T07:14:00')
         self.assertEqual(self.calls, [])
+
+    async def test_sticky_blocks_presence_and_all_reconciliation_paths(self):
+        self.hass.states.async_set(STICKY, 'on')
+        self.hass.states.async_set(PRESENCE, 'on')
+        await self.load()
+        self.assertEqual(self.calls, [])
+        for trigger in ('presence', 'evening', 'startup', 'reload', 'reconcile', 'lamp'):
+            with self.subTest(trigger=trigger):
+                await self.controller(trigger)
+                self.assertEqual(self.calls, [])
+
+    async def test_sticky_enabled_during_absence_preserves_light(self):
+        await self.load()
+        self.hass.states.async_set(PRESENCE, 'on')
+        await self.settle(.03)
+        self.assertEqual(self.calls, ['turn_on'])
+        self.hass.states.async_set(PRESENCE, 'off')
+        await self.settle(.03)
+        self.hass.states.async_set(STICKY, 'on')
+        await self.settle()
+        self.assertEqual(self.calls, ['turn_on'])
+        self.assertEqual(self.hass.states.get(LAMP).state, 'on')
+
+    async def test_sticky_blocks_expired_absence_and_morning_shutdown(self):
+        self.hass.states.async_set(STICKY, 'on')
+        self.hass.states.async_set(LAMP, 'on')
+        self.spec['variables']['absence_seconds'] = .01
+        await self.settle(.03)
+        await self.controller('absence', dt_util.now().replace(tzinfo=None).isoformat())
+        await self.controller('reload', dt_util.now().replace(tzinfo=None).isoformat())
+        self.sun('above_horizon', 5, True)
+        await self.controller('morning', '2026-10-11T08:00:00')
+        self.assertEqual(self.calls, [])
+        self.assertEqual(self.hass.states.get(LAMP).state, 'on')
+
+    async def test_missing_unknown_or_unavailable_sticky_blocks_light_changes(self):
+        self.spec['variables']['absence_seconds'] = .01
+        for sticky_state in (None, 'unknown', 'unavailable'):
+            with self.subTest(sticky_state=sticky_state):
+                if sticky_state is None:
+                    self.hass.states.async_remove(STICKY)
+                else:
+                    self.hass.states.async_set(STICKY, sticky_state)
+                self.hass.states.async_set(PRESENCE, 'on')
+                self.hass.states.async_set(LAMP, 'off')
+                await self.controller('presence')
+                self.hass.states.async_set(PRESENCE, 'off')
+                self.hass.states.async_set(LAMP, 'on')
+                await self.settle(.02)
+                await self.controller('absence', dt_util.now().replace(tzinfo=None).isoformat())
+                self.assertEqual(self.calls, [])
+
+    async def test_manual_switching_survives_active_presence_with_sticky(self):
+        self.hass.states.async_set(STICKY, 'on')
+        self.hass.states.async_set(PRESENCE, 'on')
+        await self.load()
+        for command, expected in (('turn_on', 'on'), ('turn_off', 'off')):
+            await self.hass.services.async_call(
+                'switch', command, {'entity_id': LAMP}, blocking=True)
+            await self.settle(.03)
+            await self.controller('reconcile')
+            self.assertEqual(self.hass.states.get(LAMP).state, expected)
+        self.assertEqual(self.calls, ['turn_on', 'turn_off'])
+
+    async def test_disabling_sticky_allows_normal_presence_control_again(self):
+        self.hass.states.async_set(STICKY, 'on')
+        self.hass.states.async_set(PRESENCE, 'on')
+        await self.controller('presence')
+        self.assertEqual(self.calls, [])
+        self.hass.states.async_set(STICKY, 'off')
+        await self.controller('presence')
+        self.assertEqual(self.calls, ['turn_on'])
 
 
 if __name__ == '__main__':

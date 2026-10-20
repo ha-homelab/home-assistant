@@ -23,15 +23,33 @@
     data:
       message: Dining motion automation triggered {{ as_timestamp(now()) | timestamp_custom('%H:%M', true) }}
     continue_on_error: true
-  - service: switch.turn_on
-    entity_id: switch.dining_wall_light_2
-    continue_on_error: true
-  - service: switch.turn_on
-    entity_id: switch.dining_arc_lamp
-    continue_on_error: true
-  - service: light.turn_on
-    entity_id: light.adining_lamp_m
-    continue_on_error: true
+  - if:
+    - condition: state
+      entity_id: input_boolean.dining_room_sticky
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.lobby_sticky
+      state: 'off'
+    then:
+    - service: switch.turn_on
+      entity_id: switch.dining_wall_light_2
+      continue_on_error: true
+  - if:
+    - condition: state
+      entity_id: input_boolean.dining_room_sticky
+      state: 'off'
+    then:
+    - service: switch.turn_on
+      entity_id: switch.dining_arc_lamp
+      continue_on_error: true
+  - if:
+    - condition: state
+      entity_id: input_boolean.dining_room_sticky
+      state: 'off'
+    then:
+    - service: light.turn_on
+      entity_id: light.adining_lamp_m
+      continue_on_error: true
   mode: single
   trace:
     stored_traces: 5

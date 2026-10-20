@@ -23,6 +23,10 @@
       - switch.dining_arc_lamp
       - light.adining_lamp_m
       - light.dining_lights_dimmer_l
+      target_sticky_helpers:
+        switch.dining_wall_light_2:
+        - input_boolean.dining_room_sticky
+        - input_boolean.lobby_sticky
       guards:
       - condition: template
         value_template: '{{ state_attr("sun.sun", "elevation") < 0.10 }}'

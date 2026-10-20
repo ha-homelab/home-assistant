@@ -1,5 +1,17 @@
 # Portable library changelog
 
+## Unreleased
+
+### Fixed
+
+- Source configuration: honor Living room Sticky throughout presence lighting,
+  including manual-state reconciliation and absence shutdown.
+- Recheck room Sticky before every motion lighting command, including delayed
+  camera fades; shared Dining/Lobby and Hallway/Mishka lights respect both rooms
+  without pausing unrelated sibling lights.
+- Preserve manual ON provenance, existing motion timeouts and explicit controls;
+  exercise the changes with Home Assistant runtime regression tests.
+
 ## [0.1.4] - 2026-10-20
 
 ### Fixed

@@ -189,6 +189,77 @@ class MotionLightOffTest(unittest.IsolatedAsyncioTestCase):
         await self.until(lambda: bool(self.calls))
         self.assertEqual(self.targets(), ['light.first'])
 
+    async def test_shared_target_sticky_blocks_only_its_own_light(self):
+        self.inputs['target_sticky_helpers'] = {
+            'light.first': ['input_boolean.other_room_sticky']}
+        self.set_state('input_boolean.other_room_sticky', 'on')
+        self.set_state('light.first', 'on', 900)
+        self.set_state('light.second', 'on', 900)
+        await self.load()
+        self.assertEqual(self.targets(), ['light.second'])
+        self.assertEqual(self.hass.states.get('light.first').state, 'on')
+        self.set_state('input_boolean.other_room_sticky', 'off')
+        await self.reconcile()
+        self.assertEqual(self.targets(), ['light.second', 'light.first'])
+
+    async def test_shared_target_unknown_and_missing_sticky_fail_closed(self):
+        self.inputs['target_sticky_helpers'] = {
+            'light.first': ['input_boolean.other_room_sticky']}
+        self.set_state('light.first', 'on', 900)
+        await self.load()
+        self.assertFalse(self.calls)
+        for state in ('unknown', 'unavailable', 'on'):
+            self.set_state('input_boolean.other_room_sticky', state)
+            await self.reconcile()
+            self.assertFalse(self.calls)
+        self.set_state('input_boolean.other_room_sticky', 'off')
+        await self.reconcile()
+        self.assertEqual(self.targets(), ['light.first'])
+
+    async def test_shared_sticky_is_rechecked_between_target_commands(self):
+        self.inputs['target_sticky_helpers'] = {
+            'light.second': ['input_boolean.other_room_sticky']}
+        self.set_state('input_boolean.other_room_sticky', 'off')
+        self.set_state('light.first', 'on', 900)
+        self.set_state('light.second', 'on', 900)
+        self.after_service = lambda: self.set_state('input_boolean.other_room_sticky', 'on')
+        await self.load()
+        self.assertEqual(self.targets(), ['light.first'])
+        self.assertEqual(self.hass.states.get('light.second').state, 'on')
+
+    async def test_enabling_sticky_blocks_an_already_pending_recovery_retry(self):
+        await self.load()
+        self.fail.add('light.first')
+        self.set_state('light.first', 'on')
+        await self.until(lambda: bool(self.calls))
+        self.set_state('input_boolean.sticky', 'on')
+        self.fail.clear()
+        self.calls.clear()
+        await self.retry_wait()
+        self.assertFalse(self.calls)
+        self.assertEqual(self.hass.states.get('light.first').state, 'on')
+        self.set_state('input_boolean.sticky', 'off')
+        await self.until(lambda: bool(self.calls))
+        self.assertEqual(self.targets(), ['light.first'])
+
+    async def test_shared_sticky_blocks_recovery_and_rechecks_every_retry(self):
+        self.inputs['target_sticky_helpers'] = {
+            'light.first': ['input_boolean.other_room_sticky']}
+        self.set_state('input_boolean.other_room_sticky', 'on')
+        await self.load()
+        self.set_state('light.first', 'on')
+        await self.retry_wait()
+        self.assertFalse(self.calls)
+        self.fail.add('light.first')
+        self.set_state('input_boolean.other_room_sticky', 'off')
+        await self.until(lambda: bool(self.calls))
+        self.set_state('input_boolean.other_room_sticky', 'on')
+        self.calls.clear()
+        self.fail.clear()
+        await self.retry_wait()
+        self.assertFalse(self.calls)
+        self.assertEqual(self.hass.states.get('light.first').state, 'on')
+
     async def test_failed_device_does_not_block_sibling_and_retries(self):
         self.set_state('light.second', 'unknown')
         await self.load()
@@ -474,6 +545,9 @@ class MotionLightOffTest(unittest.IsolatedAsyncioTestCase):
             # Target lists, timeout definitions, modes and IDs remain real.
             inputs['guards'] = []
             inputs['after_actions'] = []
+            for helpers in inputs.get('target_sticky_helpers', {}).values():
+                for helper in helpers:
+                    self.set_state(helper, 'off')
             for trigger in inputs['motion_triggers']:
                 entities = trigger['entity_id']
                 entities = [entities] if isinstance(entities, str) else entities
@@ -499,6 +573,54 @@ class MotionLightOffTest(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(self.calls, 'Reload or its next retry overrode manual ON')
         for entity in target_entities:
             self.assertEqual(self.hass.states.get(entity).state, 'on', entity)
+
+    async def test_all_shipped_timeouts_preserve_lights_while_room_sticky_is_on(self):
+        directory = ROOT / 'dependencies/automations/config'
+        if not directory.is_dir():
+            self.skipTest('Private automation submodule is required')
+        configs = []
+        targets = set()
+        # Expected ownership is independent of each configuration's guards.
+        owners = {
+            '013': 'bathroom', '017': 'bathroom', '020': 'bedroom',
+            '031': 'dining_room', '038': 'hallway', '047': 'kitchen',
+            '048': 'kitchen', '051': 'kitchen', '054': 'kitchen',
+            '063': 'lobby', '082': 'porch',
+        }
+        for prefix in owners:
+            paths = list(directory.glob(f'{prefix}_*.yaml'))
+            self.assertEqual(len(paths), 1, prefix)
+            config = deepcopy(load_yaml(str(paths[0]))[0])
+            self.assertEqual(config['use_blueprint']['path'], 'ha_homelab/motion_light_off.yaml')
+            inputs = config['use_blueprint']['input']
+            # Notifications are not light control; retain every real guard,
+            # timeout, target and shared-room mapping.
+            inputs['after_actions'] = []
+            for trigger in inputs['motion_triggers']:
+                entities = trigger['entity_id']
+                for entity in [entities] if isinstance(entities, str) else entities:
+                    self.set_state(entity, 'off', 172800)
+            targets.update(inputs['target_entities'])
+            configs.append(config)
+        self.set_state('sun.sun', 'below_horizon', attributes={'elevation': -5})
+        for room in set(owners.values()) | {'mishka_room'}:
+            self.set_state(f'input_boolean.{room}_sticky', 'on')
+        for entity in targets:
+            self.set_state(entity, 'on', 259200)
+        evening = datetime.now(timezone.utc).replace(hour=21, minute=0, second=0)
+        with patch('homeassistant.helpers.condition.dt_util.now', return_value=evening):
+            await self.load(configs)
+            await self.reconcile()
+            await self.real_reload()
+            self.assertFalse(self.calls)
+            for entity in targets:
+                self.assertEqual(self.hass.states.get(entity).state, 'on', entity)
+            # Positive control: no closed time/sun/availability guard can mask
+            # an ineffective sticky fixture. Every target must now turn off.
+            for room in set(owners.values()) | {'mishka_room'}:
+                self.set_state(f'input_boolean.{room}_sticky', 'off')
+            await self.reconcile()
+            self.assertEqual(set(self.targets()), targets)
 
     async def test_all_shipped_instances_validate(self):
         from homeassistant.components.automation.config import async_validate_config_item
