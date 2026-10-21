@@ -64,6 +64,8 @@
     - service: switch.turn_off
       entity_id: switch.dining_wall_light_2
     - service: switch.turn_off
+      entity_id: switch.dining_arc_lamp
+    - service: switch.turn_off
       entity_id: switch.living_room_light_l
     - service: light.turn_off
       entity_id: light.bedroom_lamp

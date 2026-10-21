@@ -71,6 +71,18 @@ The new lamp does not inherit the old Studio motion rules, shared shutdown
 schedules, or load-selection role. Validate the changed configuration and reload
 only the affected automation and script integrations.
 
+## Explicit household shutdown
+
+The **Turn off all lights** Lovelace control calls `automation.off_lights`
+(rule 074). Its parallel shutdown list includes `switch.dining_arc_lamp` once,
+using `switch.turn_off`, so the relocated relay participates in this explicit
+household command. The same rule retains its 05:35 daily schedule and its other
+targets. This is separate from the Dining motion controller and is not blocked
+by Dining sticky: sticky pauses motion-driven changes, not an explicit shutdown.
+
+This restores the current Dining lamp to rule 074 without restoring its former
+Studio motion rules, load-selection role, or other legacy shutdown bindings.
+
 ## Readback and Matter
 
 Check the canonical relay's availability, the retained device/config-entry
