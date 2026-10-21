@@ -275,12 +275,12 @@ class HacsMaintenanceTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.count('backup.create_automatic'), 1)
         self.assertEqual(self.installed(), [entity])
 
-    async def test_weekday_does_not_start_backup_or_updates(self):
-        self.add_update('weekday_card')
+    async def test_weekday_runs_backup_and_updates(self):
+        entity = self.add_update('weekday_card')
         self.now += timedelta(days=1)
         await self.run_automation()
-        self.assertEqual(self.count('backup.create_automatic'), 0)
-        self.assertEqual(self.installed(), [])
+        self.assertEqual(self.count('backup.create_automatic'), 1)
+        self.assertEqual(self.installed(), [entity])
 
     def installed(self):
         result = []
