@@ -1883,8 +1883,9 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "fda24da32e9b3cb25286bafeb2141ac78002fdb2b2ca890800e7190db05c13c6",
+      "behavior_sha256": "4d33bdce45bb07f389211057e5c0a1800471fe6e7138c857e8808e1810ef0c3d",
       "references": [
+        "light.adining_lamp_m",
         "light.backdoor_porch",
         "light.balcony",
         "light.bathroom_mirror_light",
@@ -1922,7 +1923,7 @@
       "imported_behavior_sha256": "27f40891a35eb2eeb33f2f8dda8ab96031468efae7af5b2d7d104f24b5f0eeb4",
       "behavior_change": {
         "date": "2026-10-21",
-        "reason": "Include the relocated Dining Arc lamp in the explicit Turn off all lights action (automation.off_lights). Add one independent switch.turn_off branch; preserve the 30 existing actions, schedule, mode and identity.",
+        "reason": "Include the relocated Dining Arc lamp and Matter Dining lamp in the explicit Turn off all lights action (automation.off_lights). Add independent switch.turn_off and light.turn_off branches; retain Bedroom Lamp exactly once and preserve the 30 existing actions, schedule, mode and identity.",
         "previous_change": {
           "date": "2026-10-11",
           "reason": "Remove only Living lamp from the 05:35 shutdown: its presence controller now owns the evening-to-morning curtain window and 20-minute absence timeout. Other targets, schedule and identity remain unchanged.",

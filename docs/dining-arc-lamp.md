@@ -76,7 +76,9 @@ only the affected automation and script integrations.
 The **Turn off all lights** Lovelace control calls `automation.off_lights`
 (rule 074). Its parallel shutdown list includes `switch.dining_arc_lamp` once,
 using `switch.turn_off`, so the relocated relay participates in this explicit
-household command. The same rule retains its 05:35 daily schedule and its other
+household command. The separate Matter Dining lamp (`light.adining_lamp_m`)
+also participates through `light.turn_off`. Bedroom 2 (`light.bedroom_lamp`)
+is already in this list and remains present exactly once. The same rule retains its 05:35 daily schedule and its other
 targets. This is separate from the Dining motion controller and is not blocked
 by Dining sticky: sticky pauses motion-driven changes, not an explicit shutdown.
 
