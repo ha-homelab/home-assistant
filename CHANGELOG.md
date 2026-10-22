@@ -14,6 +14,24 @@
 
 ## [0.1.4] - 2026-10-20
 
+### Source-only vacuum features
+
+- Add native Roomba fleet cards with separate battery sensors, supported controls,
+  network diagnostics and passive local telemetry through the existing HA connection.
+- Add an experimental authenticated relative-path image from complete new poses
+  within an identified cleaning mission. This is uncalibrated odometry, not a
+  house map; physical trace acceptance remains a separate commissioning step.
+- Add capability-aware QRevo map controls and guarded position provenance for
+  separately calibrated 3D views. Empty room selections never fall back to
+  whole-home cleaning.
+- Preserve bundled custom components during staging and document source
+  installation, unavailable-image pairing, model limits and troubleshooting.
+
+These features are in the tagged repository source only. The published wheel
+and Python source distribution still contain the portable notification cache,
+not a Roomba or QRevo installer. See `docs/roomba-experience.md` in the repository
+source for the separate installation and commissioning procedure.
+
 ### Fixed
 
 - Preserve complete notification frames up to one MiB when their network chunk also contains part of the next frame.
