@@ -1883,8 +1883,9 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "67ad761fea54af3bfdaefc3e13ee766266d5d8de10c8546b2373635a9a40583d",
+      "behavior_sha256": "4d33bdce45bb07f389211057e5c0a1800471fe6e7138c857e8808e1810ef0c3d",
       "references": [
+        "light.adining_lamp_m",
         "light.backdoor_porch",
         "light.balcony",
         "light.bathroom_mirror_light",
@@ -1909,6 +1910,7 @@
         "light.porch_two",
         "light.turn_off",
         "switch.bath2",
+        "switch.dining_arc_lamp",
         "switch.dining_wall_light_2",
         "switch.fireplace_led_ll",
         "switch.led_under_cabinet",
@@ -1920,38 +1922,42 @@
       ],
       "imported_behavior_sha256": "27f40891a35eb2eeb33f2f8dda8ab96031468efae7af5b2d7d104f24b5f0eeb4",
       "behavior_change": {
-        "date": "2026-10-11",
-        "reason": "Remove only Living lamp from the 05:35 shutdown: its presence controller now owns the evening-to-morning curtain window and 20-minute absence timeout. Other targets, schedule and identity remain unchanged.",
+        "date": "2026-10-21",
+        "reason": "Include the relocated Dining Arc lamp and Matter Dining lamp in the explicit Turn off all lights action (automation.off_lights). Add independent switch.turn_off and light.turn_off branches; retain Bedroom Lamp exactly once and preserve the 30 existing actions, schedule, mode and identity.",
         "previous_change": {
           "date": "2026-10-11",
-          "reason": "Retire the disconnected Sockets behind fireplace two device and its two switch-as-light helpers. Remove only their shutdown actions and notification trigger entries; preserve other targets, schedules and automation identities.",
+          "reason": "Remove only Living lamp from the 05:35 shutdown: its presence controller now owns the evening-to-morning curtain window and 20-minute absence timeout. Other targets, schedule and identity remain unchanged.",
           "previous_change": {
-            "date": "2026-10-10",
-            "reason": "The first KMC now supplies Moen Flo monitor power, pump power enable and Laundry. Remove its old lighting actions without substituting new power controls; update notification-only references. Preserve all other actions, guards and timing.",
+            "date": "2026-10-11",
+            "reason": "Retire the disconnected Sockets behind fireplace two device and its two switch-as-light helpers. Remove only their shutdown actions and notification trigger entries; preserve other targets, schedules and automation identities.",
             "previous_change": {
               "date": "2026-10-10",
-              "reason": "Restore bedroom motion with its original sensor, solar/time guards, three-minute delay and sticky override, targeting the relocated Matter Bedroom Lamp. Include that lamp in both requested shutdown scenarios and remove only its former dining motion action.",
+              "reason": "The first KMC now supplies Moen Flo monitor power, pump power enable and Laundry. Remove its old lighting actions without substituting new power controls; update notification-only references. Preserve all other actions, guards and timing.",
               "previous_change": {
                 "date": "2026-10-10",
-                "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
+                "reason": "Restore bedroom motion with its original sensor, solar/time guards, three-minute delay and sticky override, targeting the relocated Matter Bedroom Lamp. Include that lamp in both requested shutdown scenarios and remove only its former dining motion action.",
                 "previous_change": {
                   "date": "2026-10-10",
-                  "reason": "Remove only the former Studio lamp from shared shutdown/load-selection rules after its move to Dining Arc lamp; preserve all other behavior.",
+                  "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
                   "previous_change": {
                     "date": "2026-10-10",
-                    "reason": "Retarget the converted bedroom lamp outlet as Living lamp; retain the existing global shutdown and notification behavior.",
+                    "reason": "Remove only the former Studio lamp from shared shutdown/load-selection rules after its move to Dining Arc lamp; preserve all other behavior.",
                     "previous_change": {
                       "date": "2026-10-10",
-                      "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities.",
+                      "reason": "Retarget the converted bedroom lamp outlet as Living lamp; retain the existing global shutdown and notification behavior.",
                       "previous_change": {
-                        "date": "2026-10-07",
-                        "reason": "Owner renamed all five ZHA garage light entities and added the previously omitted fifth bulb to scheduled shutdown. Preserve all other targets, parallel actions and trigger times.",
+                        "date": "2026-10-10",
+                        "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities.",
                         "previous_change": {
-                          "date": "2026-09-25",
-                          "reason": "Remove only owner-retired light targets from the existing morning shutdown list.",
+                          "date": "2026-10-07",
+                          "reason": "Owner renamed all five ZHA garage light entities and added the previously omitted fifth bulb to scheduled shutdown. Preserve all other targets, parallel actions and trigger times.",
                           "previous_change": {
-                            "date": "2026-09-24",
-                            "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged."
+                            "date": "2026-09-25",
+                            "reason": "Remove only owner-retired light targets from the existing morning shutdown list.",
+                            "previous_change": {
+                              "date": "2026-09-24",
+                              "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged."
+                            }
                           }
                         }
                       }
