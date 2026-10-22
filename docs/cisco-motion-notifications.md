@@ -15,6 +15,12 @@ cannot retract or delay the preceding mobile delivery.
 
 ## Install
 
+First deploy a Cisco gateway revision that supports the image API's
+`idle_close_seconds` field, then install or update the helper below. Older
+gateways ignore this field: updating only the helper will leave snapshot pages
+open. Use the matching gateway and helper described in the
+[Cisco motion-notification guide](https://github.com/4alvit/cisco-home-telephony/blob/main/docs/motion-notifications.md).
+
 1. Install the reviewed `scripts/cisco_motion_snapshot.py` from
    [cisco-home-telephony](https://github.com/4alvit/cisco-home-telephony) as
    `/config/housekeeping/cisco_motion_snapshot.py` in Home Assistant. Keep its
@@ -96,6 +102,12 @@ additional seconds for child cleanup, within HA's 60-second shell-command limit.
 The shell command is foreground work inside the separate HA automation; it
 does not leave a detached camera subscriber running.
 
+Each snapshot requests `idle_close_seconds: 45` through the gateway. This uses
+the phone's native idle-close action, not a fixed 45-second wall-clock expiry;
+interaction with the phone can delay or cancel that action. The minimum
+per-phone cooldown is 60 seconds. Events arriving during that cooldown are
+dropped, not queued for display when it ends.
+
 Use the original trigger time rather than `now()` at delivery time, so the
 existing bounded Ring/ONVIF preparation cannot turn a stale event into a fresh
 one. Each camera suffix keeps source events distinct. The event ID correlates
@@ -117,6 +129,9 @@ reuse a stale motion-thumbnail file.
   `Cisco: show a motion snapshot` automation trace and bounded helper result. Check global
   mute, event age, destination selection, registration, an active call or voice
   session, cooldown, and availability of the approved notification camera.
+- A static image page already open before the upgrade has no retroactive idle
+  timer. Press **Exit** once to close that old page, then test a fresh event.
+  New snapshot pages request the native idle-close action described above.
 - Missing configuration, an unavailable helper, a failed camera, or a busy
   phone must leave the existing mobile notification intact. Never fall back to
   an unapproved camera, old cached image, or force-ending a call.
