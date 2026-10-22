@@ -1,0 +1,12 @@
+{
+  "title": "Roomba Insights",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Observe native Roomba connections",
+        "description": "Add local telemetry from the existing iRobot integration. This opens no additional robot connection and sends no commands. Reported positions are uncalibrated diagnostics, not a house map."
+      }
+    },
+    "abort": {"already_configured": "Roomba Insights is already configured."}
+  }
+}

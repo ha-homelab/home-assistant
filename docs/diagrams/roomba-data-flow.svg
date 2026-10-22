@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="840" viewBox="0 0 1200 840" role="img" aria-labelledby="title description">
+  <title id="title">Roomba controls and honest map evidence</title>
+  <desc id="description">One local MQTT connection belongs to Home Assistant's native iRobot integration. A passive observer produces diagnostic telemetry; Lovelace sends only explicit supported commands through the native integration. A separate evidence gate is required before private coordinates can appear on the 3D floorplan. No real household map or identifiers are included.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto-start-reverse"><path d="M1 1 8 5 1 9" fill="none" stroke="#526780" stroke-width="1.8"/></marker>
+    <style>
+      text { font-family: Inter, Arial, sans-serif; fill: #172d43; }
+      .title { font-size: 30px; font-weight: 750; }
+      .subtitle { font-size: 17px; fill: #496078; }
+      .heading { font-size: 20px; font-weight: 700; }
+      .body { font-size: 16px; }
+      .small { font-size: 14px; fill: #496078; }
+      .label { font-size: 13px; font-weight: 700; letter-spacing: 1.4px; }
+      .arrow { fill: none; stroke: #526780; stroke-width: 2.5; marker-end: url(#arrow); }
+      .box { stroke-width: 1.6; }
+    </style>
+  </defs>
+  <rect width="1200" height="840" rx="24" fill="#f3f7fb"/>
+  <text class="label" x="44" y="42">HOME ASSISTANT · ROOMBA EXPERIENCE</text>
+  <text class="title" x="44" y="85">One connection. Clear controls. Honest maps.</text>
+  <text class="subtitle" x="44" y="116">Robot capabilities, message receipt and house position are different kinds of evidence.</text>
+
+  <rect class="box" x="44" y="155" width="272" height="194" rx="18" fill="#e1f4f1" stroke="#6da99e"/>
+  <text class="label" x="66" y="185" fill="#226452">DEVICE</text>
+  <text class="heading" x="66" y="218">Wi-Fi Roomba</text>
+  <text class="body" x="66" y="248">690 / 694: basic controls</text>
+  <text class="body" x="66" y="277">960: reported relative pose</text>
+  <text class="body" x="66" y="306">i7: Smart Map capability</text>
+  <text class="small" x="66" y="332">Availability still depends on the robot.</text>
+
+  <rect class="box" x="416" y="155" width="342" height="194" rx="18" fill="#e5edff" stroke="#8aa3d4"/>
+  <text class="label" x="438" y="185">CONNECTION OWNER</text>
+  <text class="heading" x="438" y="218">Native iRobot integration</text>
+  <text class="body" x="438" y="250">One local MQTT client</text>
+  <text class="body" x="438" y="279">State, sensors and supported actions</text>
+  <text class="body" x="438" y="308">Existing credentials remain in HA</text>
+  <path class="arrow" d="M318 240 H407"/>
+  <text class="small" x="329" y="226">reports</text>
+  <path class="arrow" d="M412 292 H325"/>
+  <text class="small" x="330" y="315">commands</text>
+
+  <rect class="box" x="852" y="155" width="304" height="194" rx="18" fill="#fff0dc" stroke="#c1a06d"/>
+  <text class="label" x="874" y="185">USER INTERFACE</text>
+  <text class="heading" x="874" y="218">Native Lovelace tiles</text>
+  <text class="body" x="874" y="250">Explicit supported controls</text>
+  <text class="body" x="874" y="279">Battery, bin and connectivity</text>
+  <text class="body" x="874" y="308">Verified optional map link</text>
+  <path class="arrow" d="M850 242 H766"/>
+  <text class="small" x="771" y="223">user action</text>
+
+  <path class="arrow" d="M586 350 V399"/>
+  <text class="small" x="606" y="381">passive callbacks</text>
+  <rect class="box" x="416" y="409" width="342" height="179" rx="18" fill="#eee8fb" stroke="#ac94ce"/>
+  <text class="label" x="438" y="439">NO EXTRA ROBOT CLIENT</text>
+  <text class="heading" x="438" y="472">Roomba Insights</text>
+  <text class="body" x="438" y="504">Bounded diagnostic fields only</text>
+  <text class="body" x="438" y="534">Local receipt ≠ observation time</text>
+  <text class="body" x="438" y="564">Uncalibrated pose ≠ house position</text>
+  <path class="arrow" d="M761 489 H1006 V359"/>
+  <text class="small" x="784" y="511">diagnostic entity details</text>
+
+  <rect class="box" x="44" y="409" width="272" height="179" rx="18" fill="#ffffff" stroke="#a7b7c9"/>
+  <text class="heading" x="66" y="445">Map support is separate</text>
+  <text class="body" x="66" y="480">600 series: no room map</text>
+  <text class="body" x="66" y="511">960: Clean Map report</text>
+  <text class="body" x="66" y="542">i7: editable Smart Map</text>
+  <text class="small" x="66" y="573">App capability ≠ HA map image.</text>
+
+  <rect class="box" x="44" y="641" width="1112" height="150" rx="18" fill="#ffffff" stroke="#a7b7c9"/>
+  <rect x="44" y="641" width="9" height="150" rx="4" fill="#c48647"/>
+  <text class="label" x="75" y="673">SEPARATE 3D EVIDENCE GATE</text>
+  <text class="heading" x="75" y="707">Verified frame + correct floor + private calibration + timestamp provenance</text>
+  <text class="body" x="75" y="739">Only a validated feed can move a robot marker. Otherwise show saved location, last known or unknown.</text>
+  <text class="small" x="75" y="768">No invented coordinates, reused calibration, empty-room fallback or public household maps.</text>
+  <path d="M586 590 V629" fill="none" stroke="#c48647" stroke-width="2.5" stroke-dasharray="5 5"/>
+  <text class="small" x="606" y="616">raw telemetry alone does not pass</text>
+  <text class="small" x="44" y="822">Conceptual architecture · fictional labels · source implementation is not proof of deployment or physical cleaning.</text>
+</svg>
