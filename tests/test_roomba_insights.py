@@ -134,6 +134,19 @@ class TelemetryTest(unittest.TestCase):
         self.assertTrue(value["room_request_observed"])
         self.assertFalse(value["room_request_matches_current_map"])
 
+    def test_truncated_or_malformed_catalog_cannot_confirm_a_request(self):
+        catalogs = [
+            [{"synthetic-map": "test-v1"}] * 25 + [{"synthetic-map": "test-v2"}],
+            [{"synthetic-map": "test-v1"}, None],
+            [{"synthetic-map": "test-v1"}, {"bad": {"nested": "unknown"}}],
+            [{"synthetic-map": "test-v1"}, {"pmap_id": "incomplete"}],
+            {f"synthetic-map-{i}": "test-v1" for i in range(26)},
+        ]
+        for catalog in catalogs:
+            result = self.valid_command(maps=catalog)
+            self.assertFalse(result["map_catalog_complete"])
+            self.assertFalse(result["room_request_matches_current_map"])
+
     def test_input_mutation_does_not_change_captured_values(self):
         self.valid_command()
         self.value.update(self.reported, received_at="pose", delta={"pose": P})

@@ -82,6 +82,30 @@ def map_references(value: Any):
     return result[:MAX_MAPS]
 
 
+def map_catalog_complete(value: Any):
+    """A bounded display subset must never establish catalog completeness."""
+    candidates = value if isinstance(value, list) else [value]
+    if not candidates or len(candidates) > MAX_MAPS:
+        return False
+    count = 0
+    for item in candidates:
+        if not isinstance(item, dict) or not item or len(item) > MAX_MAPS:
+            return False
+        if "pmap_id" in item:
+            if set(item) - {"pmap_id", "user_pmapv_id"}:
+                return False
+            if not text(item.get("pmap_id")) or not text(item.get("user_pmapv_id")):
+                return False
+            count += 1
+        else:
+            if not all(text(key) and text(version) for key, version in item.items()):
+                return False
+            count += len(item)
+        if count > MAX_MAPS:
+            return False
+    return True
+
+
 def last_command(value: Any):
     """Capture a request without making a truncated/partial replay valid."""
     result = _fields(value, ("time",), ("command", "pmap_id", "user_pmapv_id"))
@@ -131,6 +155,7 @@ class Telemetry:
             ("cycle", "phase"),
         )
         data["maps"] = map_references(reported.get("pmaps"))
+        data["map_catalog_complete"] = map_catalog_complete(reported.get("pmaps"))
         if initial:
             data["last_command"] = last_command(reported.get("lastCommand"))
             data["last_command_source"] = "native_cache"
@@ -147,7 +172,7 @@ class Telemetry:
                            and command.get("pmap_id") and command.get("user_pmapv_id") and command.get("regions_valid"))
         known_versions = {m.get("user_pmapv_id") for m in data["maps"] if m["pmap_id"] == command.get("pmap_id")}
         data["room_request_observed"] = has_request
-        data["room_request_matches_current_map"] = has_request and known_versions == {command.get("user_pmapv_id")}
+        data["room_request_matches_current_map"] = has_request and data["map_catalog_complete"] and known_versions == {command.get("user_pmapv_id")}
         data["map_image_available"] = False
 
         self.data = data

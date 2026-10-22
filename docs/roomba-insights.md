@@ -64,7 +64,9 @@ command. For this reason, cached `lastCommand` at startup is diagnostic only;
 new commands are captured from the original message delta.
 
 `room_request_matches_current_map` compares the observed request with the
-reported map catalog. It requires an unambiguous matching version. It does not
+reported map catalog. It requires a complete, bounded, recognized catalog and
+an unambiguous matching version. A truncated or malformed catalog cannot
+confirm a room request. It does not
 establish which floor is active, validate physical room boundaries, or prove a
 coordinate transformation. Invalid, duplicate or oversized region lists never
 become valid by silently dropping entries. No room-cleaning service is provided
