@@ -17,10 +17,11 @@ cannot retract or delay the preceding mobile delivery.
 
 First deploy a Cisco gateway revision that supports the guarded `motion_image`
 action and the image API's `idle_close_seconds` field, then install or update
-the helper below. Older gateways ignore the idle-close field: updating only
-the helper will leave snapshot pages open. Do not substitute the generic image
-action when a gateway lacks guarded motion delivery. Use the matching gateway
-and helper described in the
+the helper below. Gateways without idle-close support ignore that field:
+updating only the helper will leave snapshot pages open. For voice-profile
+phones, do not substitute the generic image action when a gateway lacks guarded
+motion delivery. The helper retains the legacy image fallback for phones
+without a voice profile. Use the matching gateway and helper described in the
 [Cisco motion-notification guide](https://github.com/4alvit/cisco-home-telephony/blob/main/docs/motion-notifications.md).
 
 1. Install the reviewed `scripts/cisco_motion_snapshot.py` from
