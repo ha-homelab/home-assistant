@@ -26,6 +26,8 @@
     - service: light.turn_off
       entity_id: light.dining_lights_dimmer_l
     - service: light.turn_off
+      entity_id: light.adining_lamp_m
+    - service: light.turn_off
       entity_id: light.balcony
     - service: light.turn_off
       entity_id: light.porch_one
@@ -63,6 +65,8 @@
       entity_id: switch.mishka_bedroom_desk_lamp_l
     - service: switch.turn_off
       entity_id: switch.dining_wall_light_2
+    - service: switch.turn_off
+      entity_id: switch.dining_arc_lamp
     - service: switch.turn_off
       entity_id: switch.living_room_light_l
     - service: light.turn_off

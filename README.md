@@ -133,7 +133,8 @@ Only active configuration is imported. The duplicate `input_number` key previous
 
 ## Weekly backups and maintenance
 
-The Sunday schedule uses **America/Los_Angeles**, including daylight-saving time:
+Backup jobs run on Sundays; HACS maintenance runs daily. All times use
+**America/Los_Angeles**, including daylight-saving time:
 
 - **03:30 — native HA backup:** export the external Oracle MySQL recorder, then
   include that verified export in the native HA archive uploaded to Synology.
@@ -147,7 +148,7 @@ The Sunday schedule uses **America/Los_Angeles**, including daylight-saving time
   Retain **14 completed recovery sets**. This is another NAS transfer, but it
   excludes `recorder_backup/**` and native backup archives, so it does not copy
   the SQL export again. Include the latest local Music Assistant snapshots.
-- **06:00 — HACS maintenance:** reuse a successful automatic backup from the
+- **06:00 — HACS maintenance (daily):** reuse a successful automatic backup from the
   preceding four hours before installing updates. Create another native backup
   only when updates are pending and no sufficiently recent success is available.
   With no updates or pending restart, do nothing.
@@ -160,13 +161,13 @@ can add uploads; each Oracle-to-Synology transfer consumes outbound traffic.
 
 ## Automatic HACS maintenance
 
-Installed HACS repositories are maintained on Sundays at **06:00 Home Assistant
+Installed HACS repositories are maintained daily at **06:00 Home Assistant
 local time**, configured here as **America/Los_Angeles**. When updates are
 available, the automation reuses a successful automatic backup from the preceding
 four hours (or creates and verifies one), installs the updates
 sequentially, and requests **one Home Assistant restart at the end if needed**.
 This removes the need to install each repository update and restart HA manually.
-The weekly maintenance window groups updates and limits interruptions to household
+The daily maintenance window groups updates and limits interruptions to household
 automations by loading updated integrations with a single restart.
 
 The package manages the `update.*` entities supplied by HACS, including custom
@@ -229,7 +230,7 @@ must not contain credentials, diagnostics or backups. Asset attribution is in
 3. **Reuse or create a confirmed backup.** Reuse an automatic backup whose
    successful completion timestamp is within the preceding **four hours**.
    Invalid, future or older timestamps require a new backup. In that case, allow
-   up to **30 minutes** for the backup worker to finish, the backup manager to
+   up to **60 minutes** for the backup worker to finish, the backup manager to
    become idle, and `sensor.backup_last_successful_automatic_backup` to show a new
    success from this attempt. Updates require either a confirmed recent backup
    or successful completion of this new backup.

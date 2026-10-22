@@ -3,7 +3,7 @@
 [Deployment evidence](releases/2026-09-15-hacs-maintenance.md) records the enabled
 installation, source revision, validation and the remaining live execution boundary.
 
-The `hacs_maintenance` package updates installed HACS repositories on Sundays at
+The `hacs_maintenance` package updates installed HACS repositories daily at
 **06:00 America/Los_Angeles**, using Home Assistant's configured timezone. Disable
 the automation named **HACS maintenance: update repositories and restart once** to
 pause future runs. The package does not update Home Assistant Core, container
@@ -17,7 +17,7 @@ images, Supervisor, or device firmware.
 2. Reject a busy/unavailable backup manager, a running installer, or unavailable
    worker/latch entities before beginning.
 3. Reuse a successful automatic backup completed within the preceding four hours.
-   This normally uses Sunday's 03:30 recorder/native backup and avoids another
+   On Sundays this can use the 03:30 recorder/native backup and avoid another
    Oracle-to-Synology upload. Invalid, future or older timestamps require a new
    `backup.create_automatic` with the existing automatic backup configuration.
    The current installation uploads to Synology DSM, retains three copies, and
@@ -28,7 +28,7 @@ images, Supervisor, or device firmware.
    manifest records the SQL export time independently of the archive time. See
    the [weekly backup schedule](../README.md#weekly-backups-and-maintenance) and
    the installation's recorder recovery instructions.
-4. When creating a new backup, wait up to 30 minutes for the backup worker to finish, the manager to become
+4. When creating a new backup, wait up to 60 minutes for the backup worker to finish, the manager to become
    idle, and `sensor.backup_last_successful_automatic_backup` to contain a fresh
    timestamp from this attempt. A service return alone is insufficient: remote
    upload failures can complete without raising a service exception.
@@ -47,7 +47,7 @@ images, Supervisor, or device firmware.
    and theme updates alone do not request a restart.
 7. After all selected updates succeed, wait up to 30 minutes for other automation
    and script actions, update operations, and backups to finish. Restart once if
-   needed. Otherwise retain the restart request for the next weekly run. The
+   needed. Otherwise retain the restart request for the next daily run. The
    startup automation clears the restored latch after a real HA startup.
 
 Failures create a persistent notification and stop the batch before remaining
@@ -61,6 +61,28 @@ future events. Like any Home Assistant restart, maintenance interrupts pending
 in-memory timers. Unavailable HACS entities without a known available update are
 not treated as update candidates. HACS discovers releases on its own polling
 schedule; this package does not force an unsupported repository refresh.
+
+## Slow uploads and unused repositories
+
+The backup wait is **60 minutes**. A successful remote upload was observed taking
+31 minutes 27 seconds: the former 30-minute limit stopped maintenance before any
+installation, even though the backup finished shortly afterward. The worker must
+still finish, the manager must be idle, and the success timestamp must belong to
+the new attempt. A slow or failed upload never authorizes an unprotected update.
+A timed-out worker is left running; the next daily run can retry safely.
+
+For an update that stays available, inspect the coordinator trace and the
+`hacs_maintenance_result` notification before changing HACS. An update prompt can
+mean a backup timed out rather than an installer failed. The repository package
+now matches the installation's existing daily 06:00 schedule.
+
+Unused repositories should be uninstalled through HACS after checking integration
+entries and dashboard references. The retired **iCloud3 Apple Device Tracker**
+(`gcobb321/icloud3`) and **Sankey Chart Card** (`MindFreeze/ha-sankey-chart`) are not
+runtime dependencies. **Energy Sankey Card** (`davet2001/energy-sankey`) is a
+separate project and remains in use. Remove orphan Lovelace resources and the
+retired integration's own leftover data, without deleting other integrations or
+historical backup archives.
 
 ## Deployment and verification
 
