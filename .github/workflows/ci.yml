@@ -175,6 +175,10 @@ jobs:
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_water_calendar_templates.py -v
+    - name: Verify read-only vacuum positions, map identity and stale-data handling
+      run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
+        --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+        -m unittest discover -s tests -p test_vacuum_floorplan_position.py -v
     - name: Execute Roomba network recovery scenarios
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
