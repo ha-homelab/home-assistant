@@ -1,5 +1,9 @@
 # Vitaly iPhone Air notifications
 
+The optional [Cisco motion snapshot branch](cisco-motion-notifications.md) can
+follow these approved mobile events without waiting for camera or handset work
+in the mobile notification path. It has a separate private destination list.
+
 `script.notify_optional` sends one Companion copy of each eligible Chrome delivery to
 `notify.mobile_app_als_iphone_89310`. The service retains the phone's original app
 registration name; the verified device/config entry is **Vitaly iPhone Air**.

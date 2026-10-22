@@ -46,6 +46,16 @@ automation:
               url: entityId:camera.living_room_onvif_notifications
               push:
                 category: camera
+      - event: cisco_motion_snapshot_requested
+        event_data:
+          camera_key: living_room_onvif
+          event_id: >-
+            {{ (trigger.to_state.context.id if trigger is defined and trigger.to_state is defined
+                and trigger.to_state is not none else '') ~ '_living_room_onvif' }}
+          event_at: >-
+            {{ as_timestamp(trigger.to_state.last_changed, 0) | int(0)
+               if trigger is defined and trigger.to_state is defined and trigger.to_state is not none else 0 }}
+        continue_on_error: true
     mode: single
     max_exceeded: silent
     trace:
