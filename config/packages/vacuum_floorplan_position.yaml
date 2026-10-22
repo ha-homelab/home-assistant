@@ -1,0 +1,146 @@
+# Read-only position feed for the private floorplan. No movement actions.
+# HA 2026.10 returns x/y without a device observation timestamp. Keep
+# observed_at null: a successful RPC may return byte-identical cached map data.
+# retrieved_at means only when HA received a valid response, never pose freshness.
+template:
+  - triggers:
+      - trigger: homeassistant
+        event: start
+        id: startup
+      - trigger: time_pattern
+        seconds: /15
+        id: tick
+      - trigger: state
+        entity_id:
+          - vacuum.roborock_q_revo
+          - select.roborock_q_revo_selected_map
+        to: null
+        id: source_change
+    conditions:
+      - condition: template
+        value_template: >-
+          {{ trigger.id != 'tick'
+             or states('vacuum.roborock_q_revo') in ['cleaning', 'returning']
+             or trigger.now.second == 0 }}
+    actions:
+      - variables:
+          source_entity: vacuum.roborock_q_revo
+          selector_entity: select.roborock_q_revo_selected_map
+          maps_before_response: {}
+          position_response: {}
+          maps_after_response: {}
+          integration_entry: "{{ config_entry_id('vacuum.roborock_q_revo') }}"
+          selected_before: "{{ states('select.roborock_q_revo_selected_map') }}"
+          selection_changed_before: >-
+            {{ states.select.roborock_q_revo_selected_map.last_changed.isoformat()
+               if states.select.roborock_q_revo_selected_map is not none else none }}
+          query_allowed: >-
+            {{ has_value('vacuum.roborock_q_revo')
+               and has_value('select.roborock_q_revo_selected_map')
+               and integration_entry is string
+               and config_entry_attr(integration_entry, 'domain') == 'roborock'
+               and config_entry_attr(integration_entry, 'state') == 'loaded' }}
+      - if: "{{ query_allowed }}"
+        then:
+          # get_maps reads the integration's cached map catalog; it neither
+          # switches maps nor performs another map download. Read it on both
+          # sides of the position RPC to reject changed/ambiguous associations.
+          - action: roborock.get_maps
+            target:
+              entity_id: "{{ source_entity }}"
+            response_variable: maps_before_response
+            continue_on_error: true
+          - action: roborock.get_vacuum_current_position
+            target:
+              entity_id: "{{ source_entity }}"
+            response_variable: position_response
+            continue_on_error: true
+          - action: roborock.get_maps
+            target:
+              entity_id: "{{ source_entity }}"
+            response_variable: maps_after_response
+            continue_on_error: true
+      - variables:
+          position: >-
+            {{ position_response.get(source_entity, {})
+               if position_response is mapping else {} }}
+          resolved_map_ids: >-
+            {% set result = namespace(valid=true, ids=[]) %}
+            {% for response in [maps_before_response, maps_after_response] %}
+              {% set payload = response.get(source_entity, {}) if response is mapping else {} %}
+              {% set maps = payload.get('maps') if payload is mapping else none %}
+              {% set match = namespace(ids=[], valid=true, flags=[]) %}
+              {% if response is not mapping or response | count != 1
+                    or maps is not sequence or maps is string or maps is mapping
+                    or maps | count < 1 or maps | count > 256 %}
+                {% set match.valid = false %}
+              {% else %}
+                {% for item in maps %}
+                  {% if item is not mapping or item.get('flag') is not integer
+                        or item.get('flag') is boolean or not 0 <= item['flag'] <= 65535
+                        or item['flag'] in match.flags
+                        or (item.get('name') is not none and item.get('name') is not string) %}
+                    {% set match.valid = false %}
+                  {% else %}
+                    {% set match.flags = match.flags + [item['flag']] %}
+                    {% set label = item.get('name') or ('Map ' ~ item['flag']) %}
+                    {% if label == selected_before %}
+                      {% set match.ids = match.ids + [item['flag']] %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+              {% if match.valid and match.ids | count == 1 %}
+                {% set result.ids = result.ids + match.ids %}
+              {% else %}
+                {% set result.valid = false %}
+              {% endif %}
+            {% endfor %}
+            {{ result.ids if result.valid else [] }}
+      - variables:
+          position_valid: >-
+            {{ query_allowed
+               and has_value(source_entity) and has_value(selector_entity)
+               and states(selector_entity) == selected_before
+               and states[selector_entity].last_changed.isoformat() == selection_changed_before
+               and resolved_map_ids | count == 2
+               and resolved_map_ids[0] == resolved_map_ids[1]
+               and position_response is mapping and position_response | count == 1
+               and position is mapping and position | count == 2
+               and position.get('x') is number and position.get('x') is not boolean
+               and position.get('y') is number and position.get('y') is not boolean
+               and -10000000 <= position['x'] <= 10000000
+               and -10000000 <= position['y'] <= 10000000 }}
+          received_at: "{{ utcnow().isoformat() }}"
+    sensor:
+      - name: Roborock Q Revo floorplan position
+        unique_id: ha_homelab_roborock_q_revo_floorplan_position
+        default_entity_id: sensor.roborock_q_revo_floorplan_position
+        icon: mdi:robot-vacuum
+        # An availability:false template strips attributes from HA's state.
+        # Render the unavailable state explicitly so the last-known coordinates
+        # remain readable; consumers must still honor that state.
+        state: "{{ 'reported' if position_valid | default(false) else 'unavailable' }}"
+        attributes:
+          x: >-
+            {{ position['x'] if position_valid | default(false)
+               else this.attributes.get('x') }}
+          y: >-
+            {{ position['y'] if position_valid | default(false)
+               else this.attributes.get('y') }}
+          map_id: >-
+            {{ resolved_map_ids[0] if position_valid | default(false)
+               else this.attributes.get('map_id') }}
+          selected_map: >-
+            {{ selected_before if position_valid | default(false)
+               else this.attributes.get('selected_map') }}
+          retrieved_at: >-
+            {{ received_at if position_valid | default(false)
+               else this.attributes.get('retrieved_at') }}
+          observed_at: "{{ none }}"
+          timestamp_quality: not_provided
+          source: roborock.get_vacuum_current_position
+          source_entity: vacuum.roborock_q_revo
+          map_id_source: selected_map_and_cached_get_maps
+          coordinate_system: roborock_map
+          units: mm

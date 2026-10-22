@@ -61,6 +61,11 @@ location inventories stay in the private h3 configuration and HA registries.
 [Lovelace input contrast](docs/lovelace-input-contrast.md) explains the dark theme's
 base palette, the white-on-white form regression, and browser verification.
 
+[Vacuum maps](docs/vacuum-maps.md) adds a private, interactive Roborock view with
+room and zone selection, navigation, cleaning settings, and maintenance status.
+The reusable generator keeps house maps out of source control and documents
+the different mapping limits of the Roomba models.
+
 [RF Airbridge](docs/rf-airbridge.md) adds an exact-code MQTT counter example and
 an explicit, validated RF transmit script while retaining the existing motion
 sensor automations. Its counter is a storage-backed helper; create or restore
