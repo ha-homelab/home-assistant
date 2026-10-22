@@ -235,6 +235,38 @@ class RoombaDashboardTests(unittest.TestCase):
         maps = [row for row in walk(view) if row.get("name") == "Open map / cleaning path"]
         self.assertEqual(maps[0]["tap_action"], {"action": "navigate", "navigation_path": "/house-plan/roomba"})
 
+    def test_relative_trail_accepts_waiting_image_without_weakening_map_verification(self):
+        inventory = fixture()
+        inventory["profiles"][0]["trail"] = "image.example_trail"
+        inventory["states"].append({"entity_id": "image.example_trail", "state": "unavailable",
+                                     "attributes": {"entity_picture": "/private?token=SECRET_TRAIL_TOKEN",
+                                                    "coordinates": [12345, 67890]}})
+        view = build_view(inventory)
+        pictures = [row for row in walk(view) if row.get("type") == "conditional"
+                    and row.get("card", {}).get("type") == "picture-entity"]
+        self.assertEqual(len(pictures), 1)
+        self.assertEqual(pictures[0]["card"]["entity"], "image.example_trail")
+        self.assertEqual(pictures[0]["conditions"], [
+            {"condition": "state", "entity": "image.example_trail", "state_not": "unknown"},
+            {"condition": "state", "entity": "image.example_trail", "state_not": "unavailable"},
+        ])
+        waiting = [row for row in walk(view) if row.get("type") == "conditional"
+                   and "valid cleaning mission identity" in row.get("card", {}).get("content", "")]
+        self.assertEqual(len(waiting), 1)
+        self.assertEqual(waiting[0]["conditions"][0]["condition"], "or")
+        encoded = json.dumps(view)
+        self.assertIn("uncalibrated odometry; not a house map", encoded)
+        for private in ("SECRET_TRAIL_TOKEN", "12345", "67890", "coordinates"):
+            self.assertNotIn(private, encoded)
+        actions = [row["perform_action"] for row in walk(view) if "perform_action" in row]
+        self.assertEqual(actions, ["switch.turn_on"])
+        inventory["states"][-1]["state"] = "2026-01-01T00:00:00Z"
+        self.assertEqual(build_view(inventory), view)
+        for invalid in ("image.missing", "sensor.example_battery", "camera.example_trail"):
+            inventory["profiles"][0]["trail"] = invalid
+            with self.assertRaises(ValueError):
+                build_view(inventory)
+
     def test_patch_preserves_unrelated_content_and_is_idempotent(self):
         inventory = fixture()
         view = build_view(inventory)

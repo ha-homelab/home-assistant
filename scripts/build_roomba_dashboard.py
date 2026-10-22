@@ -5,7 +5,9 @@ Input: {"states": [...], "profiles": [{"entity": "vacuum.example", "name":
 "Example", "model": "960", "battery": "sensor.example_battery", "network":
 "binary_sensor.example_network", "statistics": ["sensor.example_missions"]}]}.
 Optional profile keys: charging, bin_full, dock_power, last_recovery, telemetry,
-capability_note, and map. A map requires verified:true plus either an image/
+capability_note, trail, and map. A trail is an explicit existing image entity
+for experimental relative odometry; it can be unavailable while waiting for
+actual poses. A map requires verified:true plus either an image/
 camera entity or a local navigation_path. No map coordinates or tokens are
 copied from the inventory. Existing dashboard content is preserved by the merge.
 Supplying a map asserts that its association was independently checked.
@@ -29,7 +31,7 @@ ENTITY = re.compile(r"[a-z][a-z0-9_]*\.[a-z0-9_]+\Z")
 NAVIGATION = re.compile(r"/[A-Za-z0-9_/-]+\Z")
 PROFILE_KEYS = {
     "entity", "name", "model", "battery", "charging", "bin_full", "network",
-    "dock_power", "last_recovery", "telemetry", "statistics", "capability_note", "map",
+    "dock_power", "last_recovery", "telemetry", "statistics", "capability_note", "map", "trail",
 }
 SENSOR_DOMAINS = {
     "battery": {"sensor"}, "charging": {"binary_sensor"},
@@ -126,6 +128,8 @@ def _validate(inventory):
         # also checks capabilities when rendering each configured command.
         profile["commands"] = [command for bit, command in COMMANDS
                                if type(features) is int and features >= 0 and features & bit]
+        if "trail" in source:
+            profile["trail"] = selected(source["trail"], {"image"})
         if "map" in source:
             mapping = source["map"]
             if (not isinstance(mapping, dict) or mapping.get("verified") is not True
@@ -252,6 +256,24 @@ def _robot_cards(profile):
             cards.append({"type": "button", "name": "Open map / cleaning path", "icon": "mdi:map",
                           "tap_action": {"action": "navigate", "navigation_path": mapping["navigation_path"]},
                           "hold_action": {"action": "none"}})
+    if "trail" in profile:
+        image = profile["trail"]
+        cards.append({"type": "markdown", "content":
+                      "**Relative cleaning path**\n\nExperimental, uncalibrated odometry; not a house map."})
+        cards.append(_conditional(_available(image), {
+            "type": "picture-entity", "entity": image, "show_name": False, "show_state": False,
+            "fit_mode": "contain", "tap_action": {"action": "more-info"},
+            "hold_action": {"action": "none"}}))
+        cards.append(_conditional([_unavailable(image)], {"type": "markdown", "content": "\n".join((
+            f"{{% if state_attr('{image}', 'path_status') == 'unknown_mission' %}}",
+            "Path unavailable: the robot has not provided a valid cleaning mission identity.",
+            f"{{% elif state_attr('{image}', 'connected') == false %}}",
+            "Waiting for the robot's local connection and fresh cleaning poses.",
+            "{% else %}",
+            "Waiting for at least two fresh, complete poses in one continuous cleaning segment.",
+            "{% endif %}",
+            "Only supported local pose reports are used; no house layout is inferred.",
+        ))}))
     for card in cards:
         card["grid_options"] = {"columns": "full", "rows": "auto"}
     return cards

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="840" viewBox="0 0 1200 840" role="img" aria-labelledby="title description">
   <title id="title">Roomba controls and honest map evidence</title>
-  <desc id="description">One local MQTT connection belongs to Home Assistant's native iRobot integration. A passive observer produces diagnostic telemetry; Lovelace sends only explicit supported commands through the native integration. A separate evidence gate is required before private coordinates can appear on the 3D floorplan. No real household map or identifiers are included.</desc>
+  <desc id="description">One local MQTT connection belongs to Home Assistant's native iRobot integration. A passive observer produces diagnostic telemetry and an experimental bounded relative cleaning-path image from fresh pose messages; Lovelace sends only explicit supported commands through the native integration. The path has no walls or rooms. A separate evidence gate is required before private coordinates can appear on the 3D floorplan. No real household map or identifiers are included.</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto-start-reverse"><path d="M1 1 8 5 1 9" fill="none" stroke="#526780" stroke-width="1.8"/></marker>
     <style>
@@ -56,8 +56,16 @@
   <text class="body" x="438" y="504">Bounded diagnostic fields only</text>
   <text class="body" x="438" y="534">Local receipt ≠ observation time</text>
   <text class="body" x="438" y="564">Uncalibrated pose ≠ house position</text>
-  <path class="arrow" d="M761 489 H1006 V359"/>
-  <text class="small" x="784" y="511">diagnostic entity details</text>
+  <path class="arrow" d="M761 489 H843"/>
+
+  <rect class="box" x="852" y="409" width="304" height="179" rx="18" fill="#dff5f7" stroke="#79afb5"/>
+  <text class="label" x="874" y="439">EXPERIMENTAL · IN MEMORY</text>
+  <text class="heading" x="874" y="472">Relative cleaning path</text>
+  <text class="body" x="874" y="504">At most 2,048 sampled points</text>
+  <text class="body" x="874" y="534">Breaks at gaps and resets</text>
+  <text class="small" x="874" y="564">No walls, rooms or 3D coordinates.</text>
+  <path class="arrow" d="M1006 407 V359"/>
+  <text class="small" x="1022" y="385">private PNG</text>
 
   <rect class="box" x="44" y="409" width="272" height="179" rx="18" fill="#ffffff" stroke="#a7b7c9"/>
   <text class="heading" x="66" y="445">Map support is separate</text>

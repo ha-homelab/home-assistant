@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 from types import SimpleNamespace
 import unittest
+from unittest.mock import AsyncMock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 COMPONENT = ROOT / "config/custom_components/roomba_insights"
@@ -211,6 +212,31 @@ class LifecycleTest(unittest.TestCase):
         self.manager.async_notify("test", self.binding)
         self.assertEqual(self.jobs, [])
 
+    def test_trail_receives_actual_delta_and_explicit_disconnect_boundary(self):
+        events = []
+        self.binding.trail = SimpleNamespace(
+            update=lambda reported, delta, **kwargs: events.append(("update", delta)),
+            break_path=lambda **kwargs: events.append(("break", kwargs["reason"])),
+            snapshot=lambda: "frozen",
+        )
+        delta = {"pose": deepcopy(P)}
+        self.binding.on_message({"state": {"reported": delta}})
+        self.binding.on_disconnect("connection lost")
+        self.assertEqual(events, [("update", delta), ("break", "disconnected")])
+
+    def test_normal_disconnect_and_unavailable_entry_break_trail_on_inspection(self):
+        events = []
+        self.binding.trail = SimpleNamespace(
+            break_path=lambda **kwargs: events.append(kwargs["reason"]),
+            snapshot=lambda: "frozen",
+        )
+        self.robot.roomba_connected = False
+        self.assertEqual(self.manager.snapshot_trail("test"), "frozen")
+        self.robot.roomba_connected = True
+        self.entry.state = integration.ConfigEntryState.SETUP_RETRY
+        self.manager.snapshot_trail("test")
+        self.assertEqual(events, ["disconnected", "disconnected"])
+
     def test_malformed_messages_do_not_crash_callback(self):
         for payload in [None, [], {"state": None}, {"state": {"reported": None}}]:
             self.binding.on_message(payload)
@@ -222,10 +248,16 @@ class SetupTest(unittest.IsolatedAsyncioTestCase):
         import tempfile
         from homeassistant import loader
         from homeassistant.bootstrap import async_load_base_functionality
+        from homeassistant.auth import auth_manager_from_config
         from homeassistant.config_entries import ConfigEntries, ConfigEntry
         from homeassistant.helpers import entity_registry as er
         self.original_component_path = custom_components.__path__
         custom_components.__path__ = [str(ROOT / "config/custom_components")]
+        # The image platform depends on HTTP. Keep the real platform/view setup,
+        # but never bind a second HTTP listener inside the production pod.
+        self.http_bind_patch = patch("homeassistant.components.http.server.HomeAssistantHTTP.async_bind",
+                                     new=AsyncMock(), create=True)
+        self.http_bind_patch.start()
         self.temp = tempfile.TemporaryDirectory(prefix="roomba-insights-test-")
         (Path(self.temp.name) / "custom_components").symlink_to(ROOT / "config/custom_components", target_is_directory=True)
         self.hass = HomeAssistant(self.temp.name)
@@ -233,6 +265,7 @@ class SetupTest(unittest.IsolatedAsyncioTestCase):
         self.hass.config_entries = ConfigEntries(self.hass, {})
         self.hass.config.skip_pip = True
         self.assertTrue(await async_load_base_functionality(self.hass))
+        self.hass.auth = await auth_manager_from_config(self.hass, [], [])
         self.robot = SimpleNamespace(master_state={"state": {"reported": {"pose": deepcopy(P), "cap": {"pose": 1}}}},
                                      roomba_connected=True, on_message_callbacks=[], on_disconnect_callbacks=[])
         self.robot.register_on_message_callback = self.robot.on_message_callbacks.append
@@ -262,6 +295,7 @@ class SetupTest(unittest.IsolatedAsyncioTestCase):
         if runtime is not None:
             runtime.close()
         await self.hass.async_stop(force=True)
+        self.http_bind_patch.stop()
         self.temp.cleanup()
         custom_components.__path__ = self.original_component_path
 
@@ -271,6 +305,8 @@ class SetupTest(unittest.IsolatedAsyncioTestCase):
         manager = self.companion.runtime_data
         self.assertEqual(len(manager.entities), 5)
         self.assertEqual(len(manager.bindings), 1)
+        self.assertEqual(len(manager.images), 1)
+        self.assertEqual(len(self.hass.states.async_all("image")), 1)
         states = [s for s in self.hass.states.async_all("sensor") if "native_entry_state" in s.attributes]
         self.assertEqual(len(states), 5)
         self.assertEqual(sum(s.attributes["connected"] for s in states), 1)
@@ -279,6 +315,11 @@ class SetupTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.robot.on_message_callbacks, [])
         self.assertEqual(self.robot.on_disconnect_callbacks, [])
         self.assertTrue(manager.closed)
+        # HA intentionally restores registry entities as unavailable on unload.
+        self.assertTrue(all(state.state == "unavailable" for state in self.hass.states.async_all("image")))
+        self.assertTrue(all(image._removed for image in manager.images.values()))
+        for image in manager.images.values():
+            self.assertIsNone(await image.async_image())
 
     async def test_config_flow_aborts_existing_singleton(self):
         from custom_components.roomba_insights.config_flow import RoombaInsightsConfigFlow

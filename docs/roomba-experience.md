@@ -4,6 +4,8 @@ This repository adds a native Lovelace fleet view and an optional **Roomba
 Insights** companion integration. They reuse Home Assistant's existing iRobot
 integration. The dashboard exposes supported controls and useful diagnostics;
 the companion observes local messages without opening another robot connection.
+An experimental image can draw a relative cleaning path from supported robots'
+actual pose messages. It does not create a house map.
 
 Source availability, passing tests, installation in HA, and a successful physical
 cleaning test are separate results. This guide describes the implementation and
@@ -77,6 +79,28 @@ version, but does not replay it. A matching catalog does not establish the
 active floor or physical room labels. Never substitute a whole-home `start`
 when room selection is empty, invalid or no longer matches its map version.
 
+## Experimental relative path, not a house map
+
+Pose-capable robots gain a **Relative cleaning path** image. A connected robot
+must report a valid mission identity, an active cleaning phase, and at least
+two complete pose points before the image becomes available. Cached startup
+coordinates are never drawn. A robot or firmware without the required mission
+fields will correctly leave this feature unavailable.
+
+The plain PNG shows only sampled relative motion. It cannot show walls, room
+boundaries, absolute coverage, or where the robot is on the home's 3D plan.
+Mission changes and reconnects start a new trace; invalid poses and temporal or
+coordinate gaps break the line. The history is limited to 2,048 points and
+exists only in memory. The technical [path contract](roomba-insights.md#experimental-relative-cleaning-path)
+documents the sampling, image and lifecycle limits.
+
+Bind the actual image entity to the dedicated `trail` slot in the Lovelace
+profile below. It may be unavailable initially: the view shows an explanation
+while waiting for a connection, mission identity or enough valid poses. Once a
+supervised clean produces a real image, inspect it against the intended robot's
+movement. Software and synthetic pixel tests do not establish that physical
+correspondence; physical acceptance remains outstanding.
+
 ## Generate the Lovelace view
 
 [`scripts/build_roomba_dashboard.py`](../scripts/build_roomba_dashboard.py) runs
@@ -95,7 +119,8 @@ with a private inventory of your actual entities:
     {"entity_id": "vacuum.example_robot", "state": "docked", "attributes": {"supported_features": 13084}},
     {"entity_id": "sensor.example_robot_battery", "state": "90", "attributes": {}},
     {"entity_id": "binary_sensor.example_robot_network", "state": "on", "attributes": {}},
-    {"entity_id": "sensor.example_robot_local_telemetry", "state": "charge", "attributes": {}}
+    {"entity_id": "sensor.example_robot_local_telemetry", "state": "charge", "attributes": {}},
+    {"entity_id": "image.example_robot_relative_cleaning_path", "state": "unavailable", "attributes": {}}
   ],
   "profiles": [{
     "entity": "vacuum.example_robot",
@@ -104,7 +129,8 @@ with a private inventory of your actual entities:
     "battery": "sensor.example_robot_battery",
     "network": "binary_sensor.example_robot_network",
     "telemetry": "sensor.example_robot_local_telemetry",
-    "capability_note": "Reported pose is uncalibrated; no room map is configured."
+    "trail": "image.example_robot_relative_cleaning_path",
+    "capability_note": "Experimental relative path; no room map is configured."
   }]
 }
 ```
@@ -120,14 +146,19 @@ python3 scripts/build_roomba_dashboard.py /private/robot-inventory.json \
 ```
 
 Optional profile keys include `charging`, `bin_full`, `dock_power`,
-`last_recovery`, `telemetry`, and `statistics`. The explicit telemetry binding
+`last_recovery`, `telemetry`, `trail`, and `statistics`. The explicit telemetry binding
 shows its state and `last_message_received_at`, or **Never received** when no
 message has arrived. Use actual separate battery sensors when the
 native vacuum no longer has a `battery_level` attribute. Every referenced entity
 must exist in the input inventory. Source state attributes are not copied
 wholesale into the generated configuration.
 
-A verified map may be supplied as exactly one of:
+The `trail` binding requires an existing image entity but permits its waiting
+or unavailable state. It is always labelled as an experimental relative path,
+with a reason shown when no image can be displayed. It does not assert that a
+house map has been verified.
+
+A separately verified map may be supplied as exactly one of:
 
 ```json
 {"map": {"verified": true, "entity": "image.example_robot_map"}}
@@ -193,6 +224,7 @@ Run the focused tests from the repository root:
 ```sh
 python3 -m unittest discover -s tests -p 'test_roomba_dashboard.py' -v
 python3 -m unittest discover -s tests -p 'test_roomba_insights.py' -v
+python3 -m unittest discover -s tests -p 'test_roomba_trail.py' -v
 ```
 
 Pure tests cover strict inputs, supported controls, merge preservation, receipt
@@ -202,11 +234,14 @@ without the HA runtime these are **skipped**, not passed. Run that suite in the
 target HA 2026.10.0 environment to verify singleton setup, mixed available/offline
 entries, callback cleanup and native-client replacement.
 
-On 2026-10-22, all **20 insights tests passed in the HA 2026.10.0 runtime**, with
-no skips: 14 telemetry tests, four callback/lifecycle tests and two setup/flow
-tests. The setup fixture used five synthetic native entries with only one
-loaded and a fake connection. This verifies software compatibility, not a
-physical robot's connectivity, map availability or deployment of the companion.
+On 2026-10-22, all **46 component tests passed in the HA 2026.10.0 runtime**, with
+no skips: 23 insights tests and 23 trail tests, including five ImageEntity
+lifecycle tests. The setup fixture used five synthetic native entries with one
+loaded, pose-capable fake connection; both sensor and image platforms were
+loaded and unloaded. The 15 dashboard tests also passed locally. This verifies
+software compatibility, not a physical robot's connectivity, map availability,
+cleaning-path accuracy or deployment of the companion. Local runs skip the
+HA-specific tests when HA is not installed.
 
 After installation, verify sensors and the dashboard in HA. Confirm a command
 with an appropriate supervised physical test before claiming cleaning works.

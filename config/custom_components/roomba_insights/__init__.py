@@ -13,8 +13,9 @@ from homeassistant.util import dt as dt_util
 
 from .const import NATIVE_DOMAIN, SCAN_SECONDS
 from .telemetry import Telemetry
+from .trail import CleaningTrail
 
-PLATFORMS = [Platform.SENSOR]
+PLATFORMS = [Platform.SENSOR, Platform.IMAGE]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -41,6 +42,7 @@ class NativeBinding:
         self.robot = robot
         self.active = True
         self.telemetry = Telemetry()
+        self.trail = CleaningTrail()
         self.telemetry.update(self.reported(), received_at=dt_util.utcnow().isoformat(), initial=True)
         robot.register_on_message_callback(self.on_message)
         robot.register_on_disconnect_callback(self.on_disconnect)
@@ -57,15 +59,20 @@ class NativeBinding:
         delta = state.get("reported", {}) if isinstance(state, dict) else {}
         # Construct the snapshot in the MQTT callback, after the library merges
         # this message and before another MQTT message can alter the cache.
-        self.telemetry.update(self.reported(), received_at=dt_util.utcnow().isoformat(), delta=delta)
+        received_at = dt_util.utcnow().isoformat()
+        reported = self.reported()
+        self.telemetry.update(reported, received_at=received_at, delta=delta)
+        self.trail.update(reported, delta, received_at=received_at)
         self.manager.hass.add_job(self.manager.async_notify, self.entry_id, self)
 
     def on_disconnect(self, _error):
         if self.active:
+            self.trail.break_path(reason="disconnected")
             self.manager.hass.add_job(self.manager.async_notify, self.entry_id, self)
 
     def close(self):
         self.active = False
+        self.trail.break_path(reason="disconnected")
         for callbacks, ours in (
             (self.robot.on_message_callbacks, self.on_message),
             (self.robot.on_disconnect_callbacks, self.on_disconnect),
@@ -79,9 +86,12 @@ class InsightsManager:
         self.hass = hass
         self.bindings = {}
         self.last_known = {}
+        self.last_trails = {}
         self.entities = {}
+        self.images = {}
         self.entries = {}
         self.add_entities: Callable | None = None
+        self.add_images: Callable | None = None
         self.cancel_timer = None
         self.closed = False
 
@@ -103,6 +113,7 @@ class InsightsManager:
             if entry is None or entry.state != ConfigEntryState.LOADED or getattr(runtime, "roomba", None) is not binding.robot:
                 binding.close()
                 self.last_known[entry_id] = binding.telemetry
+                self.last_trails[entry_id] = binding.trail.snapshot()
                 del self.bindings[entry_id]
         for entry_id, entry in entries.items():
             if entry_id not in self.entities and self.add_entities is not None:
@@ -114,6 +125,17 @@ class InsightsManager:
                 robot = getattr(getattr(entry, "runtime_data", None), "roomba", None)
                 if robot is not None:
                     self.bindings[entry_id] = NativeBinding(self, entry, robot)
+                    self.last_trails.pop(entry_id, None)
+            binding = self.bindings.get(entry_id)
+            if binding is not None:
+                if not binding.robot.roomba_connected:
+                    binding.trail.break_path(reason="disconnected")
+                supports_pose = binding.telemetry.data.get("pose_supported") or binding.telemetry.data.get("position") is not None
+                if supports_pose and entry_id not in self.images and self.add_images is not None:
+                    from .image import RoombaTrailImage
+                    image = RoombaTrailImage(self, entry)
+                    self.images[entry_id] = image
+                    self.add_images([image])
             if sensor := self.entities.get(entry_id):
                 native = next((e for e in er.async_entries_for_config_entry(registry, entry_id)
                                if e.domain == "vacuum" and e.platform == NATIVE_DOMAIN), None)
@@ -121,10 +143,16 @@ class InsightsManager:
                 self.async_notify(entry_id)
         for entry_id in set(self.last_known) - set(entries):
             del self.last_known[entry_id]
+        for entry_id in set(self.last_trails) - set(entries):
+            del self.last_trails[entry_id]
         for entry_id in set(self.entities) - set(entries):
             entity = self.entities.pop(entry_id)
             if entity.hass:
                 self.hass.async_create_task(entity.async_remove())
+        for entry_id in set(self.images) - set(entries):
+            image = self.images.pop(entry_id)
+            if image.hass:
+                self.hass.async_create_task(image.async_remove())
 
     @callback
     def async_notify(self, entry_id, source=None):
@@ -133,6 +161,9 @@ class InsightsManager:
         sensor = self.entities.get(entry_id)
         if sensor is not None and sensor.hass and sensor.entity_id:
             sensor.async_write_ha_state()
+        image = self.images.get(entry_id)
+        if image is not None and image.hass and image.entity_id:
+            image.async_update_trail()
 
     def snapshot(self, entry_id, source_entity_id):
         entry = self.hass.config_entries.async_get_entry(entry_id)
@@ -144,6 +175,14 @@ class InsightsManager:
                          and binding.robot.roomba_connected)
         return telemetry.snapshot(connected=connected, entry_state=state,
                                   source_entity_id=source_entity_id)
+
+    def snapshot_trail(self, entry_id):
+        binding = self.bindings.get(entry_id)
+        if binding is not None:
+            if not self.snapshot(entry_id, None)["connected"]:
+                binding.trail.break_path(reason="disconnected")
+            return binding.trail.snapshot()
+        return self.last_trails.get(entry_id)
 
     @callback
     def close(self):
