@@ -27,10 +27,12 @@ automation:
           sources:
             sensor.garage_person_active_count_2:
               camera: camera.garage_camera_notifications
+              cisco_camera_key: garage
               name: Garage
               tag: frigate-person-garage
             sensor.porch_person_active_count_2:
               camera: camera.porch_camera_notifications
+              cisco_camera_key: porch
               name: Porch
               tag: frigate-person-porch
       - action: script.notify_optional
@@ -46,6 +48,16 @@ automation:
               url: /lovelace/2
               push:
                 category: camera
+      - event: cisco_motion_snapshot_requested
+        event_data:
+          camera_key: '{{ sources[trigger.entity_id].cisco_camera_key }}'
+          event_id: >-
+            {{ (trigger.to_state.context.id if trigger is defined and trigger.to_state is defined
+                and trigger.to_state is not none else '') ~ '_' ~ sources[trigger.entity_id].cisco_camera_key }}
+          event_at: >-
+            {{ as_timestamp(trigger.to_state.last_changed, 0) | int(0)
+               if trigger is defined and trigger.to_state is defined and trigger.to_state is not none else 0 }}
+        continue_on_error: true
     mode: parallel
     max: 10
     trace:
@@ -92,6 +104,16 @@ automation:
               url: /lovelace/2
               push:
                 category: camera
+      - event: cisco_motion_snapshot_requested
+        event_data:
+          camera_key: ring
+          event_id: >-
+            {{ (trigger.to_state.context.id if trigger is defined and trigger.to_state is defined
+                and trigger.to_state is not none else '') ~ '_ring' }}
+          event_at: >-
+            {{ as_timestamp(trigger.to_state.last_changed, 0) | int(0)
+               if trigger is defined and trigger.to_state is defined and trigger.to_state is not none else 0 }}
+        continue_on_error: true
     mode: single
     trace:
       stored_traces: 5
