@@ -1,0 +1,54 @@
+# Optional Cisco delivery follows the existing mobile notification. All addresses,
+# credentials, camera entities and destination numbers stay in the private JSON.
+shell_command:
+  cisco_motion_snapshot: >-
+    python3 /config/housekeeping/cisco_motion_snapshot.py
+    --config /config/.storage/cisco_motion/config.json
+    --camera {{ camera_key if camera_key is string and camera_key in ['garage', 'porch', 'ring', 'living_room_onvif'] else 'invalid' }}
+    --event-id {{ event_id if event_id is string and event_id | regex_match('^[A-Za-z0-9_-]{8,96}$') and event_id == event_id | trim else 'invalid/event' }}
+    --event-at {{ event_at | default(0) | int(0) }}
+
+automation:
+  - id: ha_homelab_cisco_motion_snapshot
+    alias: 'Cisco: show a motion snapshot'
+    description: >-
+      Send one recent event frame to privately configured idle Cisco phones.
+      The event producer does not wait for camera or phone work. Drop excess
+      events instead of queuing stale images.
+    triggers:
+      - trigger: event
+        event_type: cisco_motion_snapshot_requested
+    variables:
+      camera_key: '{{ trigger.event.data.get("camera_key") }}'
+      event_id: '{{ trigger.event.data.get("event_id") }}'
+      event_at: '{{ trigger.event.data.get("event_at") }}'
+    conditions:
+      - condition: state
+        entity_id: input_boolean.notifications_off
+        state: 'off'
+      - condition: template
+        value_template: >-
+          {% set key = trigger.event.data.get('camera_key') %}
+          {% set identifier = trigger.event.data.get('event_id') %}
+          {% set original_time = trigger.event.data.get('event_at') %}
+          {% set stamp = original_time | float(0) %}
+          {% set age = as_timestamp(now()) - stamp %}
+          {{ key is string
+             and key in ['garage', 'porch', 'ring', 'living_room_onvif']
+             and identifier is string
+             and identifier | regex_match('^[A-Za-z0-9_-]{8,96}$')
+             and identifier == identifier | trim
+             and stamp > 0 and stamp == original_time | int(0)
+             and -5 <= age <= 90 }}
+    actions:
+      - action: shell_command.cisco_motion_snapshot
+        data:
+          camera_key: '{{ camera_key }}'
+          event_id: '{{ event_id }}'
+          event_at: '{{ event_at | int(0) }}'
+        continue_on_error: true
+    mode: parallel
+    max: 4
+    max_exceeded: silent
+    trace:
+      stored_traces: 5
