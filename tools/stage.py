@@ -37,6 +37,31 @@ print(json.dumps({'live_files':{name:digest(root/name) for name in files},
 '''
 
 
+PREPARE_ENVIRONMENT = r'''
+from pathlib import Path
+import sys
+stage=Path(sys.argv[1]); root=Path('/config')
+assert stage.parent==root and stage.name.startswith('.ha-homelab-stage-')
+assert stage.is_dir() and not stage.is_symlink(), 'Invalid staging directory'
+secrets=stage/'secrets.yaml'
+assert secrets.is_file() and not secrets.is_symlink(), 'Invalid staged secrets'
+secrets.chmod(0o600)
+staged=stage/'custom_components'; installed=root/'custom_components'
+assert not staged.is_symlink(), 'Staged custom_components must be a real directory'
+staged.mkdir(exist_ok=True)
+if installed.exists():
+    assert installed.is_dir(), 'Installed custom_components must be a directory'
+    for source in sorted(installed.iterdir()):
+        target=staged/source.name
+        # A bundled component must be checked as a complete replacement. Never
+        # overlay its files with the installed version or follow a target link.
+        # is_symlink also protects a preexisting broken link from replacement.
+        if target.exists() or target.is_symlink():
+            continue
+        target.symlink_to(source, target_is_directory=source.is_dir())
+'''
+
+
 def write_private(path, content):
     """Create evidence without overwriting a previous receipt or exposing secrets."""
     descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
@@ -100,9 +125,9 @@ def main():
                 member.mode = 0o600 if relative == "secrets.yaml" else 0o644
                 tar.addfile(member, io.BytesIO(content))
     subprocess.run(kubectl + ["exec", "-i", args.pod, "--", "tar", "-xf", "-", "-C", remote], input=stream.getvalue(), check=True)
-    # Reuse installed integration code for schema validation, without starting HA.
-    code = "from pathlib import Path; import sys; p=Path(sys.argv[1]); (p/'secrets.yaml').chmod(0o600); (p/'custom_components').symlink_to('/config/custom_components', target_is_directory=True)"
-    subprocess.run(execute + ["python", "-c", code, remote], check=True)
+    # Check bundled integration code, while making installed components that
+    # are absent from this bundle available for schema validation. No HA start.
+    subprocess.run(execute + ["python", "-c", PREPARE_ENVIRONMENT, remote], check=True)
     live = json.loads(subprocess.check_output(execute + ["python", "-c", FINGERPRINT, remote, json.dumps(files)], text=True))
     check = subprocess.run(execute + ["python", "-m", "homeassistant", "--script", "check_config", "--config", remote, "--json"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     write_private(log, check.stdout)

@@ -93,6 +93,11 @@ rechecks current motion and manual overrides before each command.
 [Living room presence](docs/living-room-presence.md) keeps Living lamp on during
 the overnight curtain schedule and for 20 minutes after confirmed absence.
 
+[Roomba controls, maps and local telemetry](docs/roomba-experience.md) provide a
+native fleet dashboard and a passive companion for existing iRobot connections,
+with model-specific map limits and explicit position provenance for future 3D
+integration.
+
 The [water pump rules](docs/water-pump-levels.md) use 26/27 cm operating thresholds
 with a 1 cm gap and retain the existing pump protections.
 
