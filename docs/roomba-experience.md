@@ -157,6 +157,10 @@ The `trail` binding requires an existing image entity but permits its waiting
 or unavailable state. It is always labelled as an experimental relative path,
 with a reason shown when no image can be displayed. It does not assert that a
 house map has been verified.
+HA can suppress diagnostics on an unavailable image. Follow the
+[registry-based pairing procedure](roomba-insights.md#pairing-a-waiting-image-safely)
+to associate it with the correct telemetry sensor and native vacuum; a generic
+waiting message does not mean the association failed.
 
 A separately verified map may be supplied as exactly one of:
 

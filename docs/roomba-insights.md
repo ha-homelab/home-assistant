@@ -34,6 +34,33 @@ alone does not deploy them or create the integration entry. Removing Roomba
 Insights detaches only its own observers and leaves the native connection
 running.
 
+### Pairing a waiting image safely
+
+HA suppresses an image entity's `extra_state_attributes` while it is
+unavailable. A waiting path image can therefore lack `path_status` and other
+diagnostics in its state. Do not require a `source_entity_id` attribute on the
+image or infer its robot from a friendly name. Use the entity registry and the
+companion telemetry sensor instead:
+
+1. Read the image's registered unique ID, which has the form
+   `<native_entry_id>_relative_cleaning_path`.
+2. Find exactly one sensor with unique ID
+   `<native_entry_id>_local_telemetry`, the same `roomba_insights` platform,
+   and the same companion `config_entry_id` as the image.
+3. Require that sensor's state to be available, then read its
+   `source_entity_id`. Verify that it identifies the intended native `roomba`
+   vacuum and that the vacuum's registry `config_entry_id` matches the native
+   entry prefix from step 1. The companion entry ID and native entry ID are
+   different roles; do not compare them as if they were the same entry.
+4. Save the verified image/sensor/vacuum association in the private dashboard
+   inventory. Stop on missing, unavailable or ambiguous evidence; never select
+   the first similarly named entity.
+
+The image may remain unavailable after correct pairing until sufficient
+cleaning poses arrive. Its missing diagnostics are not proof of a broken
+association. Use the paired telemetry sensor for commissioning and accept a
+generic waiting message when the image cannot expose a more specific reason.
+
 ## What the sensor means
 
 The state is the reported mission phase when connected, or the native entry's
