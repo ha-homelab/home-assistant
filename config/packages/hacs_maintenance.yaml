@@ -109,7 +109,7 @@ automation:
   - id: ha_homelab_hacs_maintenance_update
     alias: "HACS maintenance: update repositories and restart once"
     description: >-
-      Sunday at 06:00 Home Assistant local time, reuse a successful automatic backup
+      Daily at 06:00 Home Assistant local time, reuse a successful automatic backup
       from the preceding four hours or create one, then install available HACS
       updates sequentially and restart once if integrations require it.
       Stop and notify on any failure or timeout.
@@ -147,8 +147,6 @@ automation:
         {% endfor %}
         {{ ns.pending }}
     conditions:
-      - condition: time
-        weekday: [sun]
       - condition: template
         value_template: "{{ pending_updates | count > 0 or restart_requested }}"
     actions:
@@ -201,7 +199,8 @@ automation:
                  and is_state('sensor.backup_backup_manager_state', 'idle')
                  and states('sensor.backup_last_successful_automatic_backup') != backup_before
                  and as_timestamp(states('sensor.backup_last_successful_automatic_backup'), 0) >= backup_started }}
-            timeout: "00:30:00"
+            # Remote uploads can legitimately exceed the former 30-minute budget.
+            timeout: "01:00:00"
             continue_on_timeout: true
           - if:
               - condition: template
@@ -217,7 +216,7 @@ automation:
                   title: HACS maintenance stopped
                   message: >-
                     A new successful automatic backup was not confirmed within
-                    30 minutes. No HACS updates were started. Check Settings >
+                    60 minutes. No HACS updates were started. Check Settings >
                     System > Backups. Any running backup is left to finish.
               - stop: A fresh successful backup is required before updating HACS.
                 error: true
