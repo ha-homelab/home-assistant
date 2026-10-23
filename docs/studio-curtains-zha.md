@@ -143,6 +143,9 @@ No factory reset, firmware flash or travel calibration is required to install th
 
 ## Automation migration on 2026-10-12
 
+This is the historical migration record. The manual-opening policy below
+supersedes its morning behavior; do not restore the morning Studio actions.
+
 The owner confirmed that the new Zigbee motor is powered through
 `switch.studio_guard`. Both existing automation identities, schedules,
 `input_boolean.curtains_sticky` conditions and power sequences are retained.
@@ -170,3 +173,26 @@ changed automation files, run the installed HA configuration checker, then reloa
 each by its stable automation ID. Verify loaded configuration, enabled state and
 unchanged motor state without firing the household schedules. These checks do not
 constitute a new physical movement or cold-start recovery test.
+
+## Manual opening policy (2026-10-23)
+
+Studio must not open automatically in the morning. Rule **078** now operates
+only the kitchen and dining curtains: both `switch.studio_guard` power-on and
+`cover.studio_curtains` opening have been removed from that schedule. This policy
+does not depend on the shared `input_boolean.curtains_sticky` being enabled.
+Manual controls and the existing evening close rule **027** remain available.
+The motor still needs power for manual commands.
+
+The incident was traced to rule 078's sunrise trigger, followed by its existing
+90-second warm-up and explicit Studio open action. It was not an unsolicited
+Zigbee command. Removing only the open command would leave unnecessary scheduled
+power changes, so the entire Studio branch was removed. Kitchen and dining
+retain their daylight check, earliest time, warm-up and subsequent power sequence.
+
+Validation uses an isolated Home Assistant instance with recorded service calls.
+The morning tests require that neither Studio power nor Studio movement is
+called, while kitchen/dining opening and evening Studio closing still work.
+To deploy, replace only rule 078, run the installed configuration checker, and
+reload that automation by its immutable ID. Confirm its loaded actions and
+enabled state without triggering it. No physical movement is needed to test
+this policy, and a source-pin rollback must not restore the old morning actions.

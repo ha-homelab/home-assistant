@@ -2,8 +2,9 @@
 # Stable entity: automation.open_curtains_in_the_morning.
 - id: ha_homelab_curtains_open_curtains_in_the_morning
   alias: 'Curtains: Open curtains in the morning'
-  description: Open studio, kitchen and dining curtains at sunrise or 06:35, whichever is later.
-    Preserve the motor warm-up sequence and respect the manual override.
+  description: Open kitchen and dining curtains at sunrise or 06:35, whichever is later.
+    Preserve the motor warm-up sequence and respect the manual override. Studio opening
+    is manual only; do not power or open its motor from this schedule.
   triggers:
   - platform: time
     at: 06:35:00
@@ -20,18 +21,12 @@
     after: sunrise
     before: sunset
   actions:
-  - service: switch.turn_on
-    entity_id: switch.studio_guard
+  # Studio opening is manual only. Keep its power and opening out of this rule.
   - service: switch.turn_on
     entity_id: switch.dining_guard
   - service: switch.turn_on
     entity_id: switch.kitchen_guard
   - delay: 00:01:30
-  # The old Studio motor relied on power restoration; it had no open command.
-  # The new ZHA motor must receive an explicit command after the same warm-up.
-  - service: cover.open_cover
-    entity_id: cover.studio_curtains
-    continue_on_error: true
   - service: cover.open_cover
     entity_id: cover.kitchen_curtains_l
   - service: cover.open_cover

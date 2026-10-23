@@ -352,11 +352,10 @@ class StudioCurtainMigrationTest(unittest.IsolatedAsyncioTestCase):
                                         'cover.office_curtains_office_curtains')
                              for _, _, target in self.events))
 
-    async def test_morning_explicitly_opens_new_cover_after_power(self):
+    async def test_morning_leaves_studio_power_and_cover_untouched(self):
         await self.run_rule('078')
-        power = self.events.index(('switch', 'turn_on', 'switch.studio_guard'))
-        opened = self.events.index(('cover', 'open_cover', 'cover.studio_curtains'))
-        self.assertLess(power, opened)
+        self.assertFalse(any(target in ('switch.studio_guard', 'cover.studio_curtains')
+                             for _, _, target in self.events))
         self.assertIn(('cover', 'open_cover', 'cover.kitchen_curtains_l'), self.events)
         self.assertIn(('cover', 'open_cover', 'cover.dining_curtains_l'), self.events)
 
