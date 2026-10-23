@@ -3034,27 +3034,30 @@
         "conditions",
         "action"
       ],
-      "behavior_sha256": "240ad0c6fa63dc00e8706bcc9ef48bd6aea7e2c42031b4edb3b4c048c0e326da",
+      "behavior_sha256": "b1ddc6c9ce33fd004f1eedb06d207bdb44d31b136a062d957f235953756063a2",
       "references": [
         "binary_sensor.rf_dinner_motion",
         "binary_sensor.rf_dinner_two_motion",
         "input_boolean.living_room_sticky",
-        "switch.dining_media_guard",
         "switch.fireplace_switch",
         "switch.living_guard2",
         "switch.turn_on"
       ],
       "imported_behavior_sha256": "28b6ba6f4e969ff4cffefa729802298ad40f68d8d8eded1689207a9aa7eeeb64",
       "behavior_change": {
-        "date": "2026-10-20",
-        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "date": "2026-10-22",
+        "reason": "Move only Dining Media guard to the shared Living/Lobby/Dining occupancy package with ten-minute inactivity and independent LG power protection. Preserve fireplace and Living guard actions and their Sticky conditions.",
         "previous_change": {
-          "date": "2026-10-10",
-          "reason": "Restore the converted Dining Media guard to dining-room motion. Run its isolated turn-on action before legacy device actions so their failures cannot block it, and continue if the media relay itself fails. Preserve existing triggers, living-room sticky guard, legacy actions and curtain behavior. The root HA package separately handles media-only evening power-off using the owner-selected Living lamp.",
+          "date": "2026-10-20",
+          "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
           "previous_change": {
             "date": "2026-10-10",
-            "reason": "Remove only the retired Dining guard 2 action from the mixed motion automation. Preserve fireplace and Living guard 2 actions and do not turn on the new curtain supply from motion.",
-            "previous_change": null
+            "reason": "Restore the converted Dining Media guard to dining-room motion. Run its isolated turn-on action before legacy device actions so their failures cannot block it, and continue if the media relay itself fails. Preserve existing triggers, living-room sticky guard, legacy actions and curtain behavior. The root HA package separately handles media-only evening power-off using the owner-selected Living lamp.",
+            "previous_change": {
+              "date": "2026-10-10",
+              "reason": "Remove only the retired Dining guard 2 action from the mixed motion automation. Preserve fireplace and Living guard 2 actions and do not turn on the new curtain supply from motion.",
+              "previous_change": null
+            }
           }
         }
       }

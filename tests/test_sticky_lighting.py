@@ -43,7 +43,7 @@ ROOM_CASES = (
     ('064', 'lobby', ('switch.dining_wall_light_2',)),
     ('068', 'mishka_room', ('light.hall_2_m',)),
     ('083', 'porch', ('light.porch_one', 'light.porch_two')),
-    ('108', 'living_room', ('switch.dining_media_guard', 'switch.fireplace_switch', 'switch.living_guard2')),
+    ('108', 'living_room', ('switch.fireplace_switch', 'switch.living_guard2')),
 )
 
 
@@ -164,7 +164,7 @@ class StickyLightingTest(unittest.IsolatedAsyncioTestCase):
         for prefix, room, first in (('033', 'dining_room', 'switch.dining_wall_light_2'),
                                    ('040', 'hallway', 'light.hall_1_m'),
                                    ('083', 'porch', 'light.porch_one'),
-                                   ('108', 'living_room', 'switch.dining_media_guard')):
+                                   ('108', 'living_room', 'switch.fireplace_switch')):
             with self.subTest(automation=prefix):
                 self.reset_states()
                 self.after_call = lambda room=room: self.hass.states.async_set(

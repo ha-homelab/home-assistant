@@ -1,5 +1,6 @@
-"""Run the evening package with fake devices in an isolated HA instance."""
+"""Exercise media power triggers and safety guards in an isolated HA runtime."""
 import asyncio
+from copy import deepcopy
 import os
 from pathlib import Path
 import tempfile
@@ -12,6 +13,7 @@ try:
     from homeassistant.bootstrap import async_load_base_functionality
     from homeassistant.config_entries import ConfigEntries
     from homeassistant.core import HomeAssistant
+    from homeassistant.exceptions import HomeAssistantError
     from homeassistant.setup import async_setup_component
 except ImportError:
     if os.environ.get('REQUIRE_HA_RUNTIME') == '1':
@@ -21,100 +23,217 @@ else:
     HA_AVAILABLE = True
 
 ROOT = Path(os.environ.get('DINING_MEDIA_TEST_ROOT', Path(__file__).resolve().parents[1]))
-LAMP = 'switch.living_lamp'
+SENSORS = ('binary_sensor.living_room_presence', 'binary_sensor.rf_lobby_motion',
+           'binary_sensor.rf_dinner_motion', 'binary_sensor.rf_dinner_two_motion')
 MEDIA = 'switch.dining_media_guard'
-STICKY = 'input_boolean.living_room_sticky'
+TV_POWER = 'switch.living_tv_guard'
+TV = 'media_player.living_room_tv_77'
 
 
 @unittest.skipUnless(HA_AVAILABLE, 'Home Assistant runtime is not installed')
-class DiningMediaEveningTest(unittest.IsolatedAsyncioTestCase):
+class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.temp = tempfile.TemporaryDirectory(prefix='dining-media-test-')
+        self.temp = tempfile.TemporaryDirectory(prefix='media-occupancy-test-')
         self.hass = HomeAssistant(self.temp.name)
         loader.async_setup(self.hass)
         self.hass.config_entries = ConfigEntries(self.hass, {})
         self.hass.config.skip_pip = True
         self.assertTrue(await async_load_base_functionality(self.hass))
         self.calls = []
-        self.hass.services.async_register('switch', 'turn_off', self.turn_off)
-        self.hass.states.async_set(LAMP, 'on')
-        self.hass.states.async_set(MEDIA, 'on')
-        self.hass.states.async_set(STICKY, 'off')
-        self.hass.states.async_set('sun.sun', 'below_horizon', {'elevation': -5})
-        self.hass.states.async_set('switch.fireplace_switch', 'unavailable')
-        self.hass.states.async_set('switch.living_guard2', 'unavailable')
-        self.config = yaml.safe_load((ROOT / 'config/packages/dining_media_guard_evening.yaml').read_text())
-        trigger = self.config['automation'][0]['triggers'][0]
-        self.assertEqual(trigger['for'], '00:15:00')
-        # Only the test copy shortens the wait; all triggers, guards and actions stay real.
-        trigger['for'] = {'milliseconds': 250}
+        self.fail_target = None
+        self.after_command = None
+        for service in ('turn_on', 'turn_off'):
+            self.hass.services.async_register('switch', service, self.command)
+        for sensor in SENSORS:
+            self.hass.states.async_set(sensor, 'on')
+        for outlet in (MEDIA, TV_POWER):
+            self.hass.states.async_set(outlet, 'on')
+        self.hass.states.async_set(TV, 'off')
+        # These lighting overrides must not suppress media power management.
+        for room in ('living_room', 'dining_room', 'lobby'):
+            self.hass.states.async_set(f'input_boolean.{room}_sticky', 'on')
+        self.config = deepcopy(yaml.safe_load(
+            (ROOT / 'config/packages/dining_media_guard_evening.yaml').read_text()))
+        self.duration_count = 0
+
+        def shorten(value):
+            if isinstance(value, dict):
+                if 'for' in value:
+                    self.assertEqual(value['for'], '00:10:00')
+                    self.duration_count += 1
+                    value['for'] = {'milliseconds': 250}
+                for item in value.values():
+                    shorten(item)
+            elif isinstance(value, list):
+                for item in value:
+                    shorten(item)
+        shorten(self.config)
+        self.assertEqual(self.duration_count, 3)
 
     async def asyncTearDown(self):
         await self.hass.async_stop(force=True)
         self.temp.cleanup()
 
-    async def turn_off(self, call):
+    async def command(self, call):
         targets = call.data['entity_id']
-        self.calls.extend([targets] if isinstance(targets, str) else targets)
+        for target in [targets] if isinstance(targets, str) else targets:
+            if target == self.fail_target:
+                raise HomeAssistantError('Simulated outlet failure')
+            self.calls.append((call.service, target))
+            self.hass.states.async_set(target, 'on' if call.service == 'turn_on' else 'off')
+            if self.after_command:
+                self.after_command(call.service, target)
+
+    async def settle(self, seconds=.4):
+        await asyncio.sleep(seconds)
+        await self.hass.async_block_till_done()
 
     async def load(self):
         self.assertTrue(await async_setup_component(self.hass, 'automation', self.config))
         await self.hass.async_start()
         await self.hass.async_block_till_done()
 
-    async def settle(self, seconds=.35):
-        await asyncio.sleep(seconds)
-        await self.hass.async_block_till_done()
+    def set_sensors(self, state):
+        for sensor in SENSORS:
+            self.hass.states.async_set(sensor, state)
 
-    async def test_waits_then_switches_only_media_without_legacy_devices(self):
+    async def test_each_activity_source_restores_both_despite_lighting_sticky(self):
+        self.set_sensors('off')
         await self.load()
-        self.hass.states.async_set(LAMP, 'off')
-        await self.settle(.04)
+        for sensor in SENSORS:
+            with self.subTest(sensor=sensor):
+                self.set_sensors('off')
+                for outlet in (MEDIA, TV_POWER):
+                    self.hass.states.async_set(outlet, 'off')
+                self.calls.clear()
+                self.hass.states.async_set(sensor, 'on')
+                await self.settle(.04)
+                self.assertCountEqual(self.calls, [('turn_on', MEDIA), ('turn_on', TV_POWER)])
+
+    async def test_ten_minutes_quiet_switches_both_off(self):
+        await self.load()
+        self.set_sensors('off')
+        await self.settle(.05)
         self.assertEqual(self.calls, [])
         await self.settle()
-        self.assertEqual(self.calls, [MEDIA])
+        self.assertCountEqual(self.calls, [('turn_off', MEDIA), ('turn_off', TV_POWER)])
 
-    async def test_lamp_returning_on_cancels_pending_shutdown(self):
+    async def test_latest_sensor_must_complete_its_own_interval(self):
         await self.load()
-        self.hass.states.async_set(LAMP, 'off')
-        await self.settle(.04)
-        self.hass.states.async_set(LAMP, 'on')
+        for sensor in SENSORS[:-1]:
+            self.hass.states.async_set(sensor, 'off')
+        await self.settle()
+        self.assertEqual(self.calls, [])
+        self.hass.states.async_set(SENSORS[-1], 'off')
+        await self.settle(.05)
+        self.assertEqual(self.calls, [])
+        await self.settle()
+        self.assertCountEqual(self.calls, [('turn_off', MEDIA), ('turn_off', TV_POWER)])
+
+    async def test_new_activity_cancels_pending_shutdown(self):
+        await self.load()
+        self.set_sensors('off')
+        await self.settle(.05)
+        self.hass.states.async_set(SENSORS[0], 'on')
         await self.settle()
         self.assertEqual(self.calls, [])
 
-    async def test_sticky_enabled_during_wait_blocks_shutdown(self):
+    async def test_unknown_or_unavailable_sensor_blocks_shutdown(self):
         await self.load()
-        self.hass.states.async_set(LAMP, 'off')
-        await self.settle(.04)
-        self.hass.states.async_set(STICKY, 'on')
-        await self.settle()
-        self.assertEqual(self.calls, [])
+        for sensor, state in ((SENSORS[0], 'unknown'), (SENSORS[1], 'unavailable')):
+            self.set_sensors('on')
+            await self.settle(.02)
+            self.set_sensors('off')
+            self.hass.states.async_set(sensor, state)
+            await self.settle()
+            self.assertEqual(self.calls, [])
 
-    async def test_daylight_boundary_and_unknown_sun_block_shutdown(self):
+    async def test_non_off_tv_states_protect_tv_but_not_dining(self):
         await self.load()
-        for elevation in (-2, 15, None):
-            with self.subTest(elevation=elevation):
-                self.hass.states.async_set(LAMP, 'on')
-                self.hass.states.async_set('sun.sun', 'unknown' if elevation is None else 'above_horizon',
-                                           {} if elevation is None else {'elevation': elevation})
+        for state in ('on', 'playing', 'idle', 'unknown', 'unavailable'):
+            with self.subTest(tv=state):
+                self.set_sensors('on')
+                self.hass.states.async_set(TV, state)
+                self.hass.states.async_set(MEDIA, 'on')
                 await self.settle(.02)
-                self.hass.states.async_set(LAMP, 'off')
+                self.calls.clear()
+                self.set_sensors('off')
                 await self.settle()
-                self.assertEqual(self.calls, [])
+                self.assertEqual(self.calls, [('turn_off', MEDIA)])
+                self.assertEqual(self.hass.states.get(TV_POWER).state, 'on')
 
-    async def test_dining_arc_does_not_trigger_media_shutdown(self):
+    async def test_tv_off_after_timeout_triggers_tv_shutdown(self):
+        self.hass.states.async_set(TV, 'playing')
         await self.load()
-        self.hass.states.async_set('switch.dining_arc_lamp', 'on')
+        self.set_sensors('off')
+        await self.settle()
+        self.assertEqual(self.calls, [('turn_off', MEDIA)])
+        self.hass.states.async_set(TV, 'off')
+        await self.settle(.04)
+        self.assertEqual(self.calls[-1], ('turn_off', TV_POWER))
+
+    async def test_manual_off_waits_for_new_activity(self):
+        await self.load()
+        self.hass.states.async_set(TV_POWER, 'off')
+        self.hass.states.async_set(MEDIA, 'off')
+        await self.settle()
+        self.assertEqual(self.calls, [])
+        self.hass.states.async_set(SENSORS[1], 'off')
         await self.settle(.02)
-        self.hass.states.async_set('switch.dining_arc_lamp', 'off')
-        await self.settle()
-        self.assertEqual(self.calls, [])
+        self.hass.states.async_set(SENSORS[1], 'on')
+        await self.settle(.04)
+        self.assertCountEqual(self.calls, [('turn_on', MEDIA), ('turn_on', TV_POWER)])
 
-    async def test_loading_with_lamp_already_off_does_not_send_command(self):
-        self.hass.states.async_set(LAMP, 'off')
+    async def test_unavailable_outlet_recovery_restores_occupied_power(self):
         await self.load()
-        await self.settle()
+        self.hass.states.async_set(MEDIA, 'unavailable')
+        await self.settle(.02)
+        self.hass.states.async_set(MEDIA, 'off')
+        await self.settle(.04)
+        self.assertEqual(self.calls, [('turn_on', MEDIA)])
+
+    async def test_startup_and_reload_reconcile_existing_presence(self):
+        self.hass.states.async_set(MEDIA, 'off')
+        await self.load()
+        self.assertEqual(self.calls, [('turn_on', MEDIA)])
+        self.calls.clear()
+        self.hass.states.async_set(MEDIA, 'off')
+        self.hass.bus.async_fire('automation_reloaded')
+        await self.settle(.04)
+        self.assertEqual(self.calls, [('turn_on', MEDIA)])
+
+    async def test_recheck_recovers_timer_lost_on_reload_without_early_off(self):
+        # Sensors predate automation setup, so there is no off-transition timer.
+        self.set_sensors('off')
+        await self.load()
+        off_rule = next(s.entity_id for s in self.hass.states.async_all('automation')
+                        if s.attributes.get('id') == 'ha_homelab_dining_media_guard_evening_power_off')
+        async def recheck():
+            await self.hass.services.async_call('automation', 'trigger',
+                {'entity_id': off_rule, 'skip_condition': False}, blocking=True)
+        await recheck()
         self.assertEqual(self.calls, [])
+        await self.settle()
+        await recheck()
+        self.assertCountEqual(self.calls, [('turn_off', MEDIA), ('turn_off', TV_POWER)])
+
+    async def test_outlet_failure_does_not_block_other_outlet(self):
+        self.fail_target = MEDIA
+        await self.load()
+        self.set_sensors('off')
+        await self.settle()
+        self.assertEqual(self.calls, [('turn_off', TV_POWER)])
+
+    async def test_activity_during_first_shutdown_protects_tv(self):
+        await self.load()
+        def occupancy_returns(service, target):
+            if service == 'turn_off' and target == MEDIA:
+                self.hass.states.async_set(SENSORS[0], 'on')
+        self.after_command = occupancy_returns
+        self.set_sensors('off')
+        await self.settle()
+        self.assertNotIn(('turn_off', TV_POWER), self.calls)
+        self.assertEqual(self.hass.states.get(MEDIA).state, 'on')
 
 
 if __name__ == '__main__':
