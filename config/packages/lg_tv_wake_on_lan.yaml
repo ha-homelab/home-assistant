@@ -1,19 +1,20 @@
-# HA runs in OCI. Emit the broadcast on the home LAN through a restricted SSH key.
-shell_command:
-  living_room_tv_wake: >-
-    /usr/bin/ssh -T -i /config/.ssh/living_room_tv_wol
-    -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes
-    -o UserKnownHostsFile=/config/.ssh/living_room_tv_wol_known_hosts
-    -o HostKeyAlias=living-room-tv-wol
-    -o ConnectTimeout=5 -o ConnectionAttempts=1
-    -o ServerAliveInterval=5 -o ServerAliveCountMax=1
-    alvit@syn wake-living-room-tv
+# HA runs outside the home broadcast domain. RF ESPHome sends WOL locally.
+script:
+  living_room_tv_send_wake_packet:
+    alias: Living room TV - send local wake packet
+    description: Send WOL through RF ESPHome without making the caller depend on
+      the node's optional action being registered or available.
+    mode: single
+    max_exceeded: silent
+    sequence:
+      - action: esphome.rf_wake_living_tv
+        continue_on_error: true
 
 automation:
   - id: living_room_tv_wake_on_lan
     alias: Living room TV - wake over Ethernet
-    description: Wake the wired LG through the home LAN relay, falling back to
-      Harmony PowerOn if the relay fails or the TV does not confirm waking.
+    description: Wake the wired LG through RF ESPHome on the home LAN, falling
+      back to Harmony PowerOn if the RF node is unavailable or waking is unconfirmed.
     mode: single
     max_exceeded: silent
     triggers:
@@ -24,18 +25,16 @@ automation:
         value_template: >-
           {{ states('media_player.living_room_tv_77') not in
              ['on', 'playing', 'paused', 'idle', 'buffering'] }}
-      - action: shell_command.living_room_tv_wake
-        response_variable: wake_result
-        continue_on_error: true
-      - if: >-
-          {{ wake_result is defined and wake_result is mapping
-             and wake_result.get('returncode', -1) == 0 }}
-        then:
-          - wait_template: >-
-              {{ states('media_player.living_room_tv_77') in
-                 ['on', 'playing', 'paused', 'idle', 'buffering'] }}
-            timeout: "00:00:45"
-            continue_on_timeout: true
+      # Start independently: ServiceNotFound is not suppressed by continue_on_error.
+      # A missing ESPHome action must not abort the parent's Harmony fallback.
+      - action: script.turn_on
+        target:
+          entity_id: script.living_room_tv_send_wake_packet
+      - wait_template: >-
+          {{ states('media_player.living_room_tv_77') in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+        timeout: "00:00:10"
+        continue_on_timeout: true
       # A discrete PowerOn is safe if the TV wakes just before this call.
       # Never use PowerToggle, remote.turn_on or an activity change here.
       - if: >-
