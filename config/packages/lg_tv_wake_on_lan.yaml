@@ -12,25 +12,50 @@ shell_command:
 automation:
   - id: living_room_tv_wake_on_lan
     alias: Living room TV - wake over Ethernet
-    description: Turn-on requests wake the wired LG through the home LAN relay.
+    description: Wake the wired LG through the home LAN relay, falling back to
+      Harmony PowerOn if the relay fails or the TV does not confirm waking.
     mode: single
     max_exceeded: silent
     triggers:
       - trigger: webostv.turn_on
         entity_id: media_player.living_room_tv_77
     actions:
+      - condition: template
+        value_template: >-
+          {{ states('media_player.living_room_tv_77') not in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] }}
       - action: shell_command.living_room_tv_wake
         response_variable: wake_result
-      - if: "{{ wake_result.returncode != 0 }}"
+        continue_on_error: true
+      - if: >-
+          {{ wake_result is defined and wake_result is mapping
+             and wake_result.get('returncode', -1) == 0 }}
         then:
-          - stop: The home LAN Wake-on-LAN relay failed; inspect the shell command response.
-            error: true
-      - wait_template: >-
+          - wait_template: >-
+              {{ states('media_player.living_room_tv_77') in
+                 ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+            timeout: "00:00:45"
+            continue_on_timeout: true
+      # A discrete PowerOn is safe if the TV wakes just before this call.
+      # Never use PowerToggle, remote.turn_on or an activity change here.
+      - if: >-
           {{ states('media_player.living_room_tv_77') not in
-             ['off', 'unavailable', 'unknown'] }}
-        timeout: "00:00:45"
-        continue_on_timeout: true
-      - if: "{{ not wait.completed }}"
+             ['on', 'playing', 'paused', 'idle', 'buffering'] }}
         then:
-          - stop: The LG TV did not confirm power-on within 45 seconds.
+          - action: remote.send_command
+            target:
+              entity_id: remote.harmonyhub
+            data:
+              device: LG TV
+              command: PowerOn
+          - wait_template: >-
+              {{ states('media_player.living_room_tv_77') in
+                 ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+            timeout: "00:00:45"
+            continue_on_timeout: true
+      - if: >-
+          {{ states('media_player.living_room_tv_77') not in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+        then:
+          - stop: The LG TV did not confirm power-on after Wake-on-LAN and Harmony PowerOn.
             error: true

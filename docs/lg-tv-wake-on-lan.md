@@ -14,10 +14,19 @@ There, `tools/lg_tv_wol_relay.py` emits three 102-byte UDP packets to the LAN
 broadcast configured for the installation, on UDP port 9. This requires no daemon,
 container, router broadcast forwarding or cloud audio/video transport.
 
-The normal HA power button and `media_player.turn_on` use the relay. SSH
-failures and a missing TV power-on confirmation produce an automation error;
-sending a packet alone is not reported as successful TV wake-up. Duplicate
-requests during the 45-second confirmation window are ignored.
+The normal HA power button and `media_player.turn_on` use the relay first. If
+SSH fails, the automation immediately tries the existing Harmony hub's discrete
+`PowerOn` command for `LG TV`. If SSH succeeds but the TV does not confirm waking
+within 45 seconds, it also tries Harmony. The fallback has its own 45-second
+confirmation window. Sending a packet or accepting an IR command is not treated
+as proof that the television is on; a missing final confirmation is an error.
+Duplicate requests during either confirmation window are ignored. An already-on
+TV is left untouched.
+
+The fallback uses `remote.harmonyhub` and its configured `LG TV` device. It does
+not start an activity or send `PowerToggle`, so a late Wake-on-LAN response cannot
+turn the TV back off. Keep these identifiers aligned with the Harmony setup.
+The second LG (`media_player.lg2`) and other Harmony devices are not targeted.
 
 ## Provision or restore the relay
 
@@ -82,9 +91,25 @@ exit code 2 and `Only wake-living-room-tv is allowed`. That negative test checks
 SSH connectivity, authentication and the command restriction without sending
 a packet.
 
+Also inspect the selected route from the HA host to that resolved address. A
+correct DNS record does not prove that the preferred route works. In the
+2026-10-23 incident the wake trigger ran normally, but SSH to `syn` timed out;
+the old sequence aborted before sending any packet. A direct Harmony `PowerOn`
+worked. The fallback now preserves the normal `media_player.turn_on` interface
+during that transport failure; it does not repair the underlying network route.
+In a successful fallback trace, the relay can still show return code 255 while
+the later Harmony command and observed TV-on state confirm recovery.
+
 A successful relay response confirms only that three packets were sent. The
 automation separately waits for the TV state. Test a full wake from standby
 when the TV is already off; do not power-cycle it while someone is watching.
-The October 2026 outage was caused by a stale SSH IP and a second stale IP in
+An earlier October 2026 outage was caused by a stale SSH IP and a second stale IP in
 `socket.bind`, so fixing only the connection endpoint would not have repaired
 the relay.
+
+`tests/test_lg_tv_wake.py` runs the actual action sequence in an isolated Home
+Assistant instance with recorded service calls. It covers confirmed WOL, SSH
+failure, shell exceptions, packet success without wake confirmation, failure of
+both methods and already-on behavior. `tests/test_lg_tv_wol_relay.py` separately
+checks packet construction and the restricted SSH command. Neither test sends
+network packets or operates a real television.
