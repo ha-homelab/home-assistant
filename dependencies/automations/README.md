@@ -360,20 +360,17 @@ shared-rule behavior are unchanged.
 ## Dining Media guard
 
 `switch.dining_media_guard` restores the former Dining guard 2 media/printer
-power role. Rule 108 turns it on before the unchanged fireplace and Living guard
-actions. Its action uses `continue_on_error`, so a failed media outlet does not
-block the existing devices; failures from those later devices cannot block the
-media outlet. Both RF dining motion triggers and `input_boolean.living_room_sticky`
-remain unchanged. The separate `switch.dining_guard` still powers only the curtains.
+power role. The root HA package `dining_media_guard_evening.yaml` now owns its
+occupancy behavior together with `switch.living_tv_guard`. Living presence or
+Lobby/either Dining RF motion sensor turns both outlets on. All four sensors
+must remain off for ten minutes before shutdown. Only the TV outlet additionally
+requires the native LG entity to report `off`; offline sensors never prove vacancy.
 
-The historical evening-off rule 107 remains retired. The root HA package
-`dining_media_guard_evening.yaml` now provides a separate media-only replacement,
-using the owner-selected `switch.living_lamp`: off for 15 minutes, still off, sun
-below -2 degrees, and `input_boolean.living_room_sticky` off. It turns off only
-`switch.dining_media_guard`, with no fireplace dependency. Dining Arc lamp and
-the Matter Bedroom Lamp (formerly `light.arc_lamp_m`) are distinct devices and
-do not trigger this rule. The
-existing fireplace and Living guard behavior remains unchanged.
+Rule 108 retains only the fireplace and Living guard actions and their Sticky
+conditions. Media power no longer depends on these lighting overrides, sunset,
+or Living lamp. Rule 107 stays retired. The separate `switch.dining_guard` still
+powers only the curtains. See [media power control](../../docs/dining-media-guard.md)
+for recovery, manual control and runtime verification.
 
 ## Air purifier living
 

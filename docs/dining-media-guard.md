@@ -23,55 +23,72 @@ separate Dining Media guard row beside the existing Dining guard in Lovelace.
 Retain the existing curtain row and every manual override control. A Home
 Assistant restart is not required.
 
-## Motion turns media power on
+## Shared occupancy control
 
-Automation 108 retains both RF dining motion triggers and the existing
-`input_boolean.living_room_sticky` condition. Its first action now turns on
-`switch.dining_media_guard` with `continue_on_error: true`.
+The package `config/packages/dining_media_guard_evening.yaml` now owns both
+`switch.dining_media_guard` and `switch.living_tv_guard`. The filename and original
+shutdown automation ID are retained for deployed-installation compatibility.
+The previous Living-lamp/sunset/15-minute rule is replaced, and automation 108 no
+longer controls Dining Media guard. Its fireplace and Living guard actions retain
+their existing Sticky protections.
 
-Placing the new action first means failures from the later fireplace or Living
-guard actions cannot prevent media power from being restored. Continuing after
-a media action failure preserves the existing devices' opportunity to run. The
-legacy actions, their order relative to each other, and the automation's guards
-are unchanged. Motion does not enable the curtain supply.
+Activity in **any** of these sensors restores both available, powered-off outlets:
 
-No existing script still referenced the old media outlet. The migration does
-not add this power strip to generic lights-off scripts, which could interrupt
-speakers or a printer at an unrelated time.
+- `binary_sensor.living_room_presence`
+- `binary_sensor.rf_lobby_motion`
+- `binary_sensor.rf_dinner_motion`
+- `binary_sensor.rf_dinner_two_motion`
 
-## Evening power-off follows Living lamp
+Both Dining RF sensors count; the most recent one to clear determines when the
+shared inactivity interval can finish. Media power is independent of lighting
+Sticky overrides and daylight. This does not turn on lamps or the curtain supply.
 
-The owner selected **Living lamp**, the living-room floor lamp, as the evening
-shutdown signal. The package `dining_media_guard_evening.yaml` defines the new
-`automation.dining_media_guard_evening_power_off` with these conditions:
+After **all four sensors have individually stayed off for ten minutes**:
 
-- `switch.living_lamp` has changed to off and stayed off for 15 minutes.
-- Living lamp is still off when the rule runs.
-- The sun elevation is below -2 degrees; an unknown elevation blocks shutdown.
-- `input_boolean.living_room_sticky` is off.
+- Dining Media guard turns off regardless of the TV state.
+- Living TV Guard turns off only if `media_player.living_room_tv_77`, the native
+  webOS entity, explicitly reports `off`. A DLNA entity reporting `idle` is not
+  proof that the TV is off.
 
-Its only action is `switch.turn_off` for `switch.dining_media_guard`. It does not
-control the fireplace, Living guard, curtains, or Dining Arc lamp. The former
-rule 107 stays retired, and its unavailable fireplace-on guard is not inherited.
-The separate Matter `light.arc_lamp_m` and ESPHome Dining Arc lamp remain distinct
-from the selected Living lamp.
+If the TV is switched off later, its state transition immediately rechecks the
+same inactivity condition. `unknown`, `unavailable`, or missing sensor states
+never count as inactivity. An unknown or unavailable TV protects its outlet
+without preventing Dining Media guard from shutting down.
 
-This retains the original state-trigger timing: a lamp that was already off
-does not start a new timer merely because the sun crosses -2 degrees. Reloading
-automations or restarting HA resets an in-progress 15-minute state timer.
+## Reload, recovery and manual control
+
+The automation uses a ten-minute state trigger and repeats the elapsed-state
+check once per minute. This catches a deadline whose pending trigger was lost
+when automations reloaded, with at most one extra minute of delay. A full HA
+restart begins a fresh observed inactivity interval; downtime is not evidence
+that rooms were empty. See Home Assistant's [state conditions](https://www.home-assistant.io/conditions/state/)
+and [automation triggers](https://www.home-assistant.io/docs/automation/trigger/).
+
+Startup, automation reload and an outlet recovering from `unknown`/`unavailable`
+to `off` restore power if one of the four sensors is active. A regular manual
+`on` to `off` transition does not itself switch an outlet back on: the next
+activity event or explicit reconciliation can restore it. Commands are sent only
+when an outlet actually needs to change state. A failure of one outlet does not
+block the other, and inactivity is checked again before cutting TV power.
 
 ## Verification and troubleshooting
 
-Validate the complete HA configuration, reload automations, and check that the
-canonical relay is available and linked to the loaded motion automation and evening-off rule. Read
-back the dashboard and ensure it contains one separate media row. Verify that
-curtain automation files, sticky definitions, Office override controls and
-their notification rules are unchanged.
+`tests/test_dining_media_evening.py` runs the actual automations against simulated
+entities in an isolated Home Assistant instance. It covers each activity source,
+continuous shared inactivity, the last sensor's deadline, new movement, offline
+sensors, TV states, late TV shutdown, manual off, outlet recovery, startup/reload,
+one failed outlet, and activity arriving during shutdown. Only the test copy
+shortens the ten-minute durations; physical loads are not switched by the tests.
 
-If motion does not enable power, inspect the two RF motion sensors and the
-living-room sticky state first. Review the new first action separately from
-errors raised by the later legacy devices. Do not change the sticky state or
-cycle the connected load merely to test the migration.
+Inspect the traces for **Media guards: Restore power on occupancy** and
+**Media guards: Turn off after shared inactivity**. The latter retains its stable
+entity `automation.dining_media_guard_evening_power_off`. For a blocked shutdown,
+check the state and last-change time of every sensor, then the native LG state.
+Do not treat a missing motion report as proof of an empty room.
+
+Validate the full configuration before `automation.reload`; no Core restart is
+required. Preserve the independent `switch.dining_guard` curtain controller and
+all lighting Sticky definitions.
 
 Matter exposure is a separate step on the existing bridge. Preserve all prior
 endpoints and controller fabrics; publish only the canonical relay. Keep
