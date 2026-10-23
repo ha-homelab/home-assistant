@@ -41,7 +41,7 @@ jobs:
       run: python3 scripts/version_plan.py sync --root . --plan .release-plan.json
     - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884
       with:
-        version: 0.12.18
+        version: 0.13.4
     - name: Build and install the exact library distributions
       env:
         VERSION: ${{ inputs.version }}
