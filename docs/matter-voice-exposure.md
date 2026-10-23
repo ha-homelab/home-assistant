@@ -43,8 +43,44 @@ change, or new fabric was used.
 At the initial readback, **36 of the 46 additions were reachable**. Ten were
 unavailable: eight curtain endpoints whose supplies were off, Balcony Light,
 and Living Wall Dimmer. Publication is not evidence that an offline physical
-device can respond. Alexa and Google Home app/voice acceptance remain separate
-checks; they were not established by bridge readback.
+device can respond.
+
+Alexa initially imported only part of the new catalog. A command for Porch
+Light 1 incorrectly selected Backdoor Porch Light; that light was restored to
+its initial off state. Logs showed a successful invoke followed by an initial
+subscription-report timeout. After discovery and one bridge-scoped restart
+with unchanged storage, Google completed its full subscription in about 11
+seconds and Alexa in about 64 seconds. All 68 endpoint identities, three
+fabrics and bridge configuration remained intact.
+
+After the catalog updated, Alexa web commands to turn each numbered Porch
+light on and off succeeded with a positive Alexa response. HA state readback
+confirmed that only the requested bulb changed; Backdoor Porch Light stayed
+off. This verifies Alexa text-command intent and the Matter control path, not
+microphone speech recognition. Google Home app/voice acceptance remains a
+separate check; a completed subscription alone is not that test.
+
+The newly discovered group still produced an Alexa "unreachable" response
+despite successful Matter invokes and physical state changes. One failed
+off request was followed by an additional Alexa-originated on invoke. No
+matching bridge timeout or dropped-state warning accompanied those group
+commands. Do not assume that a spoken failure means the lights did not change.
+
+Two controller-side routines were therefore saved and read back as a voice
+fallback, without altering the existing routines:
+
+- **Porch lights on via Matter**: phrase `turn on porch light`; turn on
+  **Porch Light 1**, then **Porch Light 2**.
+- **Porch lights off via Matter**: phrase `turn off porch light`; turn off
+  **Porch Light 1**, then **Porch Light 2**.
+
+They deliberately exclude the bridged group and Backdoor Porch Light. Alexa's
+web interface confirmed the saved triggers/actions but does not expose their
+enabled status or support running routines. An Echo or the Alexa mobile app
+must verify enablement, execution and the spoken phrases; these checks remain
+pending. The group remains available in HA and Matter for other controllers.
+The user reported seeing the Porch entries in Google Home, but an observed
+Google-originated control command is still required to complete that test.
 
 ## Apply or audit the manifest
 
