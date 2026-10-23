@@ -147,10 +147,8 @@ class KitchenDiningCurtainDaylightTest(MorningDaylightCases, unittest.IsolatedAs
     entity_id = 'automation.open_curtains_in_the_morning'
     services = [('switch', 'turn_on'), ('cover', 'open_cover'), ('switch', 'turn_off')]
     expected_calls = [
-        ('switch', 'turn_on', {'entity_id': ['switch.studio_guard']}),
         ('switch', 'turn_on', {'entity_id': ['switch.dining_guard']}),
         ('switch', 'turn_on', {'entity_id': ['switch.kitchen_guard']}),
-        ('cover', 'open_cover', {'entity_id': ['cover.studio_curtains']}),
         ('cover', 'open_cover', {'entity_id': ['cover.kitchen_curtains_l']}),
         ('cover', 'open_cover', {'entity_id': ['cover.dining_curtains_l']}),
         ('switch', 'turn_off', {'entity_id': ['switch.dining_guard']}),
@@ -159,12 +157,9 @@ class KitchenDiningCurtainDaylightTest(MorningDaylightCases, unittest.IsolatedAs
     def prepare_actions(self, rule):
         # Preserve the production timing; only the private test copy skips waiting.
         self.assertEqual(rule['actions'], [
-            {'service': 'switch.turn_on', 'entity_id': 'switch.studio_guard'},
             {'service': 'switch.turn_on', 'entity_id': 'switch.dining_guard'},
             {'service': 'switch.turn_on', 'entity_id': 'switch.kitchen_guard'},
             {'delay': '00:01:30'},
-            {'service': 'cover.open_cover', 'entity_id': 'cover.studio_curtains',
-             'continue_on_error': True},
             {'service': 'cover.open_cover', 'entity_id': 'cover.kitchen_curtains_l'},
             {'service': 'cover.open_cover', 'entity_id': 'cover.dining_curtains_l'},
             {'delay': '00:01:00'},

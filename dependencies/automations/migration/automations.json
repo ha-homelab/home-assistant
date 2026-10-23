@@ -2146,35 +2146,37 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "00585cf07159bdfcfcf0b5111fd967bfff91cbda4a663d7ad6678ec9cafb8a5e",
+      "behavior_sha256": "beb2594b44d10594ec2b732d3035fd0cddcc2272f0a76a5d0c04580d7fc62ffa",
       "references": [
         "cover.dining_curtains_l",
         "cover.kitchen_curtains_l",
         "cover.open_cover",
-        "cover.studio_curtains",
         "input_boolean.curtains_sticky",
         "switch.dining_guard",
         "switch.kitchen_guard",
-        "switch.studio_guard",
         "switch.turn_off",
         "switch.turn_on"
       ],
       "imported_behavior_sha256": "d4eb53793f125d569d4372ec385cdfe41f0ef3856d67434d92f5d60e53ccae16",
       "behavior_change": {
-        "date": "2026-10-12",
-        "reason": "Migrate Studio movement to the calibrated ZHA cover: explicit morning open and evening close, retaining Studio guard power, schedules, delays and manual override. A Studio movement error does not abort the other rooms. Keep the legacy Wi-Fi command commented for rollback.",
+        "date": "2026-10-23",
+        "reason": "Keep Studio opening manual only: remove its power-on and open commands from the shared morning schedule; retain kitchen/dining actions, timing, daylight and override checks. Evening Studio closing is unchanged.",
         "previous_change": {
-          "date": "2026-10-10",
-          "reason": "Replace Studio guard 1 with the canonical ESPHome Studio guard relay; retain all timing, conditions, curtain actions, and other power guards.",
+          "date": "2026-10-12",
+          "reason": "Migrate Studio movement to the calibrated ZHA cover: explicit morning open and evening close, retaining Studio guard power, schedules, delays and manual override. A Studio movement error does not abort the other rooms. Keep the legacy Wi-Fi command commented for rollback.",
           "previous_change": {
             "date": "2026-10-10",
-            "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
+            "reason": "Replace Studio guard 1 with the canonical ESPHome Studio guard relay; retain all timing, conditions, curtain actions, and other power guards.",
             "previous_change": {
               "date": "2026-10-10",
-              "reason": "Replace the retired Dining guard 3 with the verified ESPHome Dining guard for curtain power. Preserve schedules, conditions, delays and all other actions.",
+              "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
               "previous_change": {
-                "date": "2026-10-07",
-                "reason": "Wait until sunrise or 06:35, whichever is later, for kitchen/dining morning curtains; retain the manual override, original power and Wi-Fi sequence, and add the same noon cutoff as the living-room schedule."
+                "date": "2026-10-10",
+                "reason": "Replace the retired Dining guard 3 with the verified ESPHome Dining guard for curtain power. Preserve schedules, conditions, delays and all other actions.",
+                "previous_change": {
+                  "date": "2026-10-07",
+                  "reason": "Wait until sunrise or 06:35, whichever is later, for kitchen/dining morning curtains; retain the manual override, original power and Wi-Fi sequence, and add the same noon cutoff as the living-room schedule."
+                }
               }
             }
           }
