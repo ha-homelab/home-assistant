@@ -32,8 +32,10 @@ cover.mishka_curtains_two_l:
   friendly_name: "Mishka curtains two"
 light.bath2_old:
   friendly_name: "Bath2_old"
-switch.bath2:
-  friendly_name: "Bath2"
+switch.bath_2:
+  friendly_name: "Bath 2"
+light.bath_2:
+  friendly_name: "Bath 2"
 light.bedroom_light_dimmer_l:
   friendly_name: "Bedroom light dimmer"
 light.dining_lights_dimmer_l:

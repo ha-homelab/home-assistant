@@ -172,8 +172,9 @@ Deploying these files does not require restarting the Home Assistant pod. Config
 
 ## Editing rules
 
-Bath2 now uses the ESPHome relay `switch.bath2`. Its motion rules, scheduled
-shutdowns, and state notifications target that relay with switch services.
+Bath 2 uses `light.bath_2`, backed by the enabled but hidden ESPHome relay
+`switch.bath_2`. Motion rules and scheduled shutdowns use light services.
+Both entities are excluded from rule 112 screen notifications.
 The original Tuya light remains available as `light.bath2_old` for explicit
 manual use. Motion timing, the bathroom manual override, and automation
 identities are unchanged.
