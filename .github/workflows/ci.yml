@@ -144,6 +144,10 @@ jobs:
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --env SELF_CONSUMPTION_SELECTOR=/workspace/config/python_scripts/select_devices.py
         --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly" --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s dependencies/automations/tests -p test_self_consumption_runtime.py -v
+    - name: Verify Bath 2 light routing and screen notification exclusion
+      run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1
+        --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly" --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
+        -m unittest discover -s tests -p test_bath_2_light.py -v
     - name: Execute optional notification resilience scenarios
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918

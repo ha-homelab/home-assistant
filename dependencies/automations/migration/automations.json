@@ -303,7 +303,7 @@
         "binary_sensor.rf_studio_motion",
         "input_boolean.bathroom_sticky",
         "light.bath_2",
-        "switch.turn_off"
+        "light.turn_off"
       ],
       "imported_behavior_sha256": "13c56240d6c57e5967201cc42c0a83f0b149446b78d523100c083af40b4ebfcc",
       "behavior_change": {
@@ -346,7 +346,7 @@
         "binary_sensor.rf_studio_motion",
         "input_boolean.bathroom_sticky",
         "light.bath_2",
-        "switch.turn_on"
+        "light.turn_on"
       ],
       "imported_behavior_sha256": "29811aab962cfd58bab039e5fa4e43c1ce65de9d157c6b6e942b3774a4072d12",
       "behavior_change": {
@@ -3008,7 +3008,7 @@
                 "reason": "The first KMC now supplies Moen Flo monitor power, pump power enable and Laundry. Remove its old lighting actions without substituting new power controls; update notification-only references. Preserve all other actions, guards and timing.",
                 "previous_change": {
                   "date": "2026-10-10",
-                  "reason": "Follow the owner-assigned Recliner role on the second KMC first physical output; preserve the already-live Flare mapping from the first KMC migration. Keep all other notification targets, triggers, conditions and delivery behavior unchanged. Old standalone roles remain registered as Switch01–03 and are not control targets.",
+                  "reason": "Follow the owner-assigned Recliner role on the second KMC first physical output; preserve the already-live Flare mapping from the first KMC migration. Keep all other notification targets, triggers, conditions and delivery behavior unchanged. Old standalone roles remain registered as Switch01\u201303 and are not control targets.",
                   "previous_change": {
                     "date": "2026-10-10",
                     "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
@@ -3129,7 +3129,7 @@
       "id": "ha_homelab_heating_lower_a_sustained_high_thermostat_setpoint",
       "previous_metadata": {
         "alias": "Thermostat Temperature Control",
-        "description": "Lower thermostat temperature as it stays above 19°C for 6 minutes.",
+        "description": "Lower thermostat temperature as it stays above 19\u00b0C for 6 minutes.",
         "mode": "single"
       },
       "previous_top_level_keys": [
@@ -3157,7 +3157,7 @@
       "id": "ha_homelab_heating_reduce_the_setpoint_after_prolonged_heating",
       "previous_metadata": {
         "alias": "Decrease Thermostat Temperature Gradually",
-        "description": "Furnace is heating for more than 5 minutes, reducing temperature by 1°C with a cooldown period",
+        "description": "Furnace is heating for more than 5 minutes, reducing temperature by 1\u00b0C with a cooldown period",
         "mode": "single"
       },
       "previous_top_level_keys": [
