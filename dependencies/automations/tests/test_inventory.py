@@ -16,10 +16,10 @@ class InventoryTest(unittest.TestCase):
 
     def test_reviewed_retirements_keep_the_complete_original_inventory(self):
         validate_inventory(self.manifest, self.files)
-        self.assertEqual(self.manifest['automation_count'], 98)
+        self.assertEqual(self.manifest['automation_count'], 97)
         retired = {entry['order'] for entry in self.manifest['retired_automations']}
         active = {entry['order'] for entry in self.manifest['automations']}
-        self.assertTrue({98, 106, 110, 111} <= retired)
+        self.assertTrue({69, 98, 106, 110, 111} <= retired)
         self.assertTrue({20, 21, 41, 42} <= active)
 
     def test_missing_rule_cannot_be_hidden_by_lowering_the_count(self):

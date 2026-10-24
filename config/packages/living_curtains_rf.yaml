@@ -32,7 +32,7 @@ script:
           - stop: "Expected main/sheer curtain and open/close command."
             error: true
       - condition: state
-        entity_id: input_boolean.curtains_sticky
+        entity_id: [input_boolean.curtains_sticky, input_boolean.living_room_sticky]
         state: 'off'
       # A missing native service is not suppressible by continue_on_error in
       # HA. A background transport isolates that error from the Wi-Fi fallback.
@@ -69,7 +69,7 @@ script:
           {{ curtain | default('') in ['main', 'sheer']
              and command | default('') in ['open', 'close'] }}
       - condition: state
-        entity_id: input_boolean.curtains_sticky
+        entity_id: [input_boolean.curtains_sticky, input_boolean.living_room_sticky]
         state: 'off'
       - action: esphome.rf_send_dooya_code
         data:
@@ -85,7 +85,9 @@ script:
     description: >-
       Power the shared socket, wait three seconds, send every requested RF
       command, then independently wait up to three minutes for each Wi-Fi motor
-      and repeat the same target command. Recheck the manual override throughout.
+      and repeat the same target command. Require both Curtains Sticky and Living
+      room Sticky to be explicitly off at each command, including queued RF and
+      delayed Wi-Fi fallback. Unknown or unavailable overrides block commands.
     icon: mdi:curtains
     mode: parallel
     max: 4
@@ -112,7 +114,7 @@ script:
           - stop: "Expected both/main/sheer curtain and open/close command."
             error: true
       - condition: state
-        entity_id: input_boolean.curtains_sticky
+        entity_id: [input_boolean.curtains_sticky, input_boolean.living_room_sticky]
         state: 'off'
       - action: switch.turn_on
         target:
@@ -135,12 +137,13 @@ script:
                 value_template: "{{ curtain | default('both') in ['both', 'main'] }}"
               - wait_template: >-
                   {{ has_value('cover.living_curtains_l')
-                     or is_state('input_boolean.curtains_sticky', 'on') }}
+                     or not is_state('input_boolean.curtains_sticky', 'off')
+                     or not is_state('input_boolean.living_room_sticky', 'off') }}
                 timeout:
                   seconds: 180
                 continue_on_timeout: false
               - condition: state
-                entity_id: input_boolean.curtains_sticky
+                entity_id: [input_boolean.curtains_sticky, input_boolean.living_room_sticky]
                 state: 'off'
               - action: "{{ 'cover.open_cover' if command == 'open' else 'cover.close_cover' }}"
                 target:
@@ -151,12 +154,13 @@ script:
                 value_template: "{{ curtain | default('both') in ['both', 'sheer'] }}"
               - wait_template: >-
                   {{ has_value('cover.living_light_curtains_l')
-                     or is_state('input_boolean.curtains_sticky', 'on') }}
+                     or not is_state('input_boolean.curtains_sticky', 'off')
+                     or not is_state('input_boolean.living_room_sticky', 'off') }}
                 timeout:
                   seconds: 180
                 continue_on_timeout: false
               - condition: state
-                entity_id: input_boolean.curtains_sticky
+                entity_id: [input_boolean.curtains_sticky, input_boolean.living_room_sticky]
                 state: 'off'
               - action: "{{ 'cover.open_cover' if command == 'open' else 'cover.close_cover' }}"
                 target:

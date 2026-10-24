@@ -2,8 +2,9 @@
 # Stable entity: automation.close_bedrooms_curtains_in_the_evening.
 - id: ha_homelab_curtains_close_bedroom_curtains_in_the_evening
   alias: 'Curtains: Close bedroom curtains in the evening'
-  description: Close bedroom curtains in the evening. Responds to sun.sun below 0.1. Runs only when all
-    configured guards pass.
+  description: Close bedroom curtains in the evening below 0.1 degrees sun elevation. Mishka and Bedroom
+    run independently; require the global and matching room Sticky to remain off at each power and movement
+    command, including delayed power-off.
   triggers:
   - platform: numeric_state
     entity_id: sun.sun
@@ -14,18 +15,52 @@
     entity_id: input_boolean.curtains_sticky
     state: 'off'
   actions:
-  - service: cover.close_cover
-    entity_id: cover.mishka_curtains_one_l
-  - service: switch.turn_on
-    entity_id: switch.bedroom_guard
-  - delay: 00:01:30
-  - service: cover.close_cover
-    entity_id: cover.mishka_curtains_two_l
-  - service: cover.close_cover
-    entity_id: cover.bedroom_curtains_l
-  - delay: 01:00:00
-  - service: switch.turn_off
-    entity_id: switch.bedroom_guard
+  - parallel:
+    - sequence:
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.mishka_room_sticky
+        state: 'off'
+      - service: cover.close_cover
+        entity_id: cover.mishka_curtains_one_l
+        continue_on_error: true
+      - delay: 00:01:30
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.mishka_room_sticky
+        state: 'off'
+      - service: cover.close_cover
+        entity_id: cover.mishka_curtains_two_l
+        continue_on_error: true
+    - sequence:
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.bedroom_sticky
+        state: 'off'
+      - service: switch.turn_on
+        entity_id: switch.bedroom_guard
+        continue_on_error: true
+      - delay: 00:01:30
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.bedroom_sticky
+        state: 'off'
+      - service: cover.close_cover
+        entity_id: cover.bedroom_curtains_l
+        continue_on_error: true
+      - delay: 01:00:00
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.bedroom_sticky
+        state: 'off'
+      - service: switch.turn_off
+        entity_id: switch.bedroom_guard
+        continue_on_error: true
   mode: single
   trace:
     stored_traces: 5

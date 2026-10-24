@@ -2,9 +2,9 @@
 # Stable entity: automation.power_below_ten_5.
 - id: ha_homelab_self_consumption_start_decorative_lights_on_low_surplus_power
   alias: 'Self-consumption: Start decorative lights on low surplus power'
-  description: Start decorative lights on low surplus power. Responds to sensor.home_123_1s below -50; or sensor.home_123_1s
-    below -75; or sensor.home_123_1s below -100; or sensor.home_123_1s below -125. Runs only when all configured
-    guards pass.
+  description: Start decorative lights on low surplus power. Responds to sensor.home_123_1s below -50;
+    or sensor.home_123_1s below -75; or sensor.home_123_1s below -100; or sensor.home_123_1s below -125.
+    Runs only when all configured guards pass. Kitchen Sticky also blocks this automatic lighting action.
   triggers:
   - platform: numeric_state
     entity_id: sensor.home_123_1s
@@ -38,8 +38,13 @@
     for:
       seconds: 10
   actions:
-  - service: switch.turn_on
-    entity_id: switch.tea_table
+  - if:
+    - condition: state
+      entity_id: input_boolean.kitchen_sticky
+      state: 'off'
+    then:
+    - service: switch.turn_on
+      entity_id: switch.tea_table
   - service: script.notify
     data:
       message: Power below ten 5
