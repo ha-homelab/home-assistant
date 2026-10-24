@@ -2,13 +2,19 @@
 # Stable entity: automation.table_lamp_off_in_the_morning.
 - id: ha_homelab_kitchen_turn_off_the_table_lamp_in_the_morning
   alias: 'Kitchen: Turn off the table lamp in the morning'
-  description: Turn off the table lamp in the morning. Responds to the daily schedule at 05:00:00.
+  description: Turn off the table lamp in the morning. Responds to the daily schedule at 05:00:00. Only
+    command a light while every owning room Sticky helper is explicitly off; check each target independently.
   triggers:
     platform: time
     at: 05:00:00
   actions:
-  - service: light.turn_off
-    entity_id: light.kitchen_lamp_m
+  - if:
+    - condition: state
+      entity_id: input_boolean.kitchen_sticky
+      state: 'off'
+    then:
+    - service: light.turn_off
+      entity_id: light.kitchen_lamp_m
   mode: single
   trace:
     stored_traces: 5

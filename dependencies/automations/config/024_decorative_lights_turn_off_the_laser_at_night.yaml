@@ -3,7 +3,8 @@
 - id: ha_homelab_decorative_lights_turn_off_the_laser_at_night
   alias: 'Decorative lights: Turn off the laser at night'
   description: Turn off the laser at night. Responds to sun.sun below -3. Runs only when all configured
-    guards pass.
+    guards pass. Require both the global curtain and room override to be off immediately before changing
+    power.
   triggers:
   - platform: numeric_state
     entity_id: sun.sun
@@ -14,6 +15,11 @@
     entity_id: input_boolean.curtains_sticky
     state: 'off'
   actions:
+  - condition: state
+    entity_id:
+    - input_boolean.curtains_sticky
+    - input_boolean.mishka_room_sticky
+    state: 'off'
   - service: switch.turn_off
     entity_id: switch.mishka_guard
   mode: single

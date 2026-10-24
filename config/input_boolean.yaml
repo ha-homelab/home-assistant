@@ -5,7 +5,6 @@ away:
   name: Away
 bath_warmer_sticky:
   icon: mdi:bed-empty
-  initial: false
   name: Bath warmer sticky
 bathroom_sticky:
   icon: mdi:water-pump

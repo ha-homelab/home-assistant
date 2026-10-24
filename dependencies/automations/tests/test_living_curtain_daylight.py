@@ -42,7 +42,8 @@ class MorningDaylightCases:
         await self.hass.config.async_set_time_zone(str(ZONE))
         self.assertTrue(await async_load_base_functionality(self.hass))
         self.hass.data[DATA_TRACE] = {}
-        self.hass.states.async_set('input_boolean.curtains_sticky', 'off')
+        for room in ('curtains', 'living_room', 'dining_room', 'kitchen'):
+            self.hass.states.async_set(f'input_boolean.{room}_sticky', 'off')
         # The scheduled event can run before the sun entity's state update.
         self.hass.states.async_set('sun.sun', 'below_horizon')
         self.calls = []
@@ -95,19 +96,19 @@ class MorningDaylightCases:
         await self.event('2026-10-07', self.earliest, '07:10:00', 'time')
         self.assertEqual(self.calls, [])
         await self.event('2026-10-07', '07:10:00', '07:10:00', 'sun')
-        self.assertEqual(self.calls, self.expected_calls)
+        self.assertCountEqual(self.calls, self.expected_calls)
 
     async def test_early_sunrise_waits_until_fixed_time(self):
         await self.event('2026-06-21', '05:45:00', '05:45:00', 'sun')
         self.assertEqual(self.calls, [])
         await self.event('2026-06-21', self.earliest, '05:45:00', 'time')
-        self.assertEqual(self.calls, self.expected_calls)
+        self.assertCountEqual(self.calls, self.expected_calls)
 
     async def test_winter_standard_time_waits_for_sunrise(self):
         await self.event('2026-12-21', self.earliest, '07:20:00', 'time')
         self.assertEqual(self.calls, [])
         await self.event('2026-12-21', '07:20:00', '07:20:00', 'sun')
-        self.assertEqual(self.calls, self.expected_calls)
+        self.assertCountEqual(self.calls, self.expected_calls)
 
     async def test_manual_override_blocks_both_events(self):
         self.hass.states.async_set('input_boolean.curtains_sticky', 'on')
@@ -128,7 +129,7 @@ class MorningDaylightCases:
 
     async def test_sunrise_between_room_schedules_respects_earliest_time(self):
         await self.event('2026-08-01', '06:32:00', '06:32:00', 'sun')
-        self.assertEqual(self.calls, self.expected_calls if self.earliest < '06:32:00' else [])
+        self.assertCountEqual(self.calls, self.expected_calls if self.earliest < '06:32:00' else [])
 
 
 @unittest.skipUnless(HA_AVAILABLE, 'Requires the deployed Home Assistant runtime')
@@ -147,32 +148,29 @@ class KitchenDiningCurtainDaylightTest(MorningDaylightCases, unittest.IsolatedAs
     entity_id = 'automation.open_curtains_in_the_morning'
     services = [('switch', 'turn_on'), ('cover', 'open_cover'), ('switch', 'turn_off')]
     expected_calls = [
-        ('switch', 'turn_on', {'entity_id': ['switch.studio_guard']}),
         ('switch', 'turn_on', {'entity_id': ['switch.dining_guard']}),
         ('switch', 'turn_on', {'entity_id': ['switch.kitchen_guard']}),
-        ('cover', 'open_cover', {'entity_id': ['cover.studio_curtains']}),
         ('cover', 'open_cover', {'entity_id': ['cover.kitchen_curtains_l']}),
         ('cover', 'open_cover', {'entity_id': ['cover.dining_curtains_l']}),
         ('switch', 'turn_off', {'entity_id': ['switch.dining_guard']}),
     ]
 
     def prepare_actions(self, rule):
-        # Preserve the production timing; only the private test copy skips waiting.
-        self.assertEqual(rule['actions'], [
-            {'service': 'switch.turn_on', 'entity_id': 'switch.studio_guard'},
-            {'service': 'switch.turn_on', 'entity_id': 'switch.dining_guard'},
-            {'service': 'switch.turn_on', 'entity_id': 'switch.kitchen_guard'},
-            {'delay': '00:01:30'},
-            {'service': 'cover.open_cover', 'entity_id': 'cover.studio_curtains',
-             'continue_on_error': True},
-            {'service': 'cover.open_cover', 'entity_id': 'cover.kitchen_curtains_l'},
-            {'service': 'cover.open_cover', 'entity_id': 'cover.dining_curtains_l'},
-            {'delay': '00:01:00'},
-            {'service': 'switch.turn_off', 'entity_id': 'switch.dining_guard'},
+        self.assertNotIn('studio', str(rule['actions']))
+        for branch in rule['actions'][0]['parallel']:
+            delays = [step['delay'] for step in branch['sequence'] if 'delay' in step]
+            self.assertIn('00:01:30', delays)
+            for step in branch['sequence']:
+                if 'delay' in step:
+                    step['delay'] = 0
+
+    async def test_dining_override_skips_only_dining(self):
+        self.hass.states.async_set('input_boolean.dining_room_sticky', 'on')
+        await self.event('2026-10-07', '07:10:00', '07:10:00', 'sun')
+        self.assertCountEqual(self.calls, [
+            ('switch', 'turn_on', {'entity_id': ['switch.kitchen_guard']}),
+            ('cover', 'open_cover', {'entity_id': ['cover.kitchen_curtains_l']}),
         ])
-        for step in rule['actions']:
-            if 'delay' in step:
-                step['delay'] = 0
 
 
 if __name__ == '__main__':

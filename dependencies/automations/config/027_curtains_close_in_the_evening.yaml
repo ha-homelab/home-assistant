@@ -2,9 +2,9 @@
 # Stable entity: automation.close_curtains_in_the_evening.
 - id: ha_homelab_curtains_close_in_the_evening
   alias: 'Curtains: Close in the evening'
-  description: Below 0.2 degrees sun elevation, start living-room main RF closing after three seconds
-    with a bounded Wi-Fi fallback. Preserve other rooms, their 90-second warm-up, one-hour power-off delay,
-    and the manual override. Studio closes through its calibrated ZHA cover.
+  description: Close curtains below 0.2 degrees sun elevation. Each room independently requires its room
+    Sticky and Curtains Sticky to be off before power, movement and delayed power-off. Preserve the 90-second
+    warm-up and one-hour power-off delay; living-room RF starts after three seconds.
   triggers:
   - platform: numeric_state
     entity_id: sun.sun
@@ -17,31 +17,92 @@
   actions:
   - parallel:
     - sequence:
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.kitchen_sticky
+        state: 'off'
       - service: switch.turn_on
         entity_id: switch.kitchen_guard
-      - service: switch.turn_on
-        entity_id: switch.studio_guard
-      - service: switch.turn_on
-        entity_id: switch.dining_guard
+        continue_on_error: true
       - delay: 00:01:30
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.kitchen_sticky
+        state: 'off'
       - service: cover.close_cover
         entity_id: cover.kitchen_curtains_l
-      # Legacy Wi-Fi motor; retained for a manual rollback only.
-      # - service: cover.close_cover
-      #   entity_id: cover.office_curtains_r
+        continue_on_error: true
+      - delay: 01:00:00
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.kitchen_sticky
+        state: 'off'
+      - service: switch.turn_off
+        entity_id: switch.kitchen_guard
+        continue_on_error: true
+    - sequence:
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.studio_sticky
+        state: 'off'
+      - service: switch.turn_on
+        entity_id: switch.studio_guard
+        continue_on_error: true
+      - delay: 00:01:30
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.studio_sticky
+        state: 'off'
       - service: cover.close_cover
         entity_id: cover.studio_curtains
         continue_on_error: true
-      - service: cover.close_cover
-        entity_id: cover.dining_curtains_l
       - delay: 01:00:00
-      - service: switch.turn_off
-        entity_id: switch.dining_guard
-      - service: switch.turn_off
-        entity_id: switch.kitchen_guard
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.studio_sticky
+        state: 'off'
       - service: switch.turn_off
         entity_id: switch.studio_guard
+        continue_on_error: true
     - sequence:
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.dining_room_sticky
+        state: 'off'
+      - service: switch.turn_on
+        entity_id: switch.dining_guard
+        continue_on_error: true
+      - delay: 00:01:30
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.dining_room_sticky
+        state: 'off'
+      - service: cover.close_cover
+        entity_id: cover.dining_curtains_l
+        continue_on_error: true
+      - delay: 01:00:00
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.dining_room_sticky
+        state: 'off'
+      - service: switch.turn_off
+        entity_id: switch.dining_guard
+        continue_on_error: true
+    - sequence:
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.living_room_sticky
+        state: 'off'
       - action: script.living_curtains_move
         data:
           curtain: main
@@ -49,3 +110,6 @@
   mode: single
   trace:
     stored_traces: 5
+# Legacy Studio Wi-Fi motor; manual rollback reference only.
+# - service: cover.close_cover
+#   entity_id: cover.office_curtains_r
