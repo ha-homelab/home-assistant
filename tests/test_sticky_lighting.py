@@ -31,7 +31,7 @@ ROOT = Path(os.environ.get('STICKY_TEST_ROOT', Path(__file__).resolve().parents[
 # implemented in the source. File prefixes are stable automation identifiers.
 ROOM_CASES = (
     ('015', 'bathroom', ('light.bathroom_mirror_light',)),
-    ('018', 'bathroom', ('switch.bath2',)),
+    ('018', 'bathroom', ('light.bath_2',)),
     ('019', 'bath_warmer', ('switch.bathroom_warmer',)),
     ('021', 'bedroom', ('light.bedroom_lamp',)),
     ('033', 'dining_room', ('switch.dining_wall_light_2', 'switch.dining_arc_lamp', 'light.adining_lamp_m')),
@@ -54,7 +54,7 @@ TIMED_ROOMS = {
     'hallway': {'light.hall_1_m', 'light.hall_2_m'},
     'mishka_room': {'light.hall_2_m'},
     'kitchen': {'switch.tea_table', 'switch.led_under_cabinet', 'light.kitchen_lamp_m'},
-    'bathroom': {'switch.bath2', 'light.bathroom_mirror_light'},
+    'bathroom': {'light.bath_2', 'light.bathroom_mirror_light'},
     'living_room': {'switch.tv_backlight_l',
                     'light.living_wall_dimmer_l', 'switch.living_room_light_l'},
     'dining_room': {'light.dining_lights_dimmer_l', 'light.adining_lamp_m',

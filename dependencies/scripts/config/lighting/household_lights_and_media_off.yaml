@@ -15,6 +15,7 @@ turn_off_living_room:
     - light.kitchen_lamp_m
     - light.fireplace_led_ll
     - light.bathroom_mirror_light
+    - light.bath_2
     - light.dining_lights_dimmer_l
     - light.balcony
     - light.porch_one
@@ -33,7 +34,6 @@ turn_off_living_room:
     continue_on_error: true
   - service: switch.turn_off
     entity_id:
-    - switch.bath2
     - switch.fireplace_led_ll
     - switch.tv_backlight_l
     - switch.mishka_bedroom_desk_lamp_l
