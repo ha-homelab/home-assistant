@@ -298,21 +298,25 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "40a7a12c2f2fce6ba21d685475be946b209608528da5d480d69a79f4797d956d",
+      "behavior_sha256": "9bb7e072998b386ddaed73d1fb2dcf12193d5e16d52c9602688ec898db3144ca",
       "references": [
         "binary_sensor.rf_studio_motion",
         "input_boolean.bathroom_sticky",
-        "switch.bath2",
+        "light.bath_2",
         "switch.turn_off"
       ],
       "imported_behavior_sha256": "13c56240d6c57e5967201cc42c0a83f0b149446b78d523100c083af40b4ebfcc",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
+        "date": "2026-10-24",
+        "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
         "previous_change": {
           "date": "2026-10-10",
-          "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities.",
-          "previous_change": "2026-09-22 motion-light availability recovery"
+          "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
+          "previous_change": {
+            "date": "2026-10-10",
+            "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities.",
+            "previous_change": "2026-09-22 motion-light availability recovery"
+          }
         }
       }
     },
@@ -337,20 +341,24 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "cd0acd49aada5c44f0e7529ac8255d7e15e5f8bc7a3539d25fb450e66aa5fd4d",
+      "behavior_sha256": "96862fad3a1a15791a7216c05fc20e151ffe4a45a72852f311a9a85c0f09c446",
       "references": [
         "binary_sensor.rf_studio_motion",
         "input_boolean.bathroom_sticky",
-        "switch.bath2",
+        "light.bath_2",
         "switch.turn_on"
       ],
       "imported_behavior_sha256": "29811aab962cfd58bab039e5fa4e43c1ce65de9d157c6b6e942b3774a4072d12",
       "behavior_change": {
-        "date": "2026-10-20",
-        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "date": "2026-10-24",
+        "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
         "previous_change": {
-          "date": "2026-10-10",
-          "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities."
+          "date": "2026-10-20",
+          "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+          "previous_change": {
+            "date": "2026-10-10",
+            "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities."
+          }
         }
       }
     },
@@ -1856,7 +1864,7 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "527beaff77f90a0c2c0ea069e65da88ae72ebb46491e6b573ee733301b2cb6fe",
+      "behavior_sha256": "23c00664ac6ac7c15465afe820530634783774d0c7822460d43a737e207c6851",
       "references": [
         "input_boolean.bathroom_sticky",
         "input_boolean.bedroom_sticky",
@@ -1870,6 +1878,7 @@
         "light.adining_lamp_m",
         "light.backdoor_porch",
         "light.balcony",
+        "light.bath_2",
         "light.bathroom_mirror_light",
         "light.bedroom_lamp",
         "light.bedroom_light_dimmer_l",
@@ -1889,7 +1898,6 @@
         "light.porch_one",
         "light.porch_two",
         "light.turn_off",
-        "switch.bath2",
         "switch.dining_arc_lamp",
         "switch.dining_wall_light_2",
         "switch.led_under_cabinet",
@@ -1900,9 +1908,13 @@
       ],
       "imported_behavior_sha256": "27f40891a35eb2eeb33f2f8dda8ab96031468efae7af5b2d7d104f24b5f0eeb4",
       "behavior_change": {
-        "date": "2026-10-23",
-        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
-        "previous_change": "Include the relocated Dining Arc lamp and Matter Dining lamp in the explicit Turn off all lights action (automation.off_lights). Add independent switch.turn_off and light.turn_off branches; retain Bedroom Lamp exactly once and preserve the 30 existing actions, schedule, mode and identity."
+        "date": "2026-10-24",
+        "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
+        "previous_change": {
+          "date": "2026-10-23",
+          "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+          "previous_change": "Include the relocated Dining Arc lamp and Matter Dining lamp in the explicit Turn off all lights action (automation.off_lights). Add independent switch.turn_off and light.turn_off branches; retain Bedroom Lamp exactly once and preserve the 30 existing actions, schedule, mode and identity."
+        }
       }
     },
     {
@@ -1923,7 +1935,7 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "446218feeaa3b3956571e28764cee3c7da8101d492cf0aa9d81c2ea602a9f726",
+      "behavior_sha256": "b7320c0442c6f2ec8a9f9134d6149bd8e319e1b8a9a787c669063e53f915c7e2",
       "references": [
         "input_boolean.bathroom_sticky",
         "input_boolean.bedroom_sticky",
@@ -1935,6 +1947,7 @@
         "input_boolean.porch_sticky",
         "light.backdoor_porch",
         "light.balcony",
+        "light.bath_2",
         "light.bathroom_mirror_light",
         "light.bedroom_lamp",
         "light.dining_lights_dimmer_l",
@@ -1949,7 +1962,6 @@
         "light.porch_one",
         "light.porch_two",
         "light.turn_off",
-        "switch.bath2",
         "switch.dining_wall_light_2",
         "switch.led_under_cabinet",
         "switch.tea_table",
@@ -1957,9 +1969,13 @@
       ],
       "imported_behavior_sha256": "7fbd1558dcd423d768f0964ebfa72a3e4860bb4863b2d9116726933982601de1",
       "behavior_change": {
-        "date": "2026-10-23",
-        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
-        "previous_change": "Retire the disconnected Sockets behind fireplace two device and its two switch-as-light helpers. Remove only their shutdown actions and notification trigger entries; preserve other targets, schedules and automation identities."
+        "date": "2026-10-24",
+        "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
+        "previous_change": {
+          "date": "2026-10-23",
+          "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+          "previous_change": "Retire the disconnected Sockets behind fireplace two device and its two switch-as-light helpers. Remove only their shutdown actions and notification trigger entries; preserve other targets, schedules and automation identities."
+        }
       }
     },
     {
@@ -2943,7 +2959,7 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "8d4a8dd12118f75305e422e358388aee2b40bde8d865befaec4619176413344f",
+      "behavior_sha256": "5d84dd9a424450c3c4660b50957c317e312b01019cedcd86b882cd7193f55442",
       "references": [
         "light.fireplace_led_ll",
         "media_player.living_room_tv_77",
@@ -2955,7 +2971,6 @@
         "switch.attic_dehumidifier_l",
         "switch.audio_system_hall",
         "switch.audiosystem_l",
-        "switch.bath2",
         "switch.bathroom_warmer",
         "switch.clock_l",
         "switch.fireplace_led_ll",
@@ -2977,42 +2992,46 @@
       ],
       "imported_behavior_sha256": "3f605d602119655411ec1c9ab9f03f55a2ab98f1bb022df0113d7311c984a2c8",
       "behavior_change": {
-        "date": "2026-10-11",
-        "reason": "Rename the existing s6 hardware to Switch06. Preserve schedules, guards, action order, automation identities and the 750 W load estimate. The Air Purifier Living role remains on its canonical ID after transfer to KMC outlet 2.",
+        "date": "2026-10-24",
+        "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
         "previous_change": {
           "date": "2026-10-11",
-          "reason": "Retire the disconnected Sockets behind fireplace two device and its two switch-as-light helpers. Remove only their shutdown actions and notification trigger entries; preserve other targets, schedules and automation identities.",
+          "reason": "Rename the existing s6 hardware to Switch06. Preserve schedules, guards, action order, automation identities and the 750 W load estimate. The Air Purifier Living role remains on its canonical ID after transfer to KMC outlet 2.",
           "previous_change": {
             "date": "2026-10-11",
-            "reason": "Rename the existing iNewSwitch outlet to s6 after its ESPHome update. Preserve the 750 W load estimate, triggers, guards, delays, actions and automation identities.",
+            "reason": "Retire the disconnected Sockets behind fireplace two device and its two switch-as-light helpers. Remove only their shutdown actions and notification trigger entries; preserve other targets, schedules and automation identities.",
             "previous_change": {
-              "date": "2026-10-10",
-              "reason": "The first KMC now supplies Moen Flo monitor power, pump power enable and Laundry. Remove its old lighting actions without substituting new power controls; update notification-only references. Preserve all other actions, guards and timing.",
+              "date": "2026-10-11",
+              "reason": "Rename the existing iNewSwitch outlet to s6 after its ESPHome update. Preserve the 750 W load estimate, triggers, guards, delays, actions and automation identities.",
               "previous_change": {
                 "date": "2026-10-10",
-                "reason": "Follow the owner-assigned Recliner role on the second KMC first physical output; preserve the already-live Flare mapping from the first KMC migration. Keep all other notification targets, triggers, conditions and delivery behavior unchanged. Old standalone roles remain registered as Switch01–03 and are not control targets.",
+                "reason": "The first KMC now supplies Moen Flo monitor power, pump power enable and Laundry. Remove its old lighting actions without substituting new power controls; update notification-only references. Preserve all other actions, guards and timing.",
                 "previous_change": {
                   "date": "2026-10-10",
-                  "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
+                  "reason": "Follow the owner-assigned Recliner role on the second KMC first physical output; preserve the already-live Flare mapping from the first KMC migration. Keep all other notification targets, triggers, conditions and delivery behavior unchanged. Old standalone roles remain registered as Switch01–03 and are not control targets.",
                   "previous_change": {
                     "date": "2026-10-10",
-                    "reason": "Use the converted Bathroom warmer ESPHome relay. Preserve the one-minute off timer, sticky override, existing notification actions, and unrelated targets.",
+                    "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
                     "previous_change": {
                       "date": "2026-10-10",
-                      "reason": "Retarget the converted bedroom lamp outlet as Living lamp; retain the existing global shutdown and notification behavior.",
+                      "reason": "Use the converted Bathroom warmer ESPHome relay. Preserve the one-minute off timer, sticky override, existing notification actions, and unrelated targets.",
                       "previous_change": {
                         "date": "2026-10-10",
-                        "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
+                        "reason": "Retarget the converted bedroom lamp outlet as Living lamp; retain the existing global shutdown and notification behavior.",
                         "previous_change": {
                           "date": "2026-10-10",
-                          "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities.",
+                          "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
                           "previous_change": {
-                            "date": "2026-09-26",
-                            "reason": "Label routine light/switch state reports for browser delivery without the Vitaly iPhone copy. Preserve triggers and other destinations.",
+                            "date": "2026-10-10",
+                            "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities.",
                             "previous_change": {
-                              "date": "2026-09-24",
-                              "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged.",
-                              "previous_change": "2026-09-22 runtime resilience audit Add one explicit Chrome copy through the shared optional notification helper, preserving existing triggers, guards and recipients; mailbox uses its dedicated browser rule. Owner retired LocalTuya TV on 2026-09-23: remove its power-state guard or notification trigger; keep other conditions and actions."
+                              "date": "2026-09-26",
+                              "reason": "Label routine light/switch state reports for browser delivery without the Vitaly iPhone copy. Preserve triggers and other destinations.",
+                              "previous_change": {
+                                "date": "2026-09-24",
+                                "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged.",
+                                "previous_change": "2026-09-22 runtime resilience audit Add one explicit Chrome copy through the shared optional notification helper, preserving existing triggers, guards and recipients; mailbox uses its dedicated browser rule. Owner retired LocalTuya TV on 2026-09-23: remove its power-state guard or notification trigger; keep other conditions and actions."
+                              }
                             }
                           }
                         }

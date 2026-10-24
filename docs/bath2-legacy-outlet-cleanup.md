@@ -7,7 +7,8 @@ present; no separate active Heat500w or Dining chandelier records were found.
 Hardware identifiers, addresses, credentials, and private backup contents are
 intentionally omitted here.
 
-The canonical outlet is `switch.bath2`. The separate legacy bathroom light
+The canonical control is now `light.bath_2`, backed by `switch.bath_2`;
+see [the light migration](bath-2-light.md). The separate legacy bathroom light
 `light.bath2_old` remains unchanged. It is a different device.
 
 ## Retired behavior
