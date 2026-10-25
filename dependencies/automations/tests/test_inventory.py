@@ -19,8 +19,8 @@ class InventoryTest(unittest.TestCase):
         self.assertEqual(self.manifest['automation_count'], 97)
         retired = {entry['order'] for entry in self.manifest['retired_automations']}
         active = {entry['order'] for entry in self.manifest['automations']}
-        self.assertTrue({69, 98, 106, 110, 111} <= retired)
-        self.assertTrue({20, 21, 41, 42} <= active)
+        self.assertLessEqual({69, 98, 106, 110, 111}, retired)
+        self.assertLessEqual({20, 21, 41, 42}, active)
 
     def test_missing_rule_cannot_be_hidden_by_lowering_the_count(self):
         self.manifest['automations'].pop()
