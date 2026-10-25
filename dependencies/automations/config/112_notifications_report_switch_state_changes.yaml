@@ -3,7 +3,7 @@
 - id: ha_homelab_notifications_report_switch_state_changes
   alias: 'Notifications: Report switch state changes'
   description: Report switch state changes. Responds to switch.tea_table, switch.led_under_cabinet,
-    switch.bath2, light.fireplace_led_ll, switch.tv_backlight_l,
+    light.fireplace_led_ll, switch.tv_backlight_l,
     switch.audio_system_hall, sensor.switch06_signal, switch.mishka_guard, switch.range_hood_l, switch.audiosystem_l,
     switch.moen_flo_water_monitor_power, switch.pump_power_enable, switch.laundry, switch.fireplace_led_ll, switch.tv_backlight_l, switch.recliner, switch.hall_sockets_behind_tv_2_l,
     switch.heater_l, switch.clock_l, switch.garage_door_power, switch.mishka_bedroom_desk_lamp_l, switch.bathroom_warmer,
@@ -15,7 +15,6 @@
     entity_id:
     - switch.tea_table
     - switch.led_under_cabinet
-    - switch.bath2
     - light.fireplace_led_ll
     - switch.tv_backlight_l
     - switch.audio_system_hall

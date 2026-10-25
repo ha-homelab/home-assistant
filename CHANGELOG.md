@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- Expose the Bath 2 ESPHome relay through `light.bath_2`; migrate motion, schedule
+  and shutdown targets and exclude its state changes from screen notifications.
 - Extend room Sticky to scheduled lighting, energy-selected lights and all
   automatic curtain commands, including RF, delayed Wi-Fi fallback and motor power.
   Retire the 06:15 override reset; preserve independent rooms and manual controls.

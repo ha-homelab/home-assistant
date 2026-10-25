@@ -82,7 +82,7 @@ The following rule numbers refer to filenames in `dependencies/automations/confi
 Targets, durations and existing instance guards are preserved.
 
 - **013 Bathroom:** mirror light, 5 minutes; Bathroom sticky.
-- **017 Bathroom two:** `switch.bath2`, 20 minutes; Bathroom sticky.
+- **017 Bathroom two:** `light.bath_2`, 20 minutes; Bathroom sticky.
 - **020 Bedroom:** Bedroom Lamp, 3 minutes; sun elevation below 0.60°, 18:00–23:10
   in HA's local time, and Bedroom sticky.
 - **031 Dining room:** four lights/switches, 5 minutes; sun below 0.10° and
