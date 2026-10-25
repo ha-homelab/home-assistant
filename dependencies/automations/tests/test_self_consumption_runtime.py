@@ -54,11 +54,16 @@ class SelfConsumptionRuntimeTest(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(await async_setup_component(self.hass, 'python_script', {'python_script': {}}))
         self.calls, self.delays, self.notices = [], [], []
         self.failures = set()
+        self.after_notice = self.after_call = None
+        for room in ('living_room', 'dining_room', 'lobby', 'kitchen'):
+            self.hass.states.async_set(f'input_boolean.{room}_sticky', 'off')
         for name, schema in [('turn_on', LIGHT_TURN_ON_SCHEMA), ('turn_off', LIGHT_TURN_OFF_SCHEMA)]:
             self.hass.services.async_register('light', name, self.record, schema=cv.make_entity_service_schema(schema))
             self.hass.services.async_register('switch', name, self.record, schema=cv.make_entity_service_schema({}))
         async def notify(call):
             self.notices.append(dict(call.data))
+            if self.after_notice:
+                self.after_notice()
         self.hass.services.async_register('script', 'notify_mqtt', notify)
         async def delay(run):
             self.delays.append(run._get_pos_time_period_template('delay').total_seconds())
@@ -75,6 +80,8 @@ class SelfConsumptionRuntimeTest(unittest.IsolatedAsyncioTestCase):
     async def record(self, call):
         data = deepcopy(dict(call.data))
         self.calls.append((f'{call.domain}.{call.service}', data))
+        if self.after_call:
+            self.after_call()
         if any(entity in self.failures for entity in data['entity_id']):
             raise HomeAssistantError('Simulated independent device failure')
 
@@ -129,6 +136,48 @@ class SelfConsumptionRuntimeTest(unittest.IsolatedAsyncioTestCase):
         await self.run_actions(1000, {'switch.switch06': 'unavailable', 'switch.air_purifier_living': 'unknown',
                                       'switch.tea_table': 'on'})
         self.assertEqual(self.calls, [('switch.turn_off', {'entity_id': ['switch.tea_table']})])
+
+    async def test_each_room_sticky_blocks_energy_driven_on_and_off(self):
+        cases = (
+            ('living_room', 'switch.living_room_light_l'),
+            ('dining_room', 'light.dining_lights_dimmer_l'),
+            ('dining_room', 'switch.dining_wall_light_2'),
+            ('lobby', 'switch.dining_wall_light_2'),
+            ('kitchen', 'switch.tea_table'),
+        )
+        for room, target in cases:
+            for state in ('on', 'unknown', 'unavailable', None):
+                for power, lamp in ((1000, 'on'), (-1000, 'off')):
+                    with self.subTest(room=room, target=target, state=state, power=power):
+                        self.calls.clear()
+                        self.delays.clear()
+                        for _, previous in cases:
+                            self.hass.states.async_remove(previous)
+                        for helper in ('living_room', 'dining_room', 'lobby', 'kitchen'):
+                            self.hass.states.async_set(f'input_boolean.{helper}_sticky', 'off')
+                        entity = f'input_boolean.{room}_sticky'
+                        if state is None:
+                            self.hass.states.async_remove(entity)
+                        else:
+                            self.hass.states.async_set(entity, state)
+                        await self.run_actions(power, {target: lamp})
+                        self.assertEqual(self.calls, [])
+
+    async def test_blocked_light_is_excluded_before_load_selection(self):
+        self.hass.states.async_set('input_boolean.dining_room_sticky', 'on')
+        await self.run_actions(840, {'switch.switch06': 'on', 'light.dining_lights_dimmer_l': 'on'})
+        self.assertEqual(self.calls, [('switch.turn_off', {'entity_id': ['switch.switch06']})])
+
+    async def test_sticky_change_during_notification_blocks_selected_light(self):
+        self.after_notice = lambda: self.hass.states.async_set('input_boolean.kitchen_sticky', 'on')
+        await self.run_actions(-300, {'switch.tea_table': 'off'})
+        self.assertEqual(self.calls, [])
+        self.assertTrue(self.notices)
+
+    async def test_sticky_rechecked_between_selected_targets(self):
+        self.after_call = lambda: self.hass.states.async_set('input_boolean.living_room_sticky', 'on')
+        await self.run_actions(180, {'light.dining_lights_dimmer_l': 'on', 'switch.living_room_light_l': 'on'})
+        self.assertEqual(self.calls, [('light.turn_off', {'entity_id': ['light.dining_lights_dimmer_l']})])
 
     async def test_schedule_guard_mode_and_empty_selection_are_preserved(self):
         self.assertEqual(self.config['triggers'], [{'platform': 'time_pattern', 'seconds': '/2'}])

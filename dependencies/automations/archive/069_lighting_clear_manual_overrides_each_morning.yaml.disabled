@@ -1,3 +1,4 @@
+# Retired 2026-10-23: room Sticky overrides persist until the user changes them.
 # Lighting: Clear manual overrides each morning.
 # Stable entity: automation.morning_sticky_reset.
 - id: ha_homelab_lighting_clear_manual_overrides_each_morning

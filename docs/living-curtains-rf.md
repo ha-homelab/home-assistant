@@ -1,5 +1,44 @@
 # Living-room curtains: fast RF start with Wi-Fi fallback
 
+## Room overrides — 2026-10-23
+
+Automatic movement and motor power changes require **both** `Curtains Sticky`
+and the relevant room's Sticky to be explicitly **off**. `on`, `unknown`, and
+`unavailable` block the command. The living-room scripts check this at power-on,
+when each queued RF command actually runs, inside the RF transport, and before
+each Wi-Fi fallback. A blocked override also ends a pending fallback wait.
+
+Room mappings are Living room, Dining room, Kitchen, Studio, Bedroom, and
+Mishka room for their corresponding motors. The two Mishka curtains share
+`input_boolean.mishka_room_sticky`; both living-room motors share
+`input_boolean.living_room_sticky`. The global `input_boolean.curtains_sticky`
+continues to block all of them.
+
+Mixed-room schedules run independent branches. A sleeping room does not stop
+other rooms from following their schedules. Each branch rechecks the overrides
+after the 90-second warm-up and immediately before a deferred motor-power
+shutdown. If Sticky is enabled during a run, subsequent protected commands are
+suppressed; it does not undo a command already sent or issue a new stop command.
+An already-powered motor can therefore remain powered while Sticky is on.
+
+Studio **morning opening remains manual only**: schedule 078 does not power or
+open it. Its existing evening close remains automatic when both overrides are
+off. The legacy Studio Wi-Fi target remains commented out for rollback.
+
+Direct device controls remain available. The living-room RF helper itself is
+protected, so calling that helper also respects Sticky. Turning Sticky off does
+not replay a skipped opening or closing: the next scheduled trigger is used.
+
+Regression coverage in `tests/test_living_curtain_morning.py` uses an isolated
+Home Assistant engine and mocked devices. It checks both overrides before
+start, during warm-up, between queued RF commands, during Wi-Fi recovery, and
+before delayed power-off; it also checks independent room behavior. The
+schedule tests in
+`dependencies/automations/tests/test_living_curtain_daylight.py` preserve the
+sunrise/earliest-time rules and manual-only Studio morning behavior. These tests
+send no physical movement or power commands.
+
+
 The living-room main and sheer curtain schedules dispatch learned Dooya requests
 three seconds after powering their shared socket. Each requested
 motor still receives the same Open or Close command over Wi-Fi when its existing

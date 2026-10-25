@@ -2,8 +2,9 @@
 # Stable entity: automation.open_curtains_in_the_morning.
 - id: ha_homelab_curtains_open_curtains_in_the_morning
   alias: 'Curtains: Open curtains in the morning'
-  description: Open studio, kitchen and dining curtains at sunrise or 06:35, whichever is later.
-    Preserve the motor warm-up sequence and respect the manual override.
+  description: Open kitchen and dining curtains at sunrise or 06:35, whichever is later. Each room independently
+    requires its room Sticky and Curtains Sticky to be off before power, movement and delayed power-off.
+    Studio opening is manual only; do not power or open its motor from this schedule.
   triggers:
   - platform: time
     at: 06:35:00
@@ -20,25 +21,52 @@
     after: sunrise
     before: sunset
   actions:
-  - service: switch.turn_on
-    entity_id: switch.studio_guard
-  - service: switch.turn_on
-    entity_id: switch.dining_guard
-  - service: switch.turn_on
-    entity_id: switch.kitchen_guard
-  - delay: 00:01:30
-  # The old Studio motor relied on power restoration; it had no open command.
-  # The new ZHA motor must receive an explicit command after the same warm-up.
-  - service: cover.open_cover
-    entity_id: cover.studio_curtains
-    continue_on_error: true
-  - service: cover.open_cover
-    entity_id: cover.kitchen_curtains_l
-  - service: cover.open_cover
-    entity_id: cover.dining_curtains_l
-  - delay: 00:01:00
-  - service: switch.turn_off
-    entity_id: switch.dining_guard
+  - parallel:
+    - sequence:
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.dining_room_sticky
+        state: 'off'
+      - service: switch.turn_on
+        entity_id: switch.dining_guard
+        continue_on_error: true
+      - delay: 00:01:30
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.dining_room_sticky
+        state: 'off'
+      - service: cover.open_cover
+        entity_id: cover.dining_curtains_l
+        continue_on_error: true
+      - delay: 00:01:00
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.dining_room_sticky
+        state: 'off'
+      - service: switch.turn_off
+        entity_id: switch.dining_guard
+        continue_on_error: true
+    - sequence:
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.kitchen_sticky
+        state: 'off'
+      - service: switch.turn_on
+        entity_id: switch.kitchen_guard
+        continue_on_error: true
+      - delay: 00:01:30
+      - condition: state
+        entity_id:
+        - input_boolean.curtains_sticky
+        - input_boolean.kitchen_sticky
+        state: 'off'
+      - service: cover.open_cover
+        entity_id: cover.kitchen_curtains_l
+        continue_on_error: true
   mode: single
   trace:
     stored_traces: 5

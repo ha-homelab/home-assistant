@@ -4,7 +4,8 @@
   alias: 'Curtains: Close sheer curtains in the evening'
   description: Close sheer curtains while the evening sun descends through 0 to 0.6 degrees. Power the
     living-room socket, start RF after three seconds, and retain a bounded Wi-Fi fallback. Respect the
-    manual override.
+    manual override. Both Living room Sticky and Curtains Sticky must be off; the movement helper rechecks
+    before each command.
   triggers:
   - platform: numeric_state
     entity_id: sun.sun
@@ -19,7 +20,15 @@
   - condition: state
     entity_id: input_boolean.curtains_sticky
     state: 'off'
+  - condition: state
+    entity_id: input_boolean.living_room_sticky
+    state: 'off'
   actions:
+  - condition: state
+    entity_id:
+    - input_boolean.curtains_sticky
+    - input_boolean.living_room_sticky
+    state: 'off'
   - action: script.living_curtains_move
     data:
       curtain: sheer

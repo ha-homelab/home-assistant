@@ -4,6 +4,9 @@
 
 ### Fixed
 
+- Extend room Sticky to scheduled lighting, energy-selected lights and all
+  automatic curtain commands, including RF, delayed Wi-Fi fallback and motor power.
+  Retire the 06:15 override reset; preserve independent rooms and manual controls.
 - Source configuration: honor Living room Sticky throughout presence lighting,
   including manual-state reconciliation and absence shutdown.
 - Recheck room Sticky before every motion lighting command, including delayed
