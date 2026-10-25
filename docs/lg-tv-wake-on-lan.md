@@ -1,90 +1,132 @@
-# Living-room LG: Ethernet Wake-on-LAN
+# Living-room LG: local ESPHome Wake-on-LAN
 
-The LG OLED77C5 (`media_player.living_room_tv_77`) uses an installation-specific
-IP and Ethernet MAC kept in the local network and relay configuration. A local magic-packet test on
-2026-10-02 woke it from standby: HA changed from `off` to `on` in about three
-seconds. The other LG (`media_player.lg2`) is not part of this configuration.
+The normal HA power button and `media_player.turn_on` for
+`media_player.living_room_tv_77` wake the wired LG through the existing RF
+ESPHome node. The node broadcasts the magic packet on the home LAN. HA can run
+outside that broadcast domain; no SSH connection or running `syn` VM is needed.
+The other LG (`media_player.lg2`) is not targeted.
 
-HA runs in OCI, outside the Ethernet broadcast domain. The package
-`config/packages/lg_tv_wake_on_lan.yaml` handles the official
-[`webostv.turn_on` trigger](https://www.home-assistant.io/triggers/webostv.turn_on/)
-and sends one SSH command to the existing home worker `syn` through its cluster DNS name. CoreDNS maintains that name
-from the Kubernetes node address (resolved at runtime).
-There, `tools/lg_tv_wol_relay.py` emits three 102-byte UDP packets to the LAN
-broadcast configured for the installation, on UDP port 9. This requires no daemon,
-container, router broadcast forwarding or cloud audio/video transport.
+`config/packages/lg_tv_wake_on_lan.yaml` keeps the existing automation ID,
+`living_room_tv_wake_on_lan`, and official
+[`webostv.turn_on` trigger](https://www.home-assistant.io/triggers/webostv.turn_on/).
+It uses this bounded sequence:
 
-The normal HA power button and `media_player.turn_on` use the relay. SSH
-failures and a missing TV power-on confirmation produce an automation error;
-sending a packet alone is not reported as successful TV wake-up. Duplicate
-requests during the 45-second confirmation window are ignored.
+1. Leave an already-on TV untouched, including `playing`, `paused`, `idle` and
+   `buffering` states.
+2. Start `script.living_room_tv_send_wake_packet` with the nonblocking
+   `script.turn_on` action. The helper calls `esphome.rf_wake_living_tv`.
+3. Allow up to **10 seconds** for the TV to report an on state. A successful
+   service call only confirms the request, not that the TV actually woke.
+   A missing ESPHome action, offline node or helper error does not abort this
+   parent sequence; the bounded wait still leads to Harmony.
+4. If waking is still unconfirmed, send the Harmony hub's discrete `PowerOn`
+   command for `LG TV`, then allow **45 seconds** for confirmation.
+5. Record an automation error if neither route produces confirmation.
 
-## Provision or restore the relay
+Duplicate requests while this sequence runs are ignored. The fallback does not
+start a Harmony activity or use `PowerToggle`, so a late WOL response cannot
+turn the TV back off. Keep `remote.harmonyhub` and its `LG TV` device name aligned
+with the Harmony setup.
 
-1. On a trusted administrator machine, generate a dedicated Ed25519 key:
-   `ssh-keygen -q -t ed25519 -N '' -C ha-living-room-tv-wol -f living_room_tv_wol`.
-   Transfer the private key into HA at `/config/.ssh/living_room_tv_wol`
-   with mode `0600`; keep `/config/.ssh` at `0700`. Never commit the key.
-2. Copy `tools/lg_tv_wol_relay.py` to the home worker at
-   `/home/OPERATOR/.local/lib/home-assistant/lg_tv_wol_relay.py` (mode `0700`).
-   It uses only Python's standard library and needs no root permissions.
-   Before replacing an existing relay, provision `lg_tv_wol_relay.json` beside
-   the script (mode `0600`) with exactly `mac` and `broadcast` string fields.
-   Set `mac` to the TV's colon-separated Ethernet MAC and `broadcast` to the
-   IPv4 broadcast for its LAN. Both values are private installation data;
-   do not commit this JSON file. Missing or invalid configuration returns
-   exit code 3 without opening a network socket. Back up this file privately.
-3. Append the dedicated public key to the operator's `~/.ssh/authorized_keys`
-   (mode `0600`) with this exact prefix, on the same line as the public key:
+## Configure the RF node
 
-   ```text
-   restrict,command="/usr/bin/python3 /home/OPERATOR/.local/lib/home-assistant/lg_tv_wol_relay.py"
-   ```
+The installed RF board is an **ESP8266 NodeMCU v2 with CC1101**. Its Wi-Fi
+interface can send WOL; CC1101 is not involved, and no additional hardware or
+GPIO is required. The RF project provides the optional
+`packages/wake-on-lan.yaml` package and its small WiFiUDP helper. Keep the current
+RF configuration and add the package rather than replacing the existing node:
 
-   `restrict` disables forwarding, PTY and user rc execution. The forced
-   command additionally rejects every original command except
-   `wake-living-room-tv`. Do not substitute an administrator's unrestricted
-   SSH key. Preserve existing authorized keys when installing or removing it.
-4. Obtain `/etc/ssh/ssh_host_ed25519_key.pub` through an already trusted SSH
-   connection to `syn`. Store a known-hosts line beginning with
-   `living-room-tv-wol` and that public host key in
-   `/config/.ssh/living_room_tv_wol_known_hosts` (mode `0600`). Host-key
-   checking is mandatory; verify a replacement worker's new key before use.
-   The SSH `HostKeyAlias=living-room-tv-wol` pins that identity independently
-   of the worker address. Keep the dedicated private key unchanged.
-5. Deploy the package, run HA's configuration check, then reload
-   `shell_command` followed by `automation`. HA does not need a restart.
-   From standby, call `media_player.turn_on` for `media_player.living_room_tv_77`
-   and confirm both its state and the automation trace. A negative SSH test
-   with an original command such as `id` must fail without waking the TV.
+```yaml
+packages:
+  living_tv_wake: !include packages/wake-on-lan.yaml
+```
 
-HA's private configuration backup must retain these two `.ssh` files. The
-worker-side script and restricted authorized-key line must also be restored
-after losing `syn`; restoring only the HA configuration is insufficient.
-The relay lets the kernel choose the source interface for the fixed LAN
-broadcast; it does not bind to a worker IP that may change. An address change
-within the same LAN is handled by the node DNS record and this route selection.
-After a subnet change, update the broadcast address in the local JSON file. Never
-run another LAN broadcast service in OCI as a substitute.
+Set `living_tv_mac_address` in the installation's private ESPHome secrets file.
+It must be the TV's **Ethernet MAC**, not its Wi-Fi MAC. Keep the existing native
+API configuration and RF receive/transmit settings. Compile the full firmware
+and check RAM, flash and OTA headroom before upload.
 
-The TV already accepted Wake-on-LAN during commissioning. If a firmware reset
-disables it, consult the [official LG webOS integration documentation](https://www.home-assistant.io/integrations/webostv/#wakeonlan-does-not-work):
-on newer TVs the setting can be under **Support → IP control settings → Wake
-on LAN**. Keep Ethernet connected and the television in standby.
+The node exposes the native API action `wake_living_tv`, expected in HA as
+`esphome.rf_wake_living_tv`. Verify that actual registered action after OTA;
+do not deploy based on an assumed name. No extra button entity or MQTT-discovered
+copy is required. There is no boot trigger, so restarting RF must not wake the TV.
 
-## Diagnose without interrupting playback
+The built-in ESPHome WOL button supports ESP8266, but enabling the `button`
+component conflicts with the existing Dooya API's parameter named `button`.
+The small UDP helper preserves that public RF action signature. It sends only to
+the TV MAC configured at build time; this is not an arbitrary network-packet API.
 
-Check the automation trace before retrying a wake request. An SSH connection
-timeout points to reachability or name resolution; it is not evidence that the
-TV rejected a magic packet. Resolve `syn` from the HA container and compare it
-with the Kubernetes node address. A restricted `id` request must still return
-exit code 2 and `Only wake-living-room-tv is allowed`. That negative test checks
-SSH connectivity, authentication and the command restriction without sending
-a packet.
+The independent HA helper is intentional: HA does not suppress `ServiceNotFound`
+with `continue_on_error`. Starting the helper with `script.turn_on` contains a
+missing ESPHome action or disconnect inside that helper, while the parent still
+reaches Harmony. A normal blocking call to the helper would lose this property.
 
-A successful relay response confirms only that three packets were sent. The
-automation separately waits for the TV state. Test a full wake from standby
-when the TV is already off; do not power-cycle it while someone is watching.
-The October 2026 outage was caused by a stale SSH IP and a second stale IP in
-`socket.bind`, so fixing only the connection endpoint would not have repaired
-the relay.
+## Network requirements
+
+The RF helper sends a 102-byte UDP magic packet to
+**`255.255.255.255:9`**. The destination is fixed; the package only accepts the
+private TV MAC. The RF node and TV must therefore share a reachable LAN broadcast domain. Guest Wi-Fi isolation, VLAN
+separation or blocked Wi-Fi-to-Ethernet broadcast can prevent waking even when
+HA can still reach the node's API. Physical proximity to the TV does not replace
+this network requirement.
+
+The TV must retain power in standby and allow network wake. A local WOL test
+on 2026-10-02 woke this TV in about three seconds, which informs the 10-second
+primary confirmation window. That earlier test is not proof of a later RF
+firmware deployment. See the
+[official LG webOS guidance](https://www.home-assistant.io/integrations/webostv/#wakeonlan-does-not-work)
+if a TV reset disables WOL; newer models may expose it under
+**Support → IP control settings → Wake on LAN**.
+
+## Deploy and verify
+
+1. Build and upload the RF firmware; wait for its existing sensors and new WOL
+   API action to register. Confirm the actual action name.
+2. Apply only this HA package and run HA's configuration check.
+3. Reload scripts while none are running, then reload this automation by ID.
+   When replacing the old SSH package, also reload
+   `shell_command` to remove the retired `living_room_tv_wake` action. A core
+   restart is unnecessary. If that reload action is unavailable on an older HA
+   version, the unused shell action can remain loaded until a normal restart;
+   this automation no longer calls it.
+4. When the TV is already off and the room can be disturbed, call
+   `esphome.rf_wake_living_tv` directly and confirm the TV state. This isolates ESPHome from the Harmony
+   fallback. Do not turn off a TV that someone is watching for a test.
+5. From standby, exercise `media_player.turn_on` and inspect the automation trace.
+   Confirm WOL succeeded without a Harmony call, or that an unconfirmed wake
+   invoked only the explicit `PowerOn` fallback. Test missing-action/offline/error
+   conditions in the isolated runtime tests rather than by taking RF offline.
+
+The RF node remains responsible for its existing motion reception and curtain
+transmission. Verify those entities reconnect after OTA. The WOL addition must
+not automatically move curtains or change RF transmission permissions.
+
+## Troubleshooting and previous relay
+
+A missing WOL action means the action name, RF firmware or native API connection
+needs checking. An action that accepts a request but does not wake the TV calls
+for checking broadcast delivery, Ethernet MAC and TV standby settings. The automation's final state check prevents either case from appearing
+as a confirmed wake merely because a service accepted the request.
+
+The previous implementation ran `tools/lg_tv_wol_relay.py` over a restricted SSH
+key on `syn`. On 2026-10-23 its SSH connection timed out while Harmony `PowerOn`
+worked. The `syn` VM was subsequently found shut down, although the Synology NAS
+itself was reachable. A NAS response did not imply the VM relay was running.
+The current package removes that VM dependency completely.
+
+The legacy relay tool and its packet/command tests remain in the repository for
+reference; they are not used by this automation. Its private MAC/broadcast JSON,
+SSH private key, pinned known-hosts entry and restricted authorized-key line are
+not needed by the ESPHome path. Retire those installation artifacts separately
+once their lack of other callers is confirmed; do not delete unrelated SSH keys
+or weaken host-key checking to repair a retired path.
+
+`tests/test_lg_tv_wake.py` validates and runs the actual action sequence inside an
+isolated Home Assistant instance with recorded services. It covers immediate
+and delayed WOL confirmation, a missing ESPHome action, API errors, unconfirmed
+packet delivery, failure of both routes, every already-on state, and duplicate
+requests. It loads the real HA script integration for the independent helper,
+so the tests exercise error isolation rather than mocking `script.turn_on`.
+Unknown/unavailable TV states cannot pass the final confirmation check. The test
+never sends network packets or operates a real TV. `tests/test_lg_tv_wol_relay.py` keeps
+the legacy relay's packet construction and restricted-command checks.
