@@ -1,6 +1,8 @@
-# HACS 2.0.5 uses the external brands service for update pictures; the DESLOC
-# image can be unavailable there even when the integration bundles its icon.
+# HACS 2.0.5 uses external branding for integration updates and does not
+# provide update pictures for dashboard cards. Use the shared local icon.
 homeassistant:
   customize:
     update.desloc_experimental_update:
+      entity_picture: /local/desloc/icon.png
+    update.desloc_lock_card_update:
       entity_picture: /local/desloc/icon.png
