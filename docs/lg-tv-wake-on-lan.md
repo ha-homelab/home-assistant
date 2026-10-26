@@ -39,6 +39,14 @@ bounded even after a failed request. Duplicate requests do not extend it.
 Lighting Sticky overrides do not block an explicit TV power-on request and are
 never changed by it; they still protect automatic media-outlet control.
 
+The confirmation waits do not impose a wall-clock deadline on every HA service
+call. Harmony `remote.send_command` is synchronous: a slow call delays the start
+of its 45-second confirmation wait. The independent outlet helper can finish
+after the caller's power-confirmation deadline; timeout does not cancel an
+already dispatched outlet request. The two-minute shutdown grace expires
+independently of slow service calls. A hard deadline for the entire sequence is
+not guaranteed.
+
 The companion [media guard package](dining-media-guard.md) cuts TV power only
 after this timer is idle **and** the outlet has continuously reported `on` for
 two minutes. This also protects cold power restored by occupancy or the outlet's
