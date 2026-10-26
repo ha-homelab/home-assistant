@@ -7,7 +7,8 @@ package `config/packages/living_room_presence_lamp.yaml` controls only
 The operating window matches the scheduled main living-room curtains: it starts
 when the descending sun falls below 0.2 degrees and ends at sunrise or 06:30,
 whichever is later. Manual curtain movements and the curtain sticky override do
-not change this lighting window. The curtain automations themselves are unchanged.
+not change this lighting window. Automatic curtains separately require both
+Curtains Sticky and the relevant room Sticky to be OFF.
 
 Presence turns the lamp on, including when it is already detected as the evening
 window begins. Continuous confirmed absence turns it off after 20 minutes; renewed
@@ -27,7 +28,7 @@ automatic light commands. Sticky does not issue a light command itself.
 The guard is checked both when the automation starts and immediately before each
 command. Dining room sticky controls dining lights; it does not replace the
 living-room override. Shared lights and other motion paths are documented in
-[Motion lighting overrides](motion-light-sticky.md).
+[Room Sticky policy](motion-light-sticky.md).
 
 Startup, automation reload, lamp availability recovery and a once-a-minute check
 reconcile the current state. If a reload loses the normal `for` timer, the current

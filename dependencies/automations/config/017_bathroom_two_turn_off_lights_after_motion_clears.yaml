@@ -17,7 +17,7 @@
         for:
           minutes: 20
       target_entities:
-      - switch.bath2
+      - light.bath_2
       guards:
       - condition: state
         entity_id: input_boolean.bathroom_sticky

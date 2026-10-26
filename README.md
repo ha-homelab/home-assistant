@@ -61,6 +61,11 @@ location inventories stay in the private h3 configuration and HA registries.
 [Lovelace input contrast](docs/lovelace-input-contrast.md) explains the dark theme's
 base palette, the white-on-white form regression, and browser verification.
 
+[Vacuum maps](docs/vacuum-maps.md) adds a private, interactive Roborock view with
+room and zone selection, navigation, cleaning settings, and maintenance status.
+The reusable generator keeps house maps out of source control and documents
+the different mapping limits of the Roomba models.
+
 [RF Airbridge](docs/rf-airbridge.md) adds an exact-code MQTT counter example and
 an explicit, validated RF transmit script while retaining the existing motion
 sensor automations. Its counter is a storage-backed helper; create or restore
@@ -87,6 +92,11 @@ rechecks current motion and manual overrides before each command.
 
 [Living room presence](docs/living-room-presence.md) keeps Living lamp on during
 the overnight curtain schedule and for 20 minutes after confirmed absence.
+
+[Roomba controls, maps and local telemetry](docs/roomba-experience.md) provide a
+native fleet dashboard and a passive companion for existing iRobot connections,
+with model-specific map limits and explicit position provenance for future 3D
+integration.
 
 The [water pump rules](docs/water-pump-levels.md) use 26/27 cm operating thresholds
 with a 1 cm gap and retain the existing pump protections.
@@ -119,6 +129,11 @@ configured Cast display. It rechecks each selected title and channel before
 obtaining a fresh playback session from a private gateway. Google account
 linking is a separate setup step; installing the package alone does not enable
 Google microphone commands.
+
+[Matter voice exposure](docs/matter-voice-exposure.md) documents the additive
+household control manifest, stable Porch names, existing-fabric preservation,
+and separate Alexa/Google Home acceptance checks. Its publisher defaults to a
+read-only preview and never resets or re-pairs the bridge.
 
 [Homeway voice](docs/homeway-voice.md) documents the verified Sage Russian
 assistant, private audio URL, and the Echo Dot / LineageOS Echo Show 5

@@ -4,6 +4,11 @@
 
 ### Fixed
 
+- Expose the Bath 2 ESPHome relay through `light.bath_2`; migrate motion, schedule
+  and shutdown targets and exclude its state changes from screen notifications.
+- Extend room Sticky to scheduled lighting, energy-selected lights and all
+  automatic curtain commands, including RF, delayed Wi-Fi fallback and motor power.
+  Retire the 06:15 override reset; preserve independent rooms and manual controls.
 - Source configuration: honor Living room Sticky throughout presence lighting,
   including manual-state reconciliation and absence shutdown.
 - Recheck room Sticky before every motion lighting command, including delayed
@@ -13,6 +18,24 @@
   exercise the changes with Home Assistant runtime regression tests.
 
 ## [0.1.4] - 2026-10-20
+
+### Source-only vacuum features
+
+- Add native Roomba fleet cards with separate battery sensors, supported controls,
+  network diagnostics and passive local telemetry through the existing HA connection.
+- Add an experimental authenticated relative-path image from complete new poses
+  within an identified cleaning mission. This is uncalibrated odometry, not a
+  house map; physical trace acceptance remains a separate commissioning step.
+- Add capability-aware QRevo map controls and guarded position provenance for
+  separately calibrated 3D views. Empty room selections never fall back to
+  whole-home cleaning.
+- Preserve bundled custom components during staging and document source
+  installation, unavailable-image pairing, model limits and troubleshooting.
+
+These features are in the tagged repository source only. The published wheel
+and Python source distribution still contain the portable notification cache,
+not a Roomba or QRevo installer. See `docs/roomba-experience.md` in the repository
+source for the separate installation and commissioning procedure.
 
 ### Fixed
 

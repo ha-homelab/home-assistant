@@ -31,20 +31,38 @@ ROOT = Path(os.environ.get('STICKY_TEST_ROOT', Path(__file__).resolve().parents[
 # implemented in the source. File prefixes are stable automation identifiers.
 ROOM_CASES = (
     ('015', 'bathroom', ('light.bathroom_mirror_light',)),
-    ('018', 'bathroom', ('switch.bath2',)),
+    ('018', 'bathroom', ('light.bath_2',)),
+    ('019', 'bath_warmer', ('switch.bathroom_warmer',)),
     ('021', 'bedroom', ('light.bedroom_lamp',)),
     ('033', 'dining_room', ('switch.dining_wall_light_2', 'switch.dining_arc_lamp', 'light.adining_lamp_m')),
     ('037', 'hallway', ('light.hall_1_m', 'light.hall_2_m')),
     ('040', 'hallway', ('light.hall_1_m', 'light.hall_2_m')),
-    ('045', 'kitchen', ('light.kitchen_lamp_m',)),
-    ('046', 'kitchen', ('light.kitchen_lamp_m',)),
+    ('045', 'kitchen', ('light.kitchen_lamp',)),
+    ('046', 'kitchen', ('light.kitchen_lamp',)),
     ('050', 'kitchen', ('switch.led_under_cabinet',)),
     ('053', 'kitchen', ('switch.tea_table',)),
     ('064', 'lobby', ('switch.dining_wall_light_2',)),
     ('068', 'mishka_room', ('light.hall_2_m',)),
     ('083', 'porch', ('light.porch_one', 'light.porch_two')),
-    ('108', 'living_room', ('switch.dining_media_guard', 'switch.fireplace_switch', 'switch.living_guard2')),
+    ('108', 'living_room', ('switch.fireplace_switch', 'switch.living_guard2')),
 )
+
+
+# Independent room ownership for scheduled and energy-driven light commands.
+# Garage has no room Sticky helper; its independent commands remain available.
+TIMED_ROOMS = {
+    'hallway': {'light.hall_1_m', 'light.hall_2_m'},
+    'mishka_room': {'light.hall_2_m'},
+    'kitchen': {'switch.tea_table', 'switch.led_under_cabinet', 'light.kitchen_lamp'},
+    'bathroom': {'light.bath_2', 'light.bathroom_mirror_light'},
+    'living_room': {'switch.tv_backlight_l',
+                    'light.living_wall_dimmer_l', 'switch.living_room_light_l'},
+    'dining_room': {'light.dining_lights_dimmer_l', 'light.adining_lamp_m',
+                    'switch.dining_wall_light_2', 'switch.dining_arc_lamp'},
+    'lobby': {'switch.dining_wall_light_2'},
+    'porch': {'light.balcony', 'light.porch_one', 'light.porch_two', 'light.backdoor_porch'},
+    'bedroom': {'light.bedroom_light_dimmer_l', 'light.bedroom_lamp'},
+}
 
 
 @unittest.skipUnless(HA_AVAILABLE, 'Home Assistant runtime is not installed')
@@ -65,7 +83,7 @@ class StickyLightingTest(unittest.IsolatedAsyncioTestCase):
         for domain in ('light', 'switch'):
             for service in ('turn_on', 'turn_off'):
                 self.hass.services.async_register(domain, service, self.record_command)
-        for service in ('notify_mqtt_log', 'notify_optional', 'capture_camera_alert'):
+        for service in ('notify_mqtt_log', 'notify_optional', 'capture_camera_alert', 'notify'):
             self.hass.services.async_register('script', service, self.record_notification)
         self.reset_states()
 
@@ -164,13 +182,52 @@ class StickyLightingTest(unittest.IsolatedAsyncioTestCase):
         for prefix, room, first in (('033', 'dining_room', 'switch.dining_wall_light_2'),
                                    ('040', 'hallway', 'light.hall_1_m'),
                                    ('083', 'porch', 'light.porch_one'),
-                                   ('108', 'living_room', 'switch.dining_media_guard')):
+                                   ('108', 'living_room', 'switch.fireplace_switch')):
             with self.subTest(automation=prefix):
                 self.reset_states()
                 self.after_call = lambda room=room: self.hass.states.async_set(
                     f'input_boolean.{room}_sticky', 'on')
                 await self.run_automation(prefix)
                 self.assertEqual([call[0] for call in self.calls], [first])
+
+    async def test_scheduled_shutdowns_respect_each_room_without_blocking_other_rooms(self):
+        for prefix in ('039', '049', '074', '075'):
+            self.reset_states()
+            await self.run_automation(prefix)
+            allowed = {call[0] for call in self.calls}
+            self.assertTrue(allowed, prefix)
+            for room, targets in TIMED_ROOMS.items():
+                for state in ('on', 'unknown', 'unavailable', None):
+                    with self.subTest(automation=prefix, room=room, state=state):
+                        self.reset_states()
+                        entity = f'input_boolean.{room}_sticky'
+                        if state is None:
+                            self.hass.states.async_remove(entity)
+                        else:
+                            self.hass.states.async_set(entity, state)
+                        await self.run_automation(prefix)
+                        self.assertEqual({call[0] for call in self.calls}, allowed - targets)
+                        self.assertTrue(all(call[1] == 'turn_off' for call in self.calls))
+
+    async def test_timed_hallway_rechecks_sticky_between_commands(self):
+        self.after_call = lambda: self.hass.states.async_set('input_boolean.hallway_sticky', 'on')
+        await self.run_automation('039')
+        self.assertEqual([call[0] for call in self.calls], ['light.hall_1_m'])
+
+    async def test_solar_surplus_does_not_bypass_kitchen_sticky(self):
+        sequence = self.automation('091')['actions']
+        for state in ('on', 'unknown', 'unavailable', None):
+            with self.subTest(state=state):
+                self.reset_states()
+                if state is None:
+                    self.hass.states.async_remove('input_boolean.kitchen_sticky')
+                else:
+                    self.hass.states.async_set('input_boolean.kitchen_sticky', state)
+                await self.run_sequence(sequence)
+                self.assertEqual(self.calls, [])
+        self.reset_states()
+        await self.run_sequence(sequence)
+        self.assertEqual([(call[0], call[1]) for call in self.calls], [('switch.tea_table', 'turn_on')])
 
     def porch_sequence(self):
         path = ROOT / 'dependencies/scripts/config/notifications/backdoor_motion.yaml'
@@ -204,6 +261,19 @@ class StickyLightingTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([(call[0], call[1]) for call in self.calls],
                          [('light.backdoor_porch', 'turn_on')])
         self.assertEqual(self.hass.states.get('light.backdoor_porch').state, 'on')
+
+
+class StickyPersistenceTest(unittest.TestCase):
+    def test_room_sticky_state_survives_restart_and_has_no_clock_reset(self):
+        helpers = yaml.safe_load((ROOT / 'config/input_boolean.yaml').read_text())
+        for room in (*TIMED_ROOMS, 'studio', 'curtains', 'bath_warmer'):
+            self.assertNotIn('initial', helpers[f'{room}_sticky'])
+        active = ROOT / 'dependencies/automations/config'
+        if not active.is_dir():
+            self.skipTest('Private automation dependency is not installed')
+        self.assertFalse(list(active.glob('069_*.yaml')))
+        archive = ROOT / 'dependencies/automations/archive/069_lighting_clear_manual_overrides_each_morning.yaml.disabled'
+        self.assertTrue(archive.is_file())
 
 
 if __name__ == '__main__':

@@ -3,7 +3,8 @@
 - id: ha_homelab_decorative_lights_turn_on_the_laser_in_the_evening
   alias: 'Decorative lights: Turn on the laser in the evening'
   description: Turn on the laser in the evening. Responds to sun.sun below 0.4. Runs only when all configured
-    guards pass.
+    guards pass. Require both the global curtain and room override to be off immediately before changing
+    power.
   triggers:
   - platform: numeric_state
     entity_id: sun.sun
@@ -14,6 +15,11 @@
     entity_id: input_boolean.curtains_sticky
     state: 'off'
   actions:
+  - condition: state
+    entity_id:
+    - input_boolean.curtains_sticky
+    - input_boolean.mishka_room_sticky
+    state: 'off'
   - service: switch.turn_on
     entity_id: switch.mishka_guard
   mode: single

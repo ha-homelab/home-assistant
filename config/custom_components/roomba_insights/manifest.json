@@ -1,0 +1,11 @@
+{
+  "domain": "roomba_insights",
+  "name": "Roomba Insights",
+  "after_dependencies": ["roomba"],
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://github.com/ha-homelab/home-assistant",
+  "integration_type": "service",
+  "iot_class": "local_push",
+  "version": "0.1.0"
+}

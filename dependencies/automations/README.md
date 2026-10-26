@@ -172,8 +172,9 @@ Deploying these files does not require restarting the Home Assistant pod. Config
 
 ## Editing rules
 
-Bath2 now uses the ESPHome relay `switch.bath2`. Its motion rules, scheduled
-shutdowns, and state notifications target that relay with switch services.
+Bath 2 uses `light.bath_2`, backed by the enabled but hidden ESPHome relay
+`switch.bath_2`. Motion rules and scheduled shutdowns use light services.
+Both entities are excluded from rule 112 screen notifications.
 The original Tuya light remains available as `light.bath2_old` for explicit
 manual use. Motion timing, the bathroom manual override, and automation
 identities are unchanged.
@@ -360,20 +361,20 @@ shared-rule behavior are unchanged.
 ## Dining Media guard
 
 `switch.dining_media_guard` restores the former Dining guard 2 media/printer
-power role. Rule 108 turns it on before the unchanged fireplace and Living guard
-actions. Its action uses `continue_on_error`, so a failed media outlet does not
-block the existing devices; failures from those later devices cannot block the
-media outlet. Both RF dining motion triggers and `input_boolean.living_room_sticky`
-remain unchanged. The separate `switch.dining_guard` still powers only the curtains.
+power role. The root HA package `dining_media_guard_evening.yaml` owns its
+occupancy behavior together with `switch.living_tv_guard`. Living presence or
+Lobby/either Dining RF motion sensor restores eligible outlets. All four sensors
+must remain off for ten minutes before shutdown. Only the TV outlet additionally
+requires the native LG entity to report `off`; offline sensors never prove vacancy.
 
-The historical evening-off rule 107 remains retired. The root HA package
-`dining_media_guard_evening.yaml` now provides a separate media-only replacement,
-using the owner-selected `switch.living_lamp`: off for 15 minutes, still off, sun
-below -2 degrees, and `input_boolean.living_room_sticky` off. It turns off only
-`switch.dining_media_guard`, with no fireplace dependency. Dining Arc lamp and
-the Matter Bedroom Lamp (formerly `light.arc_lamp_m`) are distinct devices and
-do not trigger this rule. The
-existing fireplace and Living guard behavior remains unchanged.
+Living Sticky blocks automatic commands to both outlets. Dining Sticky additionally
+blocks Dining Media guard; a blocked media outlet does not prevent an eligible TV
+outlet command. Overrides must explicitly be `off` and are rechecked before each
+command. Media power no longer depends on sunset or Living lamp. Rule 108 retains
+only the fireplace and Living guard actions and their current Sticky conditions;
+rule 107 stays retired. The separate `switch.dining_guard` still powers only the
+curtains. See [media power control](../../docs/dining-media-guard.md) for recovery,
+manual control and runtime verification.
 
 ## Air purifier living
 

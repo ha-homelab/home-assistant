@@ -867,6 +867,11 @@ class RuntimeResilienceTest(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn('switch.switch02', switch_targets)
 
     async def test_lighting_scenarios_never_control_repurposed_water_outlets(self):
+        # Exercise the automatic lighting branches with room overrides released.
+        # An absent Sticky helper intentionally blocks those branches.
+        for room in ('hallway', 'mishka_room', 'kitchen', 'bathroom', 'dining_room',
+                     'porch', 'living_room', 'bedroom', 'lobby'):
+            self.hass.states.async_set(f'input_boolean.{room}_sticky', 'off')
         forbidden = {
             'switch.fireplace_l', 'switch.stage_led_l', 'switch.flare',
             'switch.sockets_behind_fireplace_3_l',

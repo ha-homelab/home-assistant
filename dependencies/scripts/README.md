@@ -9,8 +9,9 @@ household lighting shutdown. Other targets, error continuation and the final
 iNew shutdown call remain unchanged. The former standalone Living lamp
 plug is retained as Switch02 and is not substituted into this logical role.
 
-Bath2 is controlled through the ESPHome relay `switch.bath2`. The household
-shutdown script includes it in the switch shutdown action. The retained Tuya
+Bath 2 is controlled through `light.bath_2`, backed by the hidden ESPHome
+relay `switch.bath_2`. The household shutdown script includes the light in its
+domain-neutral shutdown action. The retained Tuya
 light `light.bath2_old` is excluded from routine shutdown targets; other lights,
 media power targets, and the final host shutdown action are unchanged.
 

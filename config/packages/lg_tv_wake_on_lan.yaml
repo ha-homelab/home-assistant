@@ -1,36 +1,60 @@
-# HA runs in OCI. Emit the broadcast on the home LAN through a restricted SSH key.
-shell_command:
-  living_room_tv_wake: >-
-    /usr/bin/ssh -T -i /config/.ssh/living_room_tv_wol
-    -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes
-    -o UserKnownHostsFile=/config/.ssh/living_room_tv_wol_known_hosts
-    -o HostKeyAlias=living-room-tv-wol
-    -o ConnectTimeout=5 -o ConnectionAttempts=1
-    -o ServerAliveInterval=5 -o ServerAliveCountMax=1
-    alvit@syn wake-living-room-tv
+# HA runs outside the home broadcast domain. RF ESPHome sends WOL locally.
+script:
+  living_room_tv_send_wake_packet:
+    alias: Living room TV - send local wake packet
+    description: Send WOL through RF ESPHome without making the caller depend on
+      the node's optional action being registered or available.
+    mode: single
+    max_exceeded: silent
+    sequence:
+      - action: esphome.rf_wake_living_tv
+        continue_on_error: true
 
 automation:
   - id: living_room_tv_wake_on_lan
     alias: Living room TV - wake over Ethernet
-    description: Turn-on requests wake the wired LG through the home LAN relay.
+    description: Wake the wired LG through RF ESPHome on the home LAN, falling
+      back to Harmony PowerOn if the RF node is unavailable or waking is unconfirmed.
     mode: single
     max_exceeded: silent
     triggers:
       - trigger: webostv.turn_on
         entity_id: media_player.living_room_tv_77
     actions:
-      - action: shell_command.living_room_tv_wake
-        response_variable: wake_result
-      - if: "{{ wake_result.returncode != 0 }}"
-        then:
-          - stop: The home LAN Wake-on-LAN relay failed; inspect the shell command response.
-            error: true
-      - wait_template: >-
+      - condition: template
+        value_template: >-
           {{ states('media_player.living_room_tv_77') not in
-             ['off', 'unavailable', 'unknown'] }}
-        timeout: "00:00:45"
+             ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+      # Start independently: ServiceNotFound is not suppressed by continue_on_error.
+      # A missing ESPHome action must not abort the parent's Harmony fallback.
+      - action: script.turn_on
+        target:
+          entity_id: script.living_room_tv_send_wake_packet
+      - wait_template: >-
+          {{ states('media_player.living_room_tv_77') in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+        timeout: "00:00:10"
         continue_on_timeout: true
-      - if: "{{ not wait.completed }}"
+      # A discrete PowerOn is safe if the TV wakes just before this call.
+      # Never use PowerToggle, remote.turn_on or an activity change here.
+      - if: >-
+          {{ states('media_player.living_room_tv_77') not in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] }}
         then:
-          - stop: The LG TV did not confirm power-on within 45 seconds.
+          - action: remote.send_command
+            target:
+              entity_id: remote.harmonyhub
+            data:
+              device: LG TV
+              command: PowerOn
+          - wait_template: >-
+              {{ states('media_player.living_room_tv_77') in
+                 ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+            timeout: "00:00:45"
+            continue_on_timeout: true
+      - if: >-
+          {{ states('media_player.living_room_tv_77') not in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+        then:
+          - stop: The LG TV did not confirm power-on after Wake-on-LAN and Harmony PowerOn.
             error: true

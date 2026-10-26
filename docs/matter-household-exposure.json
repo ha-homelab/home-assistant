@@ -1,0 +1,197 @@
+{
+  "description": "Additive household voice controls. Preserve existing bridge filters, endpoint identities and controller fabrics. Infrastructure, maintenance controls, unmapped spare relays, duplicate wrappers and vacuum bridges are outside this manifest.",
+  "porch_group": {
+    "name": "Porch Light",
+    "entity_id": "light.porch_light",
+    "members": [
+      "light.porch_one",
+      "light.porch_two"
+    ]
+  },
+  "entities": [
+    {
+      "entity_id": "light.porch_one",
+      "name": "Porch Light 1"
+    },
+    {
+      "entity_id": "light.porch_two",
+      "name": "Porch Light 2"
+    },
+    {
+      "entity_id": "light.porch_light",
+      "name": "Porch Light"
+    },
+    {
+      "entity_id": "light.garage",
+      "name": "Garage Lights"
+    },
+    {
+      "entity_id": "light.garage_bulb_one",
+      "name": "Garage Light 1"
+    },
+    {
+      "entity_id": "light.garage_bulb_two",
+      "name": "Garage Light 2"
+    },
+    {
+      "entity_id": "light.garage_bulb_three",
+      "name": "Garage Light 3"
+    },
+    {
+      "entity_id": "light.garage_bulb_four",
+      "name": "Garage Light 4"
+    },
+    {
+      "entity_id": "light.garage_bulb_five",
+      "name": "Garage Light 5"
+    },
+    {
+      "entity_id": "light.kitchen_led_under_cabinet_relay",
+      "name": "Kitchen Cabinet Light"
+    },
+    {
+      "entity_id": "light.kitchen_tea_table_relay",
+      "name": "Tea Table Light"
+    },
+    {
+      "entity_id": "light.studio_night_light",
+      "name": "Studio Night Light"
+    },
+    {
+      "entity_id": "light.kitchen_lamp",
+      "name": "Kitchen lamp"
+    },
+    {
+      "entity_id": "light.bedroom_lamp",
+      "name": "Bedroom 2 Lamp"
+    },
+    {
+      "entity_id": "light.adining_lamp_m",
+      "name": "Dining Lamp"
+    },
+    {
+      "entity_id": "light.hall_1_m",
+      "name": "Hall Light 1"
+    },
+    {
+      "entity_id": "light.hall_2_m",
+      "name": "Hall Light 2"
+    },
+    {
+      "entity_id": "light.dining_lights_dimmer_l",
+      "name": "Dining Ceiling Lights"
+    },
+    {
+      "entity_id": "light.bedroom_light_dimmer_l",
+      "name": "Bedroom Ceiling Light"
+    },
+    {
+      "entity_id": "light.living_wall_dimmer_l",
+      "name": "Living Wall Dimmer"
+    },
+    {
+      "entity_id": "light.balcony",
+      "name": "Balcony Light"
+    },
+    {
+      "entity_id": "light.bathroom_mirror_light",
+      "name": "Bathroom Mirror Light"
+    },
+    {
+      "entity_id": "light.backdoor_porch",
+      "name": "Backdoor Porch Light"
+    },
+    {
+      "entity_id": "light.range_light",
+      "name": "Range Light"
+    },
+    {
+      "entity_id": "light.range_hood_light",
+      "name": "Range Hood Light"
+    },
+    {
+      "entity_id": "switch.dining_wall_light_2",
+      "name": "Dining Wall Light"
+    },
+    {
+      "entity_id": "switch.living_room_light_2_living_room_light_2",
+      "name": "Living Wall Light 2"
+    },
+    {
+      "entity_id": "switch.tv_backlight_l",
+      "name": "TV Backlight"
+    },
+    {
+      "entity_id": "switch.garage_floodlight",
+      "name": "Garage Floodlight"
+    },
+    {
+      "entity_id": "switch.living_bookshelf",
+      "name": "Living Bookshelf"
+    },
+    {
+      "entity_id": "switch.living_tv_guard",
+      "name": "Living TV Power"
+    },
+    {
+      "entity_id": "switch.studio_tv",
+      "name": "Studio TV Power"
+    },
+    {
+      "entity_id": "switch.roomba_i7_power",
+      "name": "Roomba i7 Power"
+    },
+    {
+      "entity_id": "switch.laundry",
+      "name": "Laundry"
+    },
+    {
+      "entity_id": "switch.bath_fan_1st_floor",
+      "name": "Bathroom Fan"
+    },
+    {
+      "entity_id": "switch.coway_airmega_bedroom",
+      "name": "Bedroom Air Purifier"
+    },
+    {
+      "entity_id": "switch.range_hood",
+      "name": "Range Hood"
+    },
+    {
+      "entity_id": "cover.living_light_curtains_r",
+      "name": "Living Sheer Curtains"
+    },
+    {
+      "entity_id": "cover.living_curtains_r",
+      "name": "Living Curtains"
+    },
+    {
+      "entity_id": "cover.dining_curtains_r",
+      "name": "Dining Curtains"
+    },
+    {
+      "entity_id": "cover.kitchen_curtains_r",
+      "name": "Kitchen Curtains"
+    },
+    {
+      "entity_id": "cover.bedroom_curtains_r",
+      "name": "Bedroom Curtains"
+    },
+    {
+      "entity_id": "cover.studio_curtains",
+      "name": "Studio Curtains"
+    },
+    {
+      "entity_id": "cover.mishka_curtains_one_l",
+      "name": "Mishka Curtains 1"
+    },
+    {
+      "entity_id": "cover.mishka_curtains_two_l",
+      "name": "Mishka Curtains 2"
+    },
+    {
+      "entity_id": "climate.thermostat_2",
+      "name": "Thermostat"
+    }
+  ]
+}

@@ -1,50 +1,127 @@
 - id: ha_homelab_lighting_turn_off_scheduled_lights_in_the_morning
   alias: 'Lighting: Turn off scheduled lights in the morning'
-  description: Turn off scheduled lights at 05:35. Living lamp follows its separate
-    presence controller until the morning curtain-opening time.
+  description: Turn off scheduled lights at 05:35. Living lamp follows its separate presence controller
+    until the morning curtain-opening time. Only command a light while every owning room Sticky helper
+    is explicitly off; check each target independently.
   triggers:
     platform: time
     at: 05:35:00
   actions:
   - parallel:
-    - service: light.turn_off
-      entity_id: light.hall_1_m
-    - service: light.turn_off
-      entity_id: light.hall_2_m
-    - service: switch.turn_off
-      entity_id: switch.tea_table
-    - service: switch.turn_off
-      entity_id: switch.led_under_cabinet
-    - service: light.turn_off
-      entity_id: light.kitchen_lamp_m
-    - service: switch.turn_off
-      entity_id: switch.bath2
-    - service: light.turn_off
-      entity_id: light.fireplace_led_ll
-    - service: light.turn_off
-      entity_id: light.bathroom_mirror_light
-    - service: light.turn_off
-      entity_id: light.dining_lights_dimmer_l
-    - service: light.turn_off
-      entity_id: light.adining_lamp_m
-    - service: light.turn_off
-      entity_id: light.balcony
-    - service: light.turn_off
-      entity_id: light.porch_one
-    - service: light.turn_off
-      entity_id: light.porch_two
+    - if:
+      - condition: state
+        entity_id: input_boolean.hallway_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.hall_1_m
+    - if:
+      - condition: state
+        entity_id: input_boolean.hallway_sticky
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.mishka_room_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.hall_2_m
+    - if:
+      - condition: state
+        entity_id: input_boolean.kitchen_sticky
+        state: 'off'
+      then:
+      - service: switch.turn_off
+        entity_id: switch.tea_table
+    - if:
+      - condition: state
+        entity_id: input_boolean.kitchen_sticky
+        state: 'off'
+      then:
+      - service: switch.turn_off
+        entity_id: switch.led_under_cabinet
+    - if:
+      - condition: state
+        entity_id: input_boolean.kitchen_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.kitchen_lamp
+    - if:
+      - condition: state
+        entity_id: input_boolean.bathroom_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.bath_2
+    - if:
+      - condition: state
+        entity_id: input_boolean.bathroom_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.bathroom_mirror_light
+    - if:
+      - condition: state
+        entity_id: input_boolean.dining_room_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.dining_lights_dimmer_l
+    - if:
+      - condition: state
+        entity_id: input_boolean.dining_room_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.adining_lamp_m
+    - if:
+      - condition: state
+        entity_id: input_boolean.porch_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.balcony
+    - if:
+      - condition: state
+        entity_id: input_boolean.porch_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.porch_one
+    - if:
+      - condition: state
+        entity_id: input_boolean.porch_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.porch_two
     - service: light.turn_off
       entity_id: light.garage_one
     - service: light.turn_off
       entity_id: light.garage_two
     - service: light.turn_off
       entity_id: light.garage_three
-    - service: light.turn_off
-      entity_id: light.backdoor_porch
-    - service: light.turn_off
-      entity_id: light.living_wall_dimmer_l
-    - service: light.turn_off
-      entity_id: light.bedroom_light_dimmer_l
+    - if:
+      - condition: state
+        entity_id: input_boolean.porch_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.backdoor_porch
+    - if:
+      - condition: state
+        entity_id: input_boolean.living_room_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.living_wall_dimmer_l
+    - if:
+      - condition: state
+        entity_id: input_boolean.bedroom_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.bedroom_light_dimmer_l
     - service: light.turn_off
       entity_id: light.garage_bulb_one
     - service: light.turn_off
@@ -55,22 +132,44 @@
       entity_id: light.garage_bulb_four
     - service: light.turn_off
       entity_id: light.garage_bulb_five
-    - service: light.turn_off
-      entity_id: light.bedroom_five
-    - service: switch.turn_off
-      entity_id: switch.fireplace_led_ll
-    - service: switch.turn_off
-      entity_id: switch.tv_backlight_l
-    - service: switch.turn_off
-      entity_id: switch.mishka_bedroom_desk_lamp_l
-    - service: switch.turn_off
-      entity_id: switch.dining_wall_light_2
-    - service: switch.turn_off
-      entity_id: switch.dining_arc_lamp
-    - service: switch.turn_off
-      entity_id: switch.living_room_light_l
-    - service: light.turn_off
-      entity_id: light.bedroom_lamp
+    - if:
+      - condition: state
+        entity_id: input_boolean.living_room_sticky
+        state: 'off'
+      then:
+      - service: switch.turn_off
+        entity_id: switch.tv_backlight_l
+    - if:
+      - condition: state
+        entity_id: input_boolean.dining_room_sticky
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.lobby_sticky
+        state: 'off'
+      then:
+      - service: switch.turn_off
+        entity_id: switch.dining_wall_light_2
+    - if:
+      - condition: state
+        entity_id: input_boolean.dining_room_sticky
+        state: 'off'
+      then:
+      - service: switch.turn_off
+        entity_id: switch.dining_arc_lamp
+    - if:
+      - condition: state
+        entity_id: input_boolean.living_room_sticky
+        state: 'off'
+      then:
+      - service: switch.turn_off
+        entity_id: switch.living_room_light_l
+    - if:
+      - condition: state
+        entity_id: input_boolean.bedroom_sticky
+        state: 'off'
+      then:
+      - service: light.turn_off
+        entity_id: light.bedroom_lamp
   mode: single
   trace:
     stored_traces: 5
