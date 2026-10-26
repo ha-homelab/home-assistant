@@ -17,7 +17,7 @@
     entity_id: input_boolean.kitchen_sticky
     state: 'off'
   - condition: state
-    entity_id: light.kitchen_lamp_m
+    entity_id: light.kitchen_lamp
     state: 'on'
   actions:
   - service: script.notify_mqtt_log
@@ -30,7 +30,7 @@
       state: 'off'
     then:
     - service: light.turn_on
-      entity_id: light.kitchen_lamp_m
+      entity_id: light.kitchen_lamp
       data_template:
         brightness: '{{ 60 if trigger.from_state.state == "off" else 180 }}'
         transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "source_home_assistant_version": "2026.9.1",
-  "automation_count": 98,
+  "automation_count": 97,
   "preserved_existing_ids": 4,
   "automations": [
     {
@@ -298,21 +298,25 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "40a7a12c2f2fce6ba21d685475be946b209608528da5d480d69a79f4797d956d",
+      "behavior_sha256": "9bb7e072998b386ddaed73d1fb2dcf12193d5e16d52c9602688ec898db3144ca",
       "references": [
         "binary_sensor.rf_studio_motion",
         "input_boolean.bathroom_sticky",
-        "switch.bath2",
-        "switch.turn_off"
+        "light.bath_2",
+        "light.turn_off"
       ],
       "imported_behavior_sha256": "13c56240d6c57e5967201cc42c0a83f0b149446b78d523100c083af40b4ebfcc",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
+        "date": "2026-10-24",
+        "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
         "previous_change": {
           "date": "2026-10-10",
-          "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities.",
-          "previous_change": "2026-09-22 motion-light availability recovery"
+          "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
+          "previous_change": {
+            "date": "2026-10-10",
+            "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities.",
+            "previous_change": "2026-09-22 motion-light availability recovery"
+          }
         }
       }
     },
@@ -337,20 +341,24 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "cd0acd49aada5c44f0e7529ac8255d7e15e5f8bc7a3539d25fb450e66aa5fd4d",
+      "behavior_sha256": "96862fad3a1a15791a7216c05fc20e151ffe4a45a72852f311a9a85c0f09c446",
       "references": [
         "binary_sensor.rf_studio_motion",
         "input_boolean.bathroom_sticky",
-        "switch.bath2",
-        "switch.turn_on"
+        "light.bath_2",
+        "light.turn_on"
       ],
       "imported_behavior_sha256": "29811aab962cfd58bab039e5fa4e43c1ce65de9d157c6b6e942b3774a4072d12",
       "behavior_change": {
-        "date": "2026-10-20",
-        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "date": "2026-10-24",
+        "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
         "previous_change": {
-          "date": "2026-10-10",
-          "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities."
+          "date": "2026-10-20",
+          "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+          "previous_change": {
+            "date": "2026-10-10",
+            "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities."
+          }
         }
       }
     },
@@ -560,18 +568,20 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "202d27fdb353ff1d74e2dcd49a693426e87262be239e2c81a6be2ef62d2e3de0",
+      "behavior_sha256": "ad0d109b53025dc30e6f1f153b2d53e67df15791433206b5039ddbe8d1ee536d",
       "references": [
+        "automation.laser_off_at_night",
         "input_boolean.curtains_sticky",
+        "input_boolean.mishka_room_sticky",
         "sun.sun",
         "switch.mishka_guard",
         "switch.turn_off"
       ],
       "imported_behavior_sha256": "19d34356f008eed50c52aa02ee867ccea49ff3f5e7bcd98dfc2df8602ed6ccae",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
-        "previous_change": null
+        "date": "2026-10-23",
+        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+        "previous_change": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets."
       }
     },
     {
@@ -593,18 +603,20 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "13d395ecedf720de06169aaf70edc18046d6abf6b5180301b56957cdb96a9bbf",
+      "behavior_sha256": "6e2221fadc3a0f97aee84d55484ed6ff7bc3e9dcb95067cdad578d7ba023f5a5",
       "references": [
+        "automation.laser_on_in_the_evening",
         "input_boolean.curtains_sticky",
+        "input_boolean.mishka_room_sticky",
         "sun.sun",
         "switch.mishka_guard",
         "switch.turn_on"
       ],
       "imported_behavior_sha256": "ffea72ea539e1f799397ccfe4bbcfb8a9797e72f94da03306441230d3c415149",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
-        "previous_change": null
+        "date": "2026-10-23",
+        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+        "previous_change": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets."
       }
     },
     {
@@ -626,14 +638,20 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "aefa93ee700932abf5fa659c3bcb82610546db9b5b73ae8310049e56fedc63a8",
+      "behavior_sha256": "7cc9b00ae5c41cbffff34294e76c7aae5f47caf33204f3187cfb68a9ed746849",
       "references": [
+        "automation.close_curtains_in_the_evening",
         "cover.close_cover",
         "cover.dining_curtains_l",
         "cover.kitchen_curtains_l",
-        "cover.living_curtains_l",
+        "cover.office_curtains_r",
         "cover.studio_curtains",
         "input_boolean.curtains_sticky",
+        "input_boolean.dining_room_sticky",
+        "input_boolean.kitchen_sticky",
+        "input_boolean.living_room_sticky",
+        "input_boolean.studio_sticky",
+        "script.living_curtains_move",
         "sun.sun",
         "switch.dining_guard",
         "switch.kitchen_guard",
@@ -643,25 +661,9 @@
       ],
       "imported_behavior_sha256": "84d51ba30817ea4d0555c50e97d00983718dd1447298eb41cdf6650c26360357",
       "behavior_change": {
-        "date": "2026-10-12",
-        "reason": "Migrate Studio movement to the calibrated ZHA cover: explicit morning open and evening close, retaining Studio guard power, schedules, delays and manual override. A Studio movement error does not abort the other rooms. Keep the legacy Wi-Fi command commented for rollback.",
-        "previous_change": {
-          "date": "2026-10-10",
-          "reason": "Replace Studio guard 1 with the canonical ESPHome Studio guard relay; retain all timing, conditions, curtain actions, and other power guards.",
-          "previous_change": {
-            "date": "2026-10-10",
-            "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
-            "previous_change": {
-              "date": "2026-10-10",
-              "reason": "Replace the retired Dining guard 3 with the verified ESPHome Dining guard for curtain power. Preserve schedules, conditions, delays and all other actions.",
-              "previous_change": {
-                "date": "2026-10-06",
-                "reason": "Start living-room main/sheer movement by learned RF three seconds after shared socket power, then independently repeat the same target over Wi-Fi with a 180-second bound and manual-override rechecks. Preserve schedules, identities, unrelated rooms and their power-off timing.",
-                "previous_change": null
-              }
-            }
-          }
-        }
+        "date": "2026-10-23",
+        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+        "previous_change": "Migrate Studio movement to the calibrated ZHA cover: explicit morning open and evening close, retaining Studio guard power, schedules, delays and manual override. A Studio movement error does not abort the other rooms. Keep the legacy Wi-Fi command commented for rollback."
       }
     },
     {
@@ -683,13 +685,16 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "6bf52b7f572abd394631976dfbd176bbe3a4664755750a65802960e73eca1138",
+      "behavior_sha256": "0a944bee732c88bec831d004d78d05a3b9635513f47651a1ddd1e10fb2918547",
       "references": [
+        "automation.close_bedrooms_curtains_in_the_evening",
         "cover.bedroom_curtains_l",
         "cover.close_cover",
         "cover.mishka_curtains_one_l",
         "cover.mishka_curtains_two_l",
+        "input_boolean.bedroom_sticky",
         "input_boolean.curtains_sticky",
+        "input_boolean.mishka_room_sticky",
         "sun.sun",
         "switch.bedroom_guard",
         "switch.turn_off",
@@ -697,9 +702,9 @@
       ],
       "imported_behavior_sha256": "f2222f72bfd0b570b8ba9437501827e8596c1db5593b6bf498360948aaf9e41e",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Replace only the old Bedroom guard 3 outlet with canonical ESPHome Bedroom guard. Preserve schedules, overrides, delays, action order and unrelated loads.",
-        "previous_change": null
+        "date": "2026-10-23",
+        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+        "previous_change": "Replace only the old Bedroom guard 3 outlet with canonical ESPHome Bedroom guard. Preserve schedules, overrides, delays, action order and unrelated loads."
       }
     },
     {
@@ -721,21 +726,19 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "d60ca8ca558a472632bcb3623550b7437fc885983320ca8ccd73a7ea3624dadf",
+      "behavior_sha256": "d940e4c38a1df0ecdc403543788c8e1899a45e4b4b075e3f4a74a2148856b436",
       "references": [
-        "cover.close_cover",
-        "cover.living_light_curtains_l",
+        "automation.close_light_curtains_in_the_evening",
         "input_boolean.curtains_sticky",
+        "input_boolean.living_room_sticky",
+        "script.living_curtains_move",
         "sun.sun"
       ],
       "imported_behavior_sha256": "0e5a3fcefa0fc51afff1466207f8120968903e513bb6ca2fb11505a17d5a0c70",
       "behavior_change": {
-        "date": "2026-10-06",
-        "reason": "Start living-room main/sheer movement by learned RF three seconds after shared socket power, then independently repeat the same target over Wi-Fi with a 180-second bound and manual-override rechecks. Preserve schedules, identities, unrelated rooms and their power-off timing.",
-        "previous_change": {
-          "date": "2026-10-04",
-          "reason": "Require the sun to be descending before closing living-room sheer curtains at 0 to 0.6 degrees elevation; prevent the same range from closing them at sunrise while preserving the evening threshold, morning opening and manual override."
-        }
+        "date": "2026-10-23",
+        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+        "previous_change": "Start living-room main/sheer movement by learned RF three seconds after shared socket power, then independently repeat the same target over Wi-Fi with a 180-second bound and manual-override rechecks. Preserve schedules, identities, unrelated rooms and their power-off timing."
       }
     },
     {
@@ -1020,12 +1023,20 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "da2515b479162c5aa1e0c2558836fc375b0b7a073bce2c2225ea244f7836f612",
+      "behavior_sha256": "15b6794d2f78a8581b7d0f99fc70050fb2712ca2446eb4ff5dd14f21296a1a42",
       "references": [
+        "automation.hallway_off_in_the_morning",
+        "input_boolean.hallway_sticky",
+        "input_boolean.mishka_room_sticky",
         "light.hall_1_m",
         "light.hall_2_m",
         "light.turn_off"
-      ]
+      ],
+      "imported_behavior_sha256": "da2515b479162c5aa1e0c2558836fc375b0b7a073bce2c2225ea244f7836f612",
+      "behavior_change": {
+        "date": "2026-10-23",
+        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening."
+      }
     },
     {
       "order": 40,
@@ -1199,24 +1210,28 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "d598f9855460a2c84c35d271b54ebd28a482b4fce9c6646ee59c6a4aadd8bb24",
+      "behavior_sha256": "e28446886ec92ffb331b77c31f3a3e3ebbb26a79ed08518291f9f375586a1bd0",
       "references": [
         "binary_sensor.rf_counter_motion",
         "binary_sensor.rf_tea_motion",
         "input_boolean.kitchen_sticky",
-        "light.kitchen_lamp_m",
+        "light.kitchen_lamp",
         "light.turn_on",
         "script.notify_mqtt_log",
         "sun.sun"
       ],
       "imported_behavior_sha256": "a04868e10a1ee8d069e5d222826b8fb5b505e7189d3612c02122a2e9ad59b2ba",
       "behavior_change": {
-        "date": "2026-10-20",
-        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
         "previous_change": {
-          "date": "2026-09-24",
-          "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
-          "previous_change": "2026-09-22 runtime resilience audit"
+          "date": "2026-10-20",
+          "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+          "previous_change": {
+            "date": "2026-09-24",
+            "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
+            "previous_change": "2026-09-22 runtime resilience audit"
+          }
         }
       }
     },
@@ -1241,20 +1256,24 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "55f809f9ab88591b4616c3b8c4691ccc5a60c627b2d9f2a24866c9656df8f166",
+      "behavior_sha256": "7a540476fd191eda6e6c6381549a6c9144c520eb155d490618eb27a3b021c03c",
       "references": [
         "group.kitchen_motion",
         "input_boolean.kitchen_sticky",
-        "light.kitchen_lamp_m",
+        "light.kitchen_lamp",
         "light.turn_on",
         "script.notify_mqtt_log",
         "sun.sun"
       ],
       "imported_behavior_sha256": "63270a84c9763521a64a2ad0af03f0f827116a1cd206b24a2f17c045f5ee9454",
       "behavior_change": {
-        "date": "2026-10-20",
-        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
-        "previous_change": "2026-09-22 runtime resilience audit"
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
+        "previous_change": {
+          "date": "2026-10-20",
+          "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+          "previous_change": "2026-09-22 runtime resilience audit"
+        }
       }
     },
     {
@@ -1278,22 +1297,26 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "92d9af224dd1e6d1a0df39640dc26c5f01e389802cbae956089574870e6d7ef0",
+      "behavior_sha256": "1b50c293d522bad2f7bf68609c7695a0303b3fb1d67a9b713c10a53408f10456",
       "references": [
         "group.kitchen_motion",
         "input_boolean.kitchen_sticky",
-        "light.kitchen_lamp_m",
+        "light.kitchen_lamp",
         "script.notify_mqtt_log",
         "sun.sun"
       ],
       "imported_behavior_sha256": "ed8f774c2968fbd09f16b3f2aa66427c2ed597e14248dc984cdc87e8ba5109aa",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
         "previous_change": {
-          "date": "2026-09-24",
-          "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
-          "previous_change": "2026-09-22 motion-light availability recovery; 2026-09-22 runtime resilience audit"
+          "date": "2026-10-10",
+          "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
+          "previous_change": {
+            "date": "2026-09-24",
+            "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
+            "previous_change": "2026-09-22 motion-light availability recovery; 2026-09-22 runtime resilience audit"
+          }
         }
       }
     },
@@ -1318,20 +1341,24 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "995a220ca7f8ab9097ea11b8300e16a52503bb31f3620a7271d29929cd10e804",
+      "behavior_sha256": "22c057882704dfe02ca9a962951c29331f853e0b38844e16fce81429ca5d3e79",
       "references": [
         "group.kitchen_motion",
         "input_boolean.kitchen_sticky",
-        "light.kitchen_lamp_m",
+        "light.kitchen_lamp",
         "light.turn_off",
         "script.notify_mqtt_log",
         "sun.sun"
       ],
       "imported_behavior_sha256": "f1b1853f9effef7b3cc4273c2e0aa586d1ddd3f2e623bf1bdc212bacfc3ec428",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
-        "previous_change": "2026-09-22 motion-light availability recovery; 2026-09-22 runtime resilience audit"
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
+        "previous_change": {
+          "date": "2026-10-10",
+          "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
+          "previous_change": "2026-09-22 motion-light availability recovery; 2026-09-22 runtime resilience audit"
+        }
       }
     },
     {
@@ -1352,11 +1379,22 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "e30424116c937f614d7db60f78a390c74969fc949a40cc7357b75a0caa6f79a6",
+      "behavior_sha256": "940de360b84814339b887e29446ca5e0a483e2b2a85cb302ef554bef76452a3f",
       "references": [
-        "light.kitchen_lamp_m",
+        "automation.table_lamp_off_in_the_morning",
+        "input_boolean.kitchen_sticky",
+        "light.kitchen_lamp",
         "light.turn_off"
-      ]
+      ],
+      "imported_behavior_sha256": "e30424116c937f614d7db60f78a390c74969fc949a40cc7357b75a0caa6f79a6",
+      "behavior_change": {
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
+        "previous_change": {
+          "date": "2026-10-23",
+          "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening."
+        }
+      }
     },
     {
       "order": 50,
@@ -1706,43 +1744,6 @@
       }
     },
     {
-      "order": 69,
-      "file": "config/069_lighting_clear_manual_overrides_each_morning.yaml",
-      "source_file": "automations/morning_sticky_reset.yaml",
-      "source_index": 0,
-      "previous_alias": "Morning sticky reset",
-      "alias": "Lighting: Clear manual overrides each morning",
-      "entity_id": "automation.morning_sticky_reset",
-      "previous_id": null,
-      "id": "ha_homelab_lighting_clear_manual_overrides_each_morning",
-      "previous_metadata": {
-        "alias": "Morning sticky reset"
-      },
-      "previous_top_level_keys": [
-        "alias",
-        "trigger",
-        "action"
-      ],
-      "behavior_sha256": "e0b50b8312b958bf7bb09dfc2fc7eca469de99a9619ee628ad59843f9a90bfb3",
-      "references": [
-        "input_boolean.bathroom_sticky",
-        "input_boolean.bedroom_sticky",
-        "input_boolean.dining_room_sticky",
-        "input_boolean.hallway_sticky",
-        "input_boolean.kitchen_sticky",
-        "input_boolean.living_room_sticky",
-        "input_boolean.lobby_sticky",
-        "input_boolean.mishka_room_sticky",
-        "input_boolean.porch_sticky",
-        "input_boolean.turn_off"
-      ],
-      "imported_behavior_sha256": "27338414c6dc134e1a8c4e38637fa1c60efd496162cbbec70c345aa1c7276055",
-      "behavior_change": {
-        "date": "2026-09-24",
-        "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged."
-      }
-    },
-    {
       "order": 70,
       "file": "config/070_notifications_report_motion_sensor_changes.yaml",
       "source_file": "automations/motion_notification.yaml",
@@ -1883,17 +1884,25 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "4d33bdce45bb07f389211057e5c0a1800471fe6e7138c857e8808e1810ef0c3d",
+      "behavior_sha256": "ae16cffdfc508025e04920e4c246341ec0221ebb989fa40e6d47b4b5c88a3cf3",
       "references": [
+        "input_boolean.bathroom_sticky",
+        "input_boolean.bedroom_sticky",
+        "input_boolean.dining_room_sticky",
+        "input_boolean.hallway_sticky",
+        "input_boolean.kitchen_sticky",
+        "input_boolean.living_room_sticky",
+        "input_boolean.lobby_sticky",
+        "input_boolean.mishka_room_sticky",
+        "input_boolean.porch_sticky",
         "light.adining_lamp_m",
         "light.backdoor_porch",
         "light.balcony",
+        "light.bath_2",
         "light.bathroom_mirror_light",
-        "light.bedroom_five",
         "light.bedroom_lamp",
         "light.bedroom_light_dimmer_l",
         "light.dining_lights_dimmer_l",
-        "light.fireplace_led_ll",
         "light.garage_bulb_five",
         "light.garage_bulb_four",
         "light.garage_bulb_one",
@@ -1904,68 +1913,30 @@
         "light.garage_two",
         "light.hall_1_m",
         "light.hall_2_m",
-        "light.kitchen_lamp_m",
+        "light.kitchen_lamp",
         "light.living_wall_dimmer_l",
         "light.porch_one",
         "light.porch_two",
         "light.turn_off",
-        "switch.bath2",
         "switch.dining_arc_lamp",
         "switch.dining_wall_light_2",
-        "switch.fireplace_led_ll",
         "switch.led_under_cabinet",
         "switch.living_room_light_l",
-        "switch.mishka_bedroom_desk_lamp_l",
         "switch.tea_table",
         "switch.turn_off",
         "switch.tv_backlight_l"
       ],
       "imported_behavior_sha256": "27f40891a35eb2eeb33f2f8dda8ab96031468efae7af5b2d7d104f24b5f0eeb4",
       "behavior_change": {
-        "date": "2026-10-21",
-        "reason": "Include the relocated Dining Arc lamp and Matter Dining lamp in the explicit Turn off all lights action (automation.off_lights). Add independent switch.turn_off and light.turn_off branches; retain Bedroom Lamp exactly once and preserve the 30 existing actions, schedule, mode and identity.",
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
         "previous_change": {
-          "date": "2026-10-11",
-          "reason": "Remove only Living lamp from the 05:35 shutdown: its presence controller now owns the evening-to-morning curtain window and 20-minute absence timeout. Other targets, schedule and identity remain unchanged.",
+          "date": "2026-10-24",
+          "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
           "previous_change": {
-            "date": "2026-10-11",
-            "reason": "Retire the disconnected Sockets behind fireplace two device and its two switch-as-light helpers. Remove only their shutdown actions and notification trigger entries; preserve other targets, schedules and automation identities.",
-            "previous_change": {
-              "date": "2026-10-10",
-              "reason": "The first KMC now supplies Moen Flo monitor power, pump power enable and Laundry. Remove its old lighting actions without substituting new power controls; update notification-only references. Preserve all other actions, guards and timing.",
-              "previous_change": {
-                "date": "2026-10-10",
-                "reason": "Restore bedroom motion with its original sensor, solar/time guards, three-minute delay and sticky override, targeting the relocated Matter Bedroom Lamp. Include that lamp in both requested shutdown scenarios and remove only its former dining motion action.",
-                "previous_change": {
-                  "date": "2026-10-10",
-                  "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
-                  "previous_change": {
-                    "date": "2026-10-10",
-                    "reason": "Remove only the former Studio lamp from shared shutdown/load-selection rules after its move to Dining Arc lamp; preserve all other behavior.",
-                    "previous_change": {
-                      "date": "2026-10-10",
-                      "reason": "Retarget the converted bedroom lamp outlet as Living lamp; retain the existing global shutdown and notification behavior.",
-                      "previous_change": {
-                        "date": "2026-10-10",
-                        "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities.",
-                        "previous_change": {
-                          "date": "2026-10-07",
-                          "reason": "Owner renamed all five ZHA garage light entities and added the previously omitted fifth bulb to scheduled shutdown. Preserve all other targets, parallel actions and trigger times.",
-                          "previous_change": {
-                            "date": "2026-09-25",
-                            "reason": "Remove only owner-retired light targets from the existing morning shutdown list.",
-                            "previous_change": {
-                              "date": "2026-09-24",
-                              "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged."
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            "date": "2026-10-23",
+            "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+            "previous_change": "Include the relocated Dining Arc lamp and Matter Dining lamp in the explicit Turn off all lights action (automation.off_lights). Add independent switch.turn_off and light.turn_off branches; retain Bedroom Lamp exactly once and preserve the 30 existing actions, schedule, mode and identity."
           }
         }
       }
@@ -1988,12 +1959,20 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "f45f4470764519e3b39eeb9d5c2c99006a2aa727c2f1783eff696d510fccb660",
+      "behavior_sha256": "1bd2ce14565d3672f762414797622e2dc18629d747da411e39b4911b0b85860c",
       "references": [
+        "input_boolean.bathroom_sticky",
+        "input_boolean.bedroom_sticky",
+        "input_boolean.dining_room_sticky",
+        "input_boolean.hallway_sticky",
+        "input_boolean.kitchen_sticky",
+        "input_boolean.lobby_sticky",
+        "input_boolean.mishka_room_sticky",
+        "input_boolean.porch_sticky",
         "light.backdoor_porch",
         "light.balcony",
+        "light.bath_2",
         "light.bathroom_mirror_light",
-        "light.bedroom_five",
         "light.bedroom_lamp",
         "light.dining_lights_dimmer_l",
         "light.garage_bulb_five",
@@ -2003,47 +1982,26 @@
         "light.garage_bulb_two",
         "light.hall_1_m",
         "light.hall_2_m",
-        "light.kitchen_lamp_m",
+        "light.kitchen_lamp",
         "light.porch_one",
         "light.porch_two",
         "light.turn_off",
-        "switch.bath2",
         "switch.dining_wall_light_2",
         "switch.led_under_cabinet",
-        "switch.mishka_bedroom_desk_lamp_l",
         "switch.tea_table",
         "switch.turn_off"
       ],
       "imported_behavior_sha256": "7fbd1558dcd423d768f0964ebfa72a3e4860bb4863b2d9116726933982601de1",
       "behavior_change": {
-        "date": "2026-10-11",
-        "reason": "Retire the disconnected Sockets behind fireplace two device and its two switch-as-light helpers. Remove only their shutdown actions and notification trigger entries; preserve other targets, schedules and automation identities.",
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
         "previous_change": {
-          "date": "2026-10-10",
-          "reason": "Restore bedroom motion with its original sensor, solar/time guards, three-minute delay and sticky override, targeting the relocated Matter Bedroom Lamp. Include that lamp in both requested shutdown scenarios and remove only its former dining motion action.",
+          "date": "2026-10-24",
+          "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
           "previous_change": {
-            "date": "2026-10-10",
-            "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
-            "previous_change": {
-              "date": "2026-10-10",
-              "reason": "Remove only the former Studio lamp from shared shutdown/load-selection rules after its move to Dining Arc lamp; preserve all other behavior.",
-              "previous_change": {
-                "date": "2026-10-10",
-                "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities.",
-                "previous_change": {
-                  "date": "2026-10-07",
-                  "reason": "Owner renamed all five ZHA garage light entities and added the previously omitted fifth bulb to scheduled shutdown. Preserve all other targets, parallel actions and trigger times.",
-                  "previous_change": {
-                    "date": "2026-09-25",
-                    "reason": "Remove only owner-retired light targets from the existing morning shutdown list.",
-                    "previous_change": {
-                      "date": "2026-09-24",
-                      "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged."
-                    }
-                  }
-                }
-              }
-            }
+            "date": "2026-10-23",
+            "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+            "previous_change": "Retire the disconnected Sockets behind fireplace two device and its two switch-as-light helpers. Remove only their shutdown actions and notification trigger entries; preserve other targets, schedules and automation identities."
           }
         }
       }
@@ -2067,22 +2025,21 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "b1d8686a6272712d6219433b0d76edf8589d609c5c253bcf101b48d2fc36c226",
+      "behavior_sha256": "9593fd39850c13363798fbafcead449cf95f64bac363b93cae42f16283ccd31c",
       "references": [
+        "automation.laser_on_in_the_morning",
+        "input_boolean.bedroom_sticky",
         "input_boolean.curtains_sticky",
+        "input_boolean.mishka_room_sticky",
         "switch.bedroom_guard",
         "switch.mishka_guard",
         "switch.turn_on"
       ],
       "imported_behavior_sha256": "e431dc3994363876c148da1fb03577d070dae660a47beeedfe142cd403f82d4c",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Replace only the old Bedroom guard 3 outlet with canonical ESPHome Bedroom guard. Preserve schedules, overrides, delays, action order and unrelated loads.",
-        "previous_change": {
-          "date": "2026-10-10",
-          "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
-          "previous_change": null
-        }
+        "date": "2026-10-23",
+        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+        "previous_change": "Replace only the old Bedroom guard 3 outlet with canonical ESPHome Bedroom guard. Preserve schedules, overrides, delays, action order and unrelated loads."
       }
     },
     {
@@ -2104,27 +2061,18 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "6a6519ec2925e7d0f6a0971c3d9ae71df8ed4d2b5b4a33da0b3ebe0a5da68d25",
+      "behavior_sha256": "cca483eb9e29abd704795cc6d467609b28327405141ab40291ee324408adb3ea",
       "references": [
-        "cover.living_curtains_l",
-        "cover.living_light_curtains_l",
-        "cover.open_cover",
+        "automation.open_living_curtains_in_the_morning",
         "input_boolean.curtains_sticky",
-        "switch.living_guard_1"
+        "input_boolean.living_room_sticky",
+        "script.living_curtains_move"
       ],
       "imported_behavior_sha256": "fd90416b354769bb0e5d19aa76ffafc648e732bcaf30d1e2c0d98632f3e53ce1",
       "behavior_change": {
-        "date": "2026-10-07",
-        "reason": "Open living-room main and sheer curtains at sunrise or 06:30 local time, whichever is later. Preserve the manual override, RF-first helper, independent Wi-Fi fallback, stable identity and other schedules.",
-        "previous_change": {
-          "date": "2026-10-06",
-          "reason": "Start living-room main/sheer movement by learned RF three seconds after shared socket power, then independently repeat the same target over Wi-Fi with a 180-second bound and manual-override rechecks. Preserve schedules, identities, unrelated rooms and their power-off timing.",
-          "previous_change": {
-            "date": "2026-09-25",
-            "reason": "Power Living guard 1 before the morning warm-up and independently wait for each motor; recheck manual override before opening.",
-            "previous_change": null
-          }
-        }
+        "date": "2026-10-23",
+        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+        "previous_change": "Open living-room main and sheer curtains at sunrise or 06:30 local time, whichever is later. Preserve the manual override, RF-first helper, independent Wi-Fi fallback, stable identity and other schedules."
       }
     },
     {
@@ -2146,39 +2094,25 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "00585cf07159bdfcfcf0b5111fd967bfff91cbda4a663d7ad6678ec9cafb8a5e",
+      "behavior_sha256": "fe92eee160c650605d7f7aaa72b209597ea85da128b567287de47914d321b3bd",
       "references": [
+        "automation.open_curtains_in_the_morning",
         "cover.dining_curtains_l",
         "cover.kitchen_curtains_l",
         "cover.open_cover",
-        "cover.studio_curtains",
         "input_boolean.curtains_sticky",
+        "input_boolean.dining_room_sticky",
+        "input_boolean.kitchen_sticky",
         "switch.dining_guard",
         "switch.kitchen_guard",
-        "switch.studio_guard",
         "switch.turn_off",
         "switch.turn_on"
       ],
       "imported_behavior_sha256": "d4eb53793f125d569d4372ec385cdfe41f0ef3856d67434d92f5d60e53ccae16",
       "behavior_change": {
-        "date": "2026-10-12",
-        "reason": "Migrate Studio movement to the calibrated ZHA cover: explicit morning open and evening close, retaining Studio guard power, schedules, delays and manual override. A Studio movement error does not abort the other rooms. Keep the legacy Wi-Fi command commented for rollback.",
-        "previous_change": {
-          "date": "2026-10-10",
-          "reason": "Replace Studio guard 1 with the canonical ESPHome Studio guard relay; retain all timing, conditions, curtain actions, and other power guards.",
-          "previous_change": {
-            "date": "2026-10-10",
-            "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
-            "previous_change": {
-              "date": "2026-10-10",
-              "reason": "Replace the retired Dining guard 3 with the verified ESPHome Dining guard for curtain power. Preserve schedules, conditions, delays and all other actions.",
-              "previous_change": {
-                "date": "2026-10-07",
-                "reason": "Wait until sunrise or 06:35, whichever is later, for kitchen/dining morning curtains; retain the manual override, original power and Wi-Fi sequence, and add the same noon cutoff as the living-room schedule."
-              }
-            }
-          }
-        }
+        "date": "2026-10-23",
+        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+        "previous_change": "Migrate Studio movement to the calibrated ZHA cover: explicit morning open and evening close, retaining Studio guard power, schedules, delays and manual override. A Studio movement error does not abort the other rooms. Keep the legacy Wi-Fi command commented for rollback."
       }
     },
     {
@@ -2421,11 +2355,16 @@
         "action",
         "mode"
       ],
-      "behavior_sha256": "50e5b4d7bf4219b67951c324f757c7a1ac5a96a246ddb83bdad1058fc5f14393",
+      "behavior_sha256": "4a2ddd5b4de7cacfac1e4ac17a6b0459100b5697475b321941bea5a57f76e6db",
       "references": [
+        "input_boolean.dining_room_sticky",
+        "input_boolean.kitchen_sticky",
+        "input_boolean.living_room_sticky",
+        "input_boolean.lobby_sticky",
         "input_boolean.modern_self_consuming",
         "light.dining_lights_dimmer_l",
         "light.garage",
+        "python_script.select_devices",
         "script.notify_mqtt",
         "sensor.battery_w",
         "sensor.home_123_1s",
@@ -2433,43 +2372,15 @@
         "switch.bath_fan_1st_floor",
         "switch.dining_wall_light_2",
         "switch.garage_floodlight",
-        "switch.switch06",
         "switch.living_room_light_l",
+        "switch.switch06",
         "switch.tea_table"
       ],
       "imported_behavior_sha256": "6b299089446f3d173d6b76eb3ad5ca9be4119f3983c69f9af5ea3e8ee93010e2",
       "behavior_change": {
-        "date": "2026-10-11",
-        "reason": "Rename the existing s6 hardware to Switch06. Preserve schedules, guards, action order, automation identities and the 750 W load estimate. The Air Purifier Living role remains on its canonical ID after transfer to KMC outlet 2.",
-        "previous_change": {
-          "date": "2026-10-11",
-          "reason": "Rename the existing iNewSwitch outlet to s6 after its ESPHome update. Preserve the 750 W load estimate, triggers, guards, delays, actions and automation identities.",
-          "previous_change": {
-            "date": "2026-10-10",
-            "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
-            "previous_change": {
-              "date": "2026-10-10",
-              "reason": "Rename the converted Workdesk outlet to Air purifier living. Preserve the235W map value, all control logic, thresholds, delays, guards and unrelated targets.",
-              "previous_change": {
-                "date": "2026-10-10",
-                "reason": "Remove only the former Studio lamp from shared shutdown/load-selection rules after its move to Dining Arc lamp; preserve all other behavior.",
-                "previous_change": {
-                  "date": "2026-10-10",
-                  "reason": "Remove the retired Playpen small-heater outlet from the shared load selector or charger guard; preserve all remaining targets, thresholds, delays, and actions. Bath2 is not a replacement heater.",
-                  "previous_change": {
-                    "date": "2026-09-29",
-                    "reason": "Light shutdown omits the turn-on-only brightness field; independently selected light/switch actions continue after recoverable device errors. Selection, thresholds, action order, enable guard and timing are unchanged.",
-                    "previous_change": {
-                      "date": "2026-09-24",
-                      "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged.",
-                      "previous_change": "2026-09-22 runtime resilience audit"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        "date": "2026-10-23",
+        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+        "previous_change": "Rename the existing s6 hardware to Switch06. Preserve schedules, guards, action order, automation identities and the 750 W load estimate. The Air Purifier Living role remains on its canonical ID after transfer to KMC outlet 2."
       }
     },
     {
@@ -2642,8 +2553,10 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "18e0838d11776840304e4d888da9ee2e760d3be738dc5ba629147f9eb2c37235",
+      "behavior_sha256": "3dc4e48980a75c52a48fe7994633adda77c17bf8e0225e3cd434b88c813ebc60",
       "references": [
+        "automation.power_below_ten_5",
+        "input_boolean.kitchen_sticky",
         "input_boolean.self_consuming",
         "script.notify",
         "sensor.home_123_1s",
@@ -2655,25 +2568,9 @@
       ],
       "imported_behavior_sha256": "91185ae33c5ef71ba5a606e5fce80558bea4efe5b343e44e1bcfb0751867ee24",
       "behavior_change": {
-        "date": "2026-10-11",
-        "reason": "Rename the existing s6 hardware to Switch06. Preserve schedules, guards, action order, automation identities and the 750 W load estimate. The Air Purifier Living role remains on its canonical ID after transfer to KMC outlet 2.",
-        "previous_change": {
-          "date": "2026-10-11",
-          "reason": "Rename the existing iNewSwitch outlet to s6 after its ESPHome update. Preserve the 750 W load estimate, triggers, guards, delays, actions and automation identities.",
-          "previous_change": {
-            "date": "2026-10-10",
-            "reason": "The first KMC now supplies Moen Flo monitor power, pump power enable and Laundry. Remove its old lighting actions without substituting new power controls; update notification-only references. Preserve all other actions, guards and timing.",
-            "previous_change": {
-              "date": "2026-10-10",
-              "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
-              "previous_change": {
-                "date": "2026-10-10",
-                "reason": "Rename the converted Workdesk outlet to Air purifier living. Preserve the235W map value, all control logic, thresholds, delays, guards and unrelated targets.",
-                "previous_change": "2026-09-22 runtime resilience audit"
-              }
-            }
-          }
-        }
+        "date": "2026-10-23",
+        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+        "previous_change": "Rename the existing s6 hardware to Switch06. Preserve schedules, guards, action order, automation identities and the 750 W load estimate. The Air Purifier Living role remains on its canonical ID after transfer to KMC outlet 2."
       }
     },
     {
@@ -3034,29 +2931,21 @@
         "conditions",
         "action"
       ],
-      "behavior_sha256": "240ad0c6fa63dc00e8706bcc9ef48bd6aea7e2c42031b4edb3b4c048c0e326da",
+      "behavior_sha256": "b1ddc6c9ce33fd004f1eedb06d207bdb44d31b136a062d957f235953756063a2",
       "references": [
+        "automation.turn_on_fireplace_when_motion_detected",
         "binary_sensor.rf_dinner_motion",
         "binary_sensor.rf_dinner_two_motion",
         "input_boolean.living_room_sticky",
-        "switch.dining_media_guard",
         "switch.fireplace_switch",
         "switch.living_guard2",
         "switch.turn_on"
       ],
       "imported_behavior_sha256": "28b6ba6f4e969ff4cffefa729802298ad40f68d8d8eded1689207a9aa7eeeb64",
       "behavior_change": {
-        "date": "2026-10-20",
-        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
-        "previous_change": {
-          "date": "2026-10-10",
-          "reason": "Restore the converted Dining Media guard to dining-room motion. Run its isolated turn-on action before legacy device actions so their failures cannot block it, and continue if the media relay itself fails. Preserve existing triggers, living-room sticky guard, legacy actions and curtain behavior. The root HA package separately handles media-only evening power-off using the owner-selected Living lamp.",
-          "previous_change": {
-            "date": "2026-10-10",
-            "reason": "Remove only the retired Dining guard 2 action from the mixed motion automation. Preserve fireplace and Living guard 2 actions and do not turn on the new curtain supply from motion.",
-            "previous_change": null
-          }
-        }
+        "date": "2026-10-23",
+        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+        "previous_change": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection."
       }
     },
     {
@@ -3098,7 +2987,7 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "8d4a8dd12118f75305e422e358388aee2b40bde8d865befaec4619176413344f",
+      "behavior_sha256": "5d84dd9a424450c3c4660b50957c317e312b01019cedcd86b882cd7193f55442",
       "references": [
         "light.fireplace_led_ll",
         "media_player.living_room_tv_77",
@@ -3110,7 +2999,6 @@
         "switch.attic_dehumidifier_l",
         "switch.audio_system_hall",
         "switch.audiosystem_l",
-        "switch.bath2",
         "switch.bathroom_warmer",
         "switch.clock_l",
         "switch.fireplace_led_ll",
@@ -3132,42 +3020,46 @@
       ],
       "imported_behavior_sha256": "3f605d602119655411ec1c9ab9f03f55a2ab98f1bb022df0113d7311c984a2c8",
       "behavior_change": {
-        "date": "2026-10-11",
-        "reason": "Rename the existing s6 hardware to Switch06. Preserve schedules, guards, action order, automation identities and the 750 W load estimate. The Air Purifier Living role remains on its canonical ID after transfer to KMC outlet 2.",
+        "date": "2026-10-24",
+        "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
         "previous_change": {
           "date": "2026-10-11",
-          "reason": "Retire the disconnected Sockets behind fireplace two device and its two switch-as-light helpers. Remove only their shutdown actions and notification trigger entries; preserve other targets, schedules and automation identities.",
+          "reason": "Rename the existing s6 hardware to Switch06. Preserve schedules, guards, action order, automation identities and the 750 W load estimate. The Air Purifier Living role remains on its canonical ID after transfer to KMC outlet 2.",
           "previous_change": {
             "date": "2026-10-11",
-            "reason": "Rename the existing iNewSwitch outlet to s6 after its ESPHome update. Preserve the 750 W load estimate, triggers, guards, delays, actions and automation identities.",
+            "reason": "Retire the disconnected Sockets behind fireplace two device and its two switch-as-light helpers. Remove only their shutdown actions and notification trigger entries; preserve other targets, schedules and automation identities.",
             "previous_change": {
-              "date": "2026-10-10",
-              "reason": "The first KMC now supplies Moen Flo monitor power, pump power enable and Laundry. Remove its old lighting actions without substituting new power controls; update notification-only references. Preserve all other actions, guards and timing.",
+              "date": "2026-10-11",
+              "reason": "Rename the existing iNewSwitch outlet to s6 after its ESPHome update. Preserve the 750 W load estimate, triggers, guards, delays, actions and automation identities.",
               "previous_change": {
                 "date": "2026-10-10",
-                "reason": "Follow the owner-assigned Recliner role on the second KMC first physical output; preserve the already-live Flare mapping from the first KMC migration. Keep all other notification targets, triggers, conditions and delivery behavior unchanged. Old standalone roles remain registered as Switch01–03 and are not control targets.",
+                "reason": "The first KMC now supplies Moen Flo monitor power, pump power enable and Laundry. Remove its old lighting actions without substituting new power controls; update notification-only references. Preserve all other actions, guards and timing.",
                 "previous_change": {
                   "date": "2026-10-10",
-                  "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
+                  "reason": "Follow the owner-assigned Recliner role on the second KMC first physical output; preserve the already-live Flare mapping from the first KMC migration. Keep all other notification targets, triggers, conditions and delivery behavior unchanged. Old standalone roles remain registered as Switch01\u201303 and are not control targets.",
                   "previous_change": {
                     "date": "2026-10-10",
-                    "reason": "Use the converted Bathroom warmer ESPHome relay. Preserve the one-minute off timer, sticky override, existing notification actions, and unrelated targets.",
+                    "reason": "Align active consumers with the verified kitchen ESPHome outlets and new garage power/floodlight entities. Preserve all guards, delays and other targets; keep the 35 W tea-table and 108 W floodlight estimates. The old garage entities remain registered and enabled.",
                     "previous_change": {
                       "date": "2026-10-10",
-                      "reason": "Retarget the converted bedroom lamp outlet as Living lamp; retain the existing global shutdown and notification behavior.",
+                      "reason": "Use the converted Bathroom warmer ESPHome relay. Preserve the one-minute off timer, sticky override, existing notification actions, and unrelated targets.",
                       "previous_change": {
                         "date": "2026-10-10",
-                        "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
+                        "reason": "Retarget the converted bedroom lamp outlet as Living lamp; retain the existing global shutdown and notification behavior.",
                         "previous_change": {
                           "date": "2026-10-10",
-                          "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities.",
+                          "reason": "Replace retired Laser and Kitchen guard 1 with canonical ESPHome room guard and Kitchen guard. Preserve schedules, guards, delays, action order, and unrelated targets.",
                           "previous_change": {
-                            "date": "2026-09-26",
-                            "reason": "Label routine light/switch state reports for browser delivery without the Vitaly iPhone copy. Preserve triggers and other destinations.",
+                            "date": "2026-10-10",
+                            "reason": "Replace the Bathroom Two Tuya light target with the Bath2 ESPHome relay and matching switch service. Preserve schedules, motion guards, manual override and stable automation identities.",
                             "previous_change": {
-                              "date": "2026-09-24",
-                              "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged.",
-                              "previous_change": "2026-09-22 runtime resilience audit Add one explicit Chrome copy through the shared optional notification helper, preserving existing triggers, guards and recipients; mailbox uses its dedicated browser rule. Owner retired LocalTuya TV on 2026-09-23: remove its power-state guard or notification trigger; keep other conditions and actions."
+                              "date": "2026-09-26",
+                              "reason": "Label routine light/switch state reports for browser delivery without the Vitaly iPhone copy. Preserve triggers and other destinations.",
+                              "previous_change": {
+                                "date": "2026-09-24",
+                                "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged.",
+                                "previous_change": "2026-09-22 runtime resilience audit Add one explicit Chrome copy through the shared optional notification helper, preserving existing triggers, guards and recipients; mailbox uses its dedicated browser rule. Owner retired LocalTuya TV on 2026-09-23: remove its power-state guard or notification trigger; keep other conditions and actions."
+                              }
                             }
                           }
                         }
@@ -3265,7 +3157,7 @@
       "id": "ha_homelab_heating_lower_a_sustained_high_thermostat_setpoint",
       "previous_metadata": {
         "alias": "Thermostat Temperature Control",
-        "description": "Lower thermostat temperature as it stays above 19°C for 6 minutes.",
+        "description": "Lower thermostat temperature as it stays above 19\u00b0C for 6 minutes.",
         "mode": "single"
       },
       "previous_top_level_keys": [
@@ -3293,7 +3185,7 @@
       "id": "ha_homelab_heating_reduce_the_setpoint_after_prolonged_heating",
       "previous_metadata": {
         "alias": "Decrease Thermostat Temperature Gradually",
-        "description": "Furnace is heating for more than 5 minutes, reducing temperature by 1°C with a cooldown period",
+        "description": "Furnace is heating for more than 5 minutes, reducing temperature by 1\u00b0C with a cooldown period",
         "mode": "single"
       },
       "previous_top_level_keys": [
@@ -3773,6 +3665,11 @@
       "file": "archive/knob.yaml.disabled",
       "source_file": "automations/knob.yaml",
       "reason": "mapping ignored by merge-list include"
+    },
+    {
+      "file": "archive/069_lighting_clear_manual_overrides_each_morning.yaml.disabled",
+      "source_file": "automations/morning_sticky_reset.yaml",
+      "reason": "Room Sticky is an explicit user override and must persist until changed by the owner; retire the 06:15 reset."
     }
   ],
   "retired_automations": [
@@ -4515,6 +4412,47 @@
       "retirement": {
         "date": "2026-09-24",
         "reason": "Owner retired the unused Postbox sensor and its mailbox notifications and indicator actions."
+      }
+    },
+    {
+      "order": 69,
+      "file": "config/069_lighting_clear_manual_overrides_each_morning.yaml",
+      "source_file": "automations/morning_sticky_reset.yaml",
+      "source_index": 0,
+      "previous_alias": "Morning sticky reset",
+      "alias": "Lighting: Clear manual overrides each morning",
+      "entity_id": "automation.morning_sticky_reset",
+      "previous_id": null,
+      "id": "ha_homelab_lighting_clear_manual_overrides_each_morning",
+      "previous_metadata": {
+        "alias": "Morning sticky reset"
+      },
+      "previous_top_level_keys": [
+        "alias",
+        "trigger",
+        "action"
+      ],
+      "behavior_sha256": "e0b50b8312b958bf7bb09dfc2fc7eca469de99a9619ee628ad59843f9a90bfb3",
+      "references": [
+        "input_boolean.bathroom_sticky",
+        "input_boolean.bedroom_sticky",
+        "input_boolean.dining_room_sticky",
+        "input_boolean.hallway_sticky",
+        "input_boolean.kitchen_sticky",
+        "input_boolean.living_room_sticky",
+        "input_boolean.lobby_sticky",
+        "input_boolean.mishka_room_sticky",
+        "input_boolean.porch_sticky",
+        "input_boolean.turn_off"
+      ],
+      "imported_behavior_sha256": "27338414c6dc134e1a8c4e38637fa1c60efd496162cbbec70c345aa1c7276055",
+      "behavior_change": {
+        "date": "2026-09-24",
+        "reason": "2026-09-24: repair six confirmed entity-name references using the live registry; remove only the nonexistent tiny-garland switch duplicate where its light entity is already retained. Trigger schedules, delays, guards, service payloads and stable IDs are otherwise unchanged."
+      },
+      "retirement": {
+        "date": "2026-10-23",
+        "reason": "Room Sticky is an explicit user override and must persist until changed by the owner; retire the 06:15 reset."
       }
     },
     {

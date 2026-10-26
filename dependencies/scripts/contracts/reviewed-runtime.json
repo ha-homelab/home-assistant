@@ -39,9 +39,10 @@
             "light.hall_2_m",
             "switch.tea_table",
             "switch.led_under_cabinet",
-            "light.kitchen_lamp_m",
+            "light.kitchen_lamp",
             "light.fireplace_led_ll",
             "light.bathroom_mirror_light",
+            "light.bath_2",
             "light.dining_lights_dimmer_l",
             "light.balcony",
             "light.porch_one",
@@ -63,7 +64,6 @@
         {
           "service": "switch.turn_off",
           "entity_id": [
-            "switch.bath2",
             "switch.fireplace_led_ll",
             "switch.tv_backlight_l",
             "switch.mishka_bedroom_desk_lamp_l",
