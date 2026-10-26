@@ -59,7 +59,7 @@
     },
     {
       "entity_id": "light.kitchen_lamp",
-      "name": "Kitchen Lamp"
+      "name": "Kitchen lamp"
     },
     {
       "entity_id": "light.bedroom_lamp",
