@@ -130,6 +130,11 @@ obtaining a fresh playback session from a private gateway. Google account
 linking is a separate setup step; installing the package alone does not enable
 Google microphone commands.
 
+[Matter voice exposure](docs/matter-voice-exposure.md) documents the additive
+household control manifest, stable Porch names, existing-fabric preservation,
+and separate Alexa/Google Home acceptance checks. Its publisher defaults to a
+read-only preview and never resets or re-pairs the bridge.
+
 [Homeway voice](docs/homeway-voice.md) documents the verified Sage Russian
 assistant, private audio URL, and the Echo Dot / LineageOS Echo Show 5
 commissioning and recovery steps, including wake-word language limitations.
