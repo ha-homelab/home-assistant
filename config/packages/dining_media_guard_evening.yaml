@@ -1,28 +1,150 @@
-# Dining Media guard: owner-selected Living lamp evening power-off.
+# Keep the deployed filename and original shutdown ID for upgrade compatibility.
+# Room Sticky overrides are checked immediately before each outlet command.
 automation:
-- id: ha_homelab_dining_media_guard_evening_power_off
-  alias: 'Dining Media guard: Turn off after evening lamp inactivity'
-  description: Turn off only dining media power after the selected lamp stays off
-    for 15 minutes, when the sun is below -2 degrees and the living-room manual override
-    is off.
+- id: ha_homelab_media_guards_restore_on_occupancy
+  alias: 'Media guards: Restore power on occupancy'
+  description: Restore both media outlets when Living presence or Lobby/Dining
+    motion is active, respecting the corresponding room Sticky overrides.
+    Reconcile startup, automation reload and outlet recovery.
   triggers:
   - trigger: state
-    entity_id: switch.living_lamp
+    entity_id:
+    - binary_sensor.living_room_presence
+    - binary_sensor.rf_lobby_motion
+    - binary_sensor.rf_dinner_motion
+    - binary_sensor.rf_dinner_two_motion
+    to: 'on'
+  - trigger: homeassistant
+    event: start
+  - trigger: event
+    event_type: automation_reloaded
+  - trigger: state
+    entity_id:
+    - switch.living_tv_guard
+    - switch.dining_media_guard
+    from:
+    - unknown
+    - unavailable
     to: 'off'
-    for: 00:15:00
   conditions:
-  - condition: template
-    value_template: '{{ state_attr(''sun.sun'', ''elevation'') | float(90) < -2 }}'
   - condition: state
-    entity_id: switch.living_lamp
-    state: 'off'
-  - condition: state
-    entity_id: input_boolean.living_room_sticky
-    state: 'off'
+    entity_id:
+    - binary_sensor.living_room_presence
+    - binary_sensor.rf_lobby_motion
+    - binary_sensor.rf_dinner_motion
+    - binary_sensor.rf_dinner_two_motion
+    match: any
+    state: 'on'
   actions:
-  - action: switch.turn_off
-    target:
+  - if:
+    - condition: state
+      entity_id: input_boolean.living_room_sticky
+      state: 'off'
+    - condition: state
+      entity_id: switch.living_tv_guard
+      state: 'off'
+    then:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.living_tv_guard
+      continue_on_error: true
+  # The first command may have yielded while occupancy or an override changed.
+  - if:
+    - condition: state
+      entity_id:
+      - binary_sensor.living_room_presence
+      - binary_sensor.rf_lobby_motion
+      - binary_sensor.rf_dinner_motion
+      - binary_sensor.rf_dinner_two_motion
+      match: any
+      state: 'on'
+    - condition: state
+      entity_id:
+      - input_boolean.living_room_sticky
+      - input_boolean.dining_room_sticky
+      state: 'off'
+    - condition: state
       entity_id: switch.dining_media_guard
-  mode: single
+      state: 'off'
+    then:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.dining_media_guard
+      continue_on_error: true
+  mode: restart
+  trace:
+    stored_traces: 5
+
+- id: ha_homelab_dining_media_guard_evening_power_off
+  alias: 'Media guards: Turn off after shared inactivity'
+  description: After all four Living/Lobby/Dining sensors are off for ten minutes,
+    turn off Dining Media guard and, only when the native LG TV is off, Living TV
+    Guard. Room Sticky overrides preserve manual outlet states. Unknown or
+    unavailable sensor states never count as inactivity.
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.living_room_presence
+    - binary_sensor.rf_lobby_motion
+    - binary_sensor.rf_dinner_motion
+    - binary_sensor.rf_dinner_two_motion
+    to: 'off'
+    for: '00:10:00'
+  - trigger: state
+    entity_id: media_player.living_room_tv_77
+    to: 'off'
+  # State timers are lost on automation reload. Recheck elapsed state ages, not
+  # outlet state changes, so a manual off never causes an immediate turn-on.
+  - trigger: time_pattern
+    minutes: '/1'
+  conditions:
+  - condition: state
+    entity_id:
+    - binary_sensor.living_room_presence
+    - binary_sensor.rf_lobby_motion
+    - binary_sensor.rf_dinner_motion
+    - binary_sensor.rf_dinner_two_motion
+    state: 'off'
+    for: '00:10:00'
+  actions:
+  - if:
+    - condition: state
+      entity_id:
+      - input_boolean.living_room_sticky
+      - input_boolean.dining_room_sticky
+      state: 'off'
+    - condition: state
+      entity_id: switch.dining_media_guard
+      state: 'on'
+    then:
+    - action: switch.turn_off
+      target:
+        entity_id: switch.dining_media_guard
+      continue_on_error: true
+  # Recheck occupancy after the first service call before cutting TV power.
+  - condition: state
+    entity_id:
+    - binary_sensor.living_room_presence
+    - binary_sensor.rf_lobby_motion
+    - binary_sensor.rf_dinner_motion
+    - binary_sensor.rf_dinner_two_motion
+    state: 'off'
+    for: '00:10:00'
+  - if:
+    - condition: state
+      entity_id: input_boolean.living_room_sticky
+      state: 'off'
+    - condition: state
+      entity_id: media_player.living_room_tv_77
+      state: 'off'
+    - condition: state
+      entity_id: switch.living_tv_guard
+      state: 'on'
+    then:
+    - action: switch.turn_off
+      target:
+        entity_id: switch.living_tv_guard
+      continue_on_error: true
+  mode: restart
   trace:
     stored_traces: 5
