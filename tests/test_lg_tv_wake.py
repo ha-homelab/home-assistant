@@ -227,7 +227,7 @@ class LGWakeTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.events, ['power'])
         self.assertEqual(self.hass.states.get(POWER).state, 'on')
         self.assertEqual(self.hass.states.get(GRACE).state, 'active')
-        await task
+        await asyncio.wait_for(task, timeout=2)
         self.assertEqual(self.events, ['power', 'wol'])
         self.assertEqual(self.execution, 'finished')
         self.assertEqual(self.hass.states.get('input_boolean.living_room_sticky').state, 'on')
@@ -296,7 +296,7 @@ class LGWakeTest(unittest.IsolatedAsyncioTestCase):
         await asyncio.wait_for(self.power_requested.wait(), timeout=2)
         await asyncio.sleep(.02)
         self.hass.states.async_set(POWER, 'unavailable')
-        await task
+        await asyncio.wait_for(task, timeout=2)
         self.assertEqual(self.events, ['power'])
         self.assertEqual(self.execution, 'aborted')
 
@@ -348,7 +348,7 @@ class LGWakeTest(unittest.IsolatedAsyncioTestCase):
         await self.inactivity_tick()
         self.assertEqual(self.events, ['power'])
         self.assertEqual(self.hass.states.get(POWER).state, 'on')
-        await task
+        await asyncio.wait_for(task, timeout=2)
         self.assertEqual(self.events, ['power', 'wol', 'ir'])
         self.assertEqual(self.execution, 'finished')
         self.hass.states.async_set(TV, 'off')
@@ -367,7 +367,7 @@ class LGWakeTest(unittest.IsolatedAsyncioTestCase):
         await self.inactivity_tick()
         self.assertEqual(self.events, ['wol'])
         self.assertEqual(self.hass.states.get(POWER).state, 'on')
-        await task
+        await asyncio.wait_for(task, timeout=2)
         self.assertEqual(self.events, ['wol', 'ir'])
         self.assertEqual(self.execution, 'finished')
 
