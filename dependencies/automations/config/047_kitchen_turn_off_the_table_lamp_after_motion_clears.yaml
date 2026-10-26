@@ -17,7 +17,7 @@
         for:
           minutes: 35
       target_entities:
-      - light.kitchen_lamp_m
+      - light.kitchen_lamp
       guards:
       - condition: template
         value_template: '{{ state_attr("sun.sun", "elevation") < 0.60 }}'

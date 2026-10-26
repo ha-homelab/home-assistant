@@ -21,4 +21,4 @@ kitchen_lights:
   entities:
     - switch.led_under_cabinet
     - switch.tea_table
-    - light.kitchen_lamp_m
+    - light.kitchen_lamp
