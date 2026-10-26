@@ -14,7 +14,7 @@
       state: 'off'
     then:
     - service: light.turn_off
-      entity_id: light.kitchen_lamp_m
+      entity_id: light.kitchen_lamp
   mode: single
   trace:
     stored_traces: 5

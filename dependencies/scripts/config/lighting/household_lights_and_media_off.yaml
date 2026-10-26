@@ -12,7 +12,7 @@ turn_off_living_room:
     - light.hall_2_m
     - switch.tea_table
     - switch.led_under_cabinet
-    - light.kitchen_lamp_m
+    - light.kitchen_lamp
     - light.fireplace_led_ll
     - light.bathroom_mirror_light
     - light.bath_2

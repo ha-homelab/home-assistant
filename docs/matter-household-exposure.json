@@ -58,7 +58,7 @@
       "name": "Studio Night Light"
     },
     {
-      "entity_id": "light.kitchen_lamp_m",
+      "entity_id": "light.kitchen_lamp",
       "name": "Kitchen Lamp"
     },
     {

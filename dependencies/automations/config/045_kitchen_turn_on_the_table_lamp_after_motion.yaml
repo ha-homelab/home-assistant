@@ -29,7 +29,7 @@
       state: 'off'
     then:
     - service: light.turn_on
-      entity_id: light.kitchen_lamp_m
+      entity_id: light.kitchen_lamp
       data_template:
         brightness: '{{ 150 if now().strftime("%H")|int < 17 or now().strftime("%H")|int > 23 else 255 }}'
         transition: '{{ 100 if trigger.to_state.state == "on" else 2 }}'

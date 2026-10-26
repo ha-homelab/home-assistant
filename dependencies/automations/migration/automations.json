@@ -1210,24 +1210,28 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "d598f9855460a2c84c35d271b54ebd28a482b4fce9c6646ee59c6a4aadd8bb24",
+      "behavior_sha256": "e28446886ec92ffb331b77c31f3a3e3ebbb26a79ed08518291f9f375586a1bd0",
       "references": [
         "binary_sensor.rf_counter_motion",
         "binary_sensor.rf_tea_motion",
         "input_boolean.kitchen_sticky",
-        "light.kitchen_lamp_m",
+        "light.kitchen_lamp",
         "light.turn_on",
         "script.notify_mqtt_log",
         "sun.sun"
       ],
       "imported_behavior_sha256": "a04868e10a1ee8d069e5d222826b8fb5b505e7189d3612c02122a2e9ad59b2ba",
       "behavior_change": {
-        "date": "2026-10-20",
-        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
         "previous_change": {
-          "date": "2026-09-24",
-          "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
-          "previous_change": "2026-09-22 runtime resilience audit"
+          "date": "2026-10-20",
+          "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+          "previous_change": {
+            "date": "2026-09-24",
+            "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
+            "previous_change": "2026-09-22 runtime resilience audit"
+          }
         }
       }
     },
@@ -1252,20 +1256,24 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "55f809f9ab88591b4616c3b8c4691ccc5a60c627b2d9f2a24866c9656df8f166",
+      "behavior_sha256": "7a540476fd191eda6e6c6381549a6c9144c520eb155d490618eb27a3b021c03c",
       "references": [
         "group.kitchen_motion",
         "input_boolean.kitchen_sticky",
-        "light.kitchen_lamp_m",
+        "light.kitchen_lamp",
         "light.turn_on",
         "script.notify_mqtt_log",
         "sun.sun"
       ],
       "imported_behavior_sha256": "63270a84c9763521a64a2ad0af03f0f827116a1cd206b24a2f17c045f5ee9454",
       "behavior_change": {
-        "date": "2026-10-20",
-        "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
-        "previous_change": "2026-09-22 runtime resilience audit"
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
+        "previous_change": {
+          "date": "2026-10-20",
+          "reason": "Respect room Sticky overrides immediately before every motion-driven lighting action, including shared-target overrides. Preserve independent sibling actions, existing triggers, payloads, timeouts and manual-ON/recovery protection.",
+          "previous_change": "2026-09-22 runtime resilience audit"
+        }
       }
     },
     {
@@ -1289,22 +1297,26 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "92d9af224dd1e6d1a0df39640dc26c5f01e389802cbae956089574870e6d7ef0",
+      "behavior_sha256": "1b50c293d522bad2f7bf68609c7695a0303b3fb1d67a9b713c10a53408f10456",
       "references": [
         "group.kitchen_motion",
         "input_boolean.kitchen_sticky",
-        "light.kitchen_lamp_m",
+        "light.kitchen_lamp",
         "script.notify_mqtt_log",
         "sun.sun"
       ],
       "imported_behavior_sha256": "ed8f774c2968fbd09f16b3f2aa66427c2ed597e14248dc984cdc87e8ba5109aa",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
         "previous_change": {
-          "date": "2026-09-24",
-          "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
-          "previous_change": "2026-09-22 motion-light availability recovery; 2026-09-22 runtime resilience audit"
+          "date": "2026-10-10",
+          "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
+          "previous_change": {
+            "date": "2026-09-24",
+            "reason": "Retire Postbox and Presence Sensor 1 dependencies. Keep all remaining RF motion triggers, inactivity durations, targets, guards and notifications.",
+            "previous_change": "2026-09-22 motion-light availability recovery; 2026-09-22 runtime resilience audit"
+          }
         }
       }
     },
@@ -1329,20 +1341,24 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "995a220ca7f8ab9097ea11b8300e16a52503bb31f3620a7271d29929cd10e804",
+      "behavior_sha256": "22c057882704dfe02ca9a962951c29331f853e0b38844e16fce81429ca5d3e79",
       "references": [
         "group.kitchen_motion",
         "input_boolean.kitchen_sticky",
-        "light.kitchen_lamp_m",
+        "light.kitchen_lamp",
         "light.turn_off",
         "script.notify_mqtt_log",
         "sun.sun"
       ],
       "imported_behavior_sha256": "f1b1853f9effef7b3cc4273c2e0aa586d1ddd3f2e623bf1bdc212bacfc3ec428",
       "behavior_change": {
-        "date": "2026-10-10",
-        "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
-        "previous_change": "2026-09-22 motion-light availability recovery; 2026-09-22 runtime resilience audit"
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
+        "previous_change": {
+          "date": "2026-10-10",
+          "reason": "Apply shared per-device manual-ON protection and genuine availability recovery. Use parallel scoped recovery runs so one failed device cannot block another; preserve all target identities, motion timeouts, sun/time/sticky guards and follow-up actions. Replace the Counter-only last_triggered workaround with the common policy.",
+          "previous_change": "2026-09-22 motion-light availability recovery; 2026-09-22 runtime resilience audit"
+        }
       }
     },
     {
@@ -1363,17 +1379,21 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "b16b7773b567cf384e79595fbc574c5fe19990535cd6baf267ba14b8bb683cee",
+      "behavior_sha256": "940de360b84814339b887e29446ca5e0a483e2b2a85cb302ef554bef76452a3f",
       "references": [
         "automation.table_lamp_off_in_the_morning",
         "input_boolean.kitchen_sticky",
-        "light.kitchen_lamp_m",
+        "light.kitchen_lamp",
         "light.turn_off"
       ],
       "imported_behavior_sha256": "e30424116c937f614d7db60f78a390c74969fc949a40cc7357b75a0caa6f79a6",
       "behavior_change": {
-        "date": "2026-10-23",
-        "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening."
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
+        "previous_change": {
+          "date": "2026-10-23",
+          "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening."
+        }
       }
     },
     {
@@ -1864,7 +1884,7 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "23c00664ac6ac7c15465afe820530634783774d0c7822460d43a737e207c6851",
+      "behavior_sha256": "ae16cffdfc508025e04920e4c246341ec0221ebb989fa40e6d47b4b5c88a3cf3",
       "references": [
         "input_boolean.bathroom_sticky",
         "input_boolean.bedroom_sticky",
@@ -1893,7 +1913,7 @@
         "light.garage_two",
         "light.hall_1_m",
         "light.hall_2_m",
-        "light.kitchen_lamp_m",
+        "light.kitchen_lamp",
         "light.living_wall_dimmer_l",
         "light.porch_one",
         "light.porch_two",
@@ -1908,12 +1928,16 @@
       ],
       "imported_behavior_sha256": "27f40891a35eb2eeb33f2f8dda8ab96031468efae7af5b2d7d104f24b5f0eeb4",
       "behavior_change": {
-        "date": "2026-10-24",
-        "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
         "previous_change": {
-          "date": "2026-10-23",
-          "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
-          "previous_change": "Include the relocated Dining Arc lamp and Matter Dining lamp in the explicit Turn off all lights action (automation.off_lights). Add independent switch.turn_off and light.turn_off branches; retain Bedroom Lamp exactly once and preserve the 30 existing actions, schedule, mode and identity."
+          "date": "2026-10-24",
+          "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
+          "previous_change": {
+            "date": "2026-10-23",
+            "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+            "previous_change": "Include the relocated Dining Arc lamp and Matter Dining lamp in the explicit Turn off all lights action (automation.off_lights). Add independent switch.turn_off and light.turn_off branches; retain Bedroom Lamp exactly once and preserve the 30 existing actions, schedule, mode and identity."
+          }
         }
       }
     },
@@ -1935,7 +1959,7 @@
         "trigger",
         "action"
       ],
-      "behavior_sha256": "b7320c0442c6f2ec8a9f9134d6149bd8e319e1b8a9a787c669063e53f915c7e2",
+      "behavior_sha256": "1bd2ce14565d3672f762414797622e2dc18629d747da411e39b4911b0b85860c",
       "references": [
         "input_boolean.bathroom_sticky",
         "input_boolean.bedroom_sticky",
@@ -1958,7 +1982,7 @@
         "light.garage_bulb_two",
         "light.hall_1_m",
         "light.hall_2_m",
-        "light.kitchen_lamp_m",
+        "light.kitchen_lamp",
         "light.porch_one",
         "light.porch_two",
         "light.turn_off",
@@ -1969,12 +1993,16 @@
       ],
       "imported_behavior_sha256": "7fbd1558dcd423d768f0964ebfa72a3e4860bb4863b2d9116726933982601de1",
       "behavior_change": {
-        "date": "2026-10-24",
-        "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
+        "date": "2026-10-25",
+        "reason": "Rename Kitchen lamp entity to light.kitchen_lamp; preserve all timing, Sticky and manual-control conditions.",
         "previous_change": {
-          "date": "2026-10-23",
-          "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
-          "previous_change": "Retire the disconnected Sockets behind fireplace two device and its two switch-as-light helpers. Remove only their shutdown actions and notification trigger entries; preserve other targets, schedules and automation identities."
+          "date": "2026-10-24",
+          "reason": "Use the Bath 2 native light facade for automatic control; exclude the underlying relay and light from switch screen notifications.",
+          "previous_change": {
+            "date": "2026-10-23",
+            "reason": "Require owning room Sticky helpers to remain explicitly OFF before each automatic lighting/curtain command, including delayed commands and energy selection; preserve independent rooms and manual-only Studio morning opening.",
+            "previous_change": "Retire the disconnected Sockets behind fireplace two device and its two switch-as-light helpers. Remove only their shutdown actions and notification trigger entries; preserve other targets, schedules and automation identities."
+          }
         }
       }
     },
