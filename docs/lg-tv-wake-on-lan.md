@@ -13,15 +13,46 @@ It uses this bounded sequence:
 
 1. Leave an already-on TV untouched, including `playing`, `paused`, `idle` and
    `buffering` states.
-2. Start `script.living_room_tv_send_wake_packet` with the nonblocking
+2. Require a known `on` or `off` state from `switch.living_tv_guard`. Start the
+   two-minute `timer.living_room_tv_wake_grace` to protect this explicit request
+   from inactivity shutdown, including when the outlet was already on.
+3. If the outlet is off, start `script.living_room_tv_restore_power`
+   independently and allow **10 seconds** for the outlet to report `on`.
+   An unavailable outlet or a request without actual `on` confirmation stops the
+   sequence with an error; a successful service call alone proves nothing. After power
+   returns, allow **30 seconds** for cold startup, ending early if the TV reports
+   an on state. A TV that starts itself needs no WOL or Harmony command.
+4. Start `script.living_room_tv_send_wake_packet` with the nonblocking
    `script.turn_on` action. The helper calls `esphome.rf_wake_living_tv`.
-3. Allow up to **10 seconds** for the TV to report an on state. A successful
+5. Allow up to **10 seconds** for the TV to report an on state. A successful
    service call only confirms the request, not that the TV actually woke.
    A missing ESPHome action, offline node or helper error does not abort this
    parent sequence; the bounded wait still leads to Harmony.
-4. If waking is still unconfirmed, send the Harmony hub's discrete `PowerOn`
+6. If waking is still unconfirmed and outlet power is still on, send the Harmony hub's discrete `PowerOn`
    command for `LG TV`, then allow **45 seconds** for confirmation.
-5. Record an automation error if neither route produces confirmation.
+7. Record an automation error if neither route produces confirmation or outlet
+   power is lost during the sequence.
+
+A powered TV in standby skips the outlet command and cold-start wait, retaining
+the fast WOL path. The HA timer is not restored across Core restarts and stays
+bounded even after a failed request. Duplicate requests do not extend it.
+Lighting Sticky overrides do not block an explicit TV power-on request and are
+never changed by it; they still protect automatic media-outlet control.
+
+The confirmation waits do not impose a wall-clock deadline on every HA service
+call. Harmony `remote.send_command` is synchronous: a slow call delays the start
+of its 45-second confirmation wait. The independent outlet helper can finish
+after the caller's power-confirmation deadline; timeout does not cancel an
+already dispatched outlet request. The two-minute shutdown grace expires
+independently of slow service calls. A hard deadline for the entire sequence is
+not guaranteed.
+
+The companion [media guard package](dining-media-guard.md) cuts TV power only
+after this timer is idle **and** the outlet has continuously reported `on` for
+two minutes. This also protects cold power restored by occupancy or the outlet's
+button. Both protections are additional to the existing ten-minute quiet-room,
+explicit TV `off`, and Living Sticky conditions. A missing timer fails closed
+for TV power shutdown, so install and reload these two packages together.
 
 Duplicate requests while this sequence runs are ignored. The fallback does not
 start a Harmony activity or use `PowerToggle`, so a late WOL response cannot
@@ -70,7 +101,9 @@ separation or blocked Wi-Fi-to-Ethernet broadcast can prevent waking even when
 HA can still reach the node's API. Physical proximity to the TV does not replace
 this network requirement.
 
-The TV must retain power in standby and allow network wake. A local WOL test
+WOL requires standby power and network wake support. Explicit HA requests now
+restore the controlled outlet first if necessary; a direct ESPHome WOL call does
+not manage that outlet. A local WOL test
 on 2026-10-02 woke this TV in about three seconds, which informs the 10-second
 primary confirmation window. That earlier test is not proof of a later RF
 firmware deployment. See the
@@ -82,8 +115,10 @@ if a TV reset disables WOL; newer models may expose it under
 
 1. Build and upload the RF firmware; wait for its existing sensors and new WOL
    API action to register. Confirm the actual action name.
-2. Apply only this HA package and run HA's configuration check.
-3. Reload scripts while none are running, then reload this automation by ID.
+2. Apply this HA package together with `dining_media_guard_evening.yaml` and run
+   HA's configuration check. The new timer and power helper must be present.
+3. Reload timer configuration and scripts while none are running, then reload
+   both affected automations. Confirm `timer.living_room_tv_wake_grace` is `idle`.
    When replacing the old SSH package, also reload
    `shell_command` to remove the retired `living_room_tv_wake` action. A core
    restart is unnecessary. If that reload action is unavailable on an older HA
@@ -127,6 +162,11 @@ and delayed WOL confirmation, a missing ESPHome action, API errors, unconfirmed
 packet delivery, failure of both routes, every already-on state, and duplicate
 requests. It loads the real HA script integration for the independent helper,
 so the tests exercise error isolation rather than mocking `script.turn_on`.
-Unknown/unavailable TV states cannot pass the final confirmation check. The test
+It also loads the real timer and companion media automation to exercise cold
+and warm manual requests while inactivity checks run, plus shutdown after grace
+expiry. Outlet failures, missing actions, stalled actions, startup power loss,
+Sticky-on explicit requests and duplicate timer deadlines are covered. Only
+the test copies shorten waits; timer expiry is also exercised through HA's
+timer service. Unknown/unavailable TV states cannot pass the final confirmation check. The test
 never sends network packets or operates a real TV. `tests/test_lg_tv_wol_relay.py` keeps
 the legacy relay's packet construction and restricted-command checks.

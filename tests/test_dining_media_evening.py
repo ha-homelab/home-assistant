@@ -30,6 +30,7 @@ TV_POWER = 'switch.living_tv_guard'
 TV = 'media_player.living_room_tv_77'
 LIVING_STICKY = 'input_boolean.living_room_sticky'
 DINING_STICKY = 'input_boolean.dining_room_sticky'
+GRACE = 'timer.living_room_tv_wake_grace'
 
 
 @unittest.skipUnless(HA_AVAILABLE, 'Home Assistant runtime is not installed')
@@ -51,6 +52,7 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         for outlet in (MEDIA, TV_POWER):
             self.hass.states.async_set(outlet, 'on')
         self.hass.states.async_set(TV, 'off')
+        self.hass.states.async_set(GRACE, 'idle')
         # Keep the current room-override policy, including the older Living
         # override on Dining Media. Lobby owns neither outlet.
         for room in ('living_room', 'dining_room', 'lobby'):
@@ -62,16 +64,16 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         def shorten(value):
             if isinstance(value, dict):
                 if 'for' in value:
-                    self.assertEqual(value['for'], '00:10:00')
+                    self.assertIn(value['for'], ('00:10:00', '00:02:00'))
                     self.duration_count += 1
-                    value['for'] = {'milliseconds': 250}
+                    value['for'] = {'milliseconds': 150 if value['for'] == '00:02:00' else 250}
                 for item in value.values():
                     shorten(item)
             elif isinstance(value, list):
                 for item in value:
                     shorten(item)
         shorten(self.config)
-        self.assertEqual(self.duration_count, 3)
+        self.assertEqual(self.duration_count, 4)
 
     async def asyncTearDown(self):
         await self.hass.async_stop(force=True)
@@ -346,6 +348,41 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         self.hass.states.async_set(SENSORS[0], 'on')
         await self.settle(.04)
         self.assertEqual(self.calls, [('turn_on', MEDIA)])
+
+
+    async def test_new_outlet_power_has_a_grace_even_when_rooms_are_already_quiet(self):
+        self.set_sensors('off')
+        self.hass.states.async_set(TV_POWER, 'off')
+        await self.load()
+        await self.settle()
+        off_rule = next(s.entity_id for s in self.hass.states.async_all('automation')
+            if s.attributes.get('id') == 'ha_homelab_dining_media_guard_evening_power_off')
+        self.hass.states.async_set(TV_POWER, 'on')
+        self.calls.clear()
+        await self.hass.services.async_call('automation', 'trigger',
+            {'entity_id': off_rule, 'skip_condition': False}, blocking=True)
+        self.assertNotIn(('turn_off', TV_POWER), self.calls)
+        await self.settle(.2)
+        await self.hass.services.async_call('automation', 'trigger',
+            {'entity_id': off_rule, 'skip_condition': False}, blocking=True)
+        self.assertEqual(self.calls[-1], ('turn_off', TV_POWER))
+
+    async def test_active_or_unknown_wake_timer_protects_only_tv_power(self):
+        await self.load()
+        for state in ('active', 'paused', 'unknown', 'unavailable', None):
+            with self.subTest(state=state):
+                self.set_sensors('on')
+                for outlet in (MEDIA, TV_POWER):
+                    self.hass.states.async_set(outlet, 'on')
+                if state is None:
+                    self.hass.states.async_remove(GRACE)
+                else:
+                    self.hass.states.async_set(GRACE, state)
+                self.calls.clear()
+                self.set_sensors('off')
+                await self.settle()
+                self.assertEqual(self.calls, [('turn_off', MEDIA)])
+                self.assertEqual(self.hass.states.get(TV_POWER).state, 'on')
 
 
 if __name__ == '__main__':

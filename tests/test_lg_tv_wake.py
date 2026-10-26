@@ -27,6 +27,8 @@ else:
 
 ROOT = Path(__file__).resolve().parents[1]
 TV = 'media_player.living_room_tv_77'
+POWER = 'switch.living_tv_guard'
+GRACE = 'timer.living_room_tv_wake_grace'
 
 
 @unittest.skipUnless(HA_AVAILABLE, 'Requires the installed Home Assistant runtime')
@@ -39,8 +41,14 @@ class LGWakeTest(unittest.IsolatedAsyncioTestCase):
         self.hass.config.skip_pip = True
         self.assertTrue(await async_load_base_functionality(self.hass))
         self.hass.states.async_set(TV, 'off')
+        self.hass.states.async_set(POWER, 'on')
         self.events = []
         self.wol_sent = asyncio.Event()
+        self.power_requested = asyncio.Event()
+        self.power_confirms = True
+        self.power_raises = False
+        self.power_release = None
+        self.power_boots_tv = False
         self.wol_raises = False
         self.wol_wakes = False
         self.wol_delay = 0
@@ -48,8 +56,12 @@ class LGWakeTest(unittest.IsolatedAsyncioTestCase):
         self.ir_wakes = True
         self.hass.services.async_register('esphome', 'rf_wake_living_tv', self.wake)
         self.hass.services.async_register('remote', 'send_command', self.remote)
+        self.hass.services.async_register('switch', 'turn_on', self.power_on)
         package = yaml.safe_load((ROOT / 'config/packages/lg_tv_wake_on_lan.yaml').read_text())
         self.assertNotIn('shell_command', package)
+        self.assertEqual(package['timer']['living_room_tv_wake_grace'], {
+            'name': 'Living room TV wake grace', 'duration': '00:02:00', 'restore': False})
+        self.assertTrue(await async_setup_component(self.hass, 'timer', {'timer': package['timer']}))
         self.assertTrue(await async_setup_component(self.hass, 'script', {'script': package['script']}))
         await self.hass.async_block_till_done()
         rule = package['automation'][0]
@@ -64,8 +76,8 @@ class LGWakeTest(unittest.IsolatedAsyncioTestCase):
                     shorten_waits(item)
             elif isinstance(value, dict):
                 if 'wait_template' in value:
-                    self.assertIn(value['timeout'], ('00:00:10', '00:00:45'))
-                    value['timeout'] = {'milliseconds': 50}
+                    self.assertIn(value['timeout'], ('00:00:10', '00:00:30', '00:00:45'))
+                    value['timeout'] = {'milliseconds': 100 if value['timeout'] == '00:00:30' else 50}
                 for item in value.values():
                     shorten_waits(item)
 
@@ -101,6 +113,19 @@ class LGWakeTest(unittest.IsolatedAsyncioTestCase):
             'entity_id': ['remote.harmonyhub'], 'device': 'LG TV', 'command': 'PowerOn'})
         if self.ir_wakes:
             self.hass.states.async_set(TV, 'on')
+
+    async def power_on(self, call):
+        self.assertEqual(dict(call.data), {'entity_id': [POWER]})
+        self.events.append('power')
+        self.power_requested.set()
+        if self.power_release is not None:
+            await self.power_release.wait()
+        if self.power_raises:
+            raise HomeAssistantError('Simulated outlet API failure')
+        if self.power_confirms:
+            self.hass.states.async_set(POWER, 'on')
+            if self.power_boots_tv:
+                self.hass.states.async_set(TV, 'on')
 
     async def run_wake(self):
         trace_clear()
@@ -184,9 +209,167 @@ class LGWakeTest(unittest.IsolatedAsyncioTestCase):
     async def test_duplicate_requests_do_not_send_duplicate_wake_commands(self):
         first = asyncio.create_task(self.run_wake())
         await asyncio.wait_for(self.wol_sent.wait(), timeout=2)
+        first_deadline = self.hass.states.get(GRACE).attributes['finishes_at']
         await self.run_wake()
+        self.assertEqual(self.hass.states.get(GRACE).attributes['finishes_at'], first_deadline)
         await first
         self.assertEqual(self.events, ['wol', 'ir'])
+
+
+    async def test_cold_wake_restores_power_despite_sticky_and_waits_before_wol(self):
+        self.hass.states.async_set(POWER, 'off')
+        for room in ('living_room', 'dining_room'):
+            self.hass.states.async_set(f'input_boolean.{room}_sticky', 'on')
+        self.wol_wakes = True
+        task = asyncio.create_task(self.run_wake())
+        await asyncio.wait_for(self.power_requested.wait(), timeout=2)
+        await asyncio.sleep(.02)
+        self.assertEqual(self.events, ['power'])
+        self.assertEqual(self.hass.states.get(POWER).state, 'on')
+        self.assertEqual(self.hass.states.get(GRACE).state, 'active')
+        await asyncio.wait_for(task, timeout=2)
+        self.assertEqual(self.events, ['power', 'wol'])
+        self.assertEqual(self.execution, 'finished')
+        self.assertEqual(self.hass.states.get('input_boolean.living_room_sticky').state, 'on')
+
+    async def test_tv_starting_with_power_needs_no_wake_packet(self):
+        self.hass.states.async_set(POWER, 'off')
+        self.power_boots_tv = True
+        await self.run_wake()
+        self.assertEqual(self.events, ['power'])
+        self.assertEqual(self.execution, 'finished')
+
+    async def test_new_request_uses_fixed_grace_not_a_previously_changed_timer(self):
+        await self.hass.services.async_call('timer', 'start',
+            {'entity_id': GRACE, 'duration': '00:10:00'}, blocking=True)
+        self.wol_wakes = True
+        await self.run_wake()
+        self.assertEqual(self.hass.states.get(GRACE).attributes['duration'], '0:02:00')
+
+    async def test_unknown_unavailable_or_missing_outlet_aborts_without_commands(self):
+        for state in ('unknown', 'unavailable', None):
+            with self.subTest(state=state):
+                if state is None:
+                    self.hass.states.async_remove(POWER)
+                else:
+                    self.hass.states.async_set(POWER, state)
+                await self.run_wake()
+                self.assertEqual(self.events, [])
+                self.assertEqual(self.execution, 'aborted')
+
+    async def test_unconfirmed_power_does_not_attempt_wol_or_ir(self):
+        self.hass.states.async_set(POWER, 'off')
+        self.power_confirms = False
+        await self.run_wake()
+        self.assertEqual(self.events, ['power'])
+        self.assertEqual(self.execution, 'aborted')
+
+    async def test_outlet_api_failure_does_not_attempt_wol_or_ir(self):
+        self.hass.states.async_set(POWER, 'off')
+        self.power_raises = True
+        await self.run_wake()
+        self.assertEqual(self.events, ['power'])
+        self.assertEqual(self.execution, 'aborted')
+
+    async def test_missing_outlet_action_remains_a_bounded_failure(self):
+        self.hass.states.async_set(POWER, 'off')
+        self.hass.services.async_remove('switch', 'turn_on')
+        await asyncio.wait_for(self.run_wake(), timeout=2)
+        self.assertEqual(self.events, [])
+        self.assertEqual(self.execution, 'aborted')
+
+    async def test_stalled_outlet_action_cannot_block_confirmation_deadline(self):
+        self.hass.states.async_set(POWER, 'off')
+        self.power_release = asyncio.Event()
+        self.power_confirms = False
+        try:
+            await asyncio.wait_for(self.run_wake(), timeout=2)
+            self.assertEqual(self.events, ['power'])
+            self.assertEqual(self.execution, 'aborted')
+        finally:
+            self.power_release.set()
+            await self.hass.async_block_till_done()
+
+    async def test_power_lost_during_cold_start_aborts(self):
+        self.hass.states.async_set(POWER, 'off')
+        task = asyncio.create_task(self.run_wake())
+        await asyncio.wait_for(self.power_requested.wait(), timeout=2)
+        await asyncio.sleep(.02)
+        self.hass.states.async_set(POWER, 'unavailable')
+        await asyncio.wait_for(task, timeout=2)
+        self.assertEqual(self.events, ['power'])
+        self.assertEqual(self.execution, 'aborted')
+
+    async def load_media_automation(self):
+        """Load the real companion automation; only shorten its elapsed ages."""
+        config = yaml.safe_load((ROOT / 'config/packages/dining_media_guard_evening.yaml').read_text())
+
+        def shorten(value):
+            if isinstance(value, dict):
+                if 'for' in value:
+                    self.assertIn(value['for'], ('00:10:00', '00:02:00'))
+                    value['for'] = {'milliseconds': 20}
+                for item in value.values():
+                    shorten(item)
+            elif isinstance(value, list):
+                for item in value:
+                    shorten(item)
+        shorten(config)
+        for sensor in ('living_room_presence', 'rf_lobby_motion', 'rf_dinner_motion', 'rf_dinner_two_motion'):
+            self.hass.states.async_set(f'binary_sensor.{sensor}', 'off')
+        for room in ('living_room', 'dining_room'):
+            self.hass.states.async_set(f'input_boolean.{room}_sticky', 'off')
+        # Isolate the TV outlet without disabling the actual Dining branch.
+        self.hass.states.async_set('switch.dining_media_guard', 'off')
+
+        async def power_off(call):
+            self.assertEqual(dict(call.data), {'entity_id': [POWER]})
+            self.events.append('power_off')
+            self.hass.states.async_set(POWER, 'off')
+        self.hass.services.async_register('switch', 'turn_off', power_off)
+        self.assertTrue(await async_setup_component(self.hass, 'automation', config))
+        await self.hass.async_start()
+        await self.hass.async_block_till_done()
+        self.off_rule = next(s.entity_id for s in self.hass.states.async_all('automation')
+            if s.attributes.get('id') == 'ha_homelab_dining_media_guard_evening_power_off')
+
+    async def inactivity_tick(self):
+        # Execute the same rule as the periodic trigger, retaining all conditions.
+        await self.hass.services.async_call('automation', 'trigger',
+            {'entity_id': self.off_rule, 'skip_condition': False}, blocking=True)
+
+    async def test_cold_manual_wake_survives_idle_tick_and_releases_after_grace(self):
+        self.hass.states.async_set(POWER, 'off')
+        await self.load_media_automation()
+        await asyncio.sleep(.03)
+        task = asyncio.create_task(self.run_wake())
+        await asyncio.wait_for(self.power_requested.wait(), timeout=2)
+        await asyncio.sleep(.03)
+        await self.inactivity_tick()
+        self.assertEqual(self.events, ['power'])
+        self.assertEqual(self.hass.states.get(POWER).state, 'on')
+        await asyncio.wait_for(task, timeout=2)
+        self.assertEqual(self.events, ['power', 'wol', 'ir'])
+        self.assertEqual(self.execution, 'finished')
+        self.hass.states.async_set(TV, 'off')
+        await self.inactivity_tick()
+        self.assertNotIn('power_off', self.events)
+        # Finish the real HA timer to simulate its bounded expiry, then tick.
+        await self.hass.services.async_call('timer', 'finish', {'entity_id': GRACE}, blocking=True)
+        await self.inactivity_tick()
+        self.assertEqual(self.events[-1], 'power_off')
+
+    async def test_warm_manual_wake_is_protected_even_after_outlet_age_grace(self):
+        await self.load_media_automation()
+        await asyncio.sleep(.03)
+        task = asyncio.create_task(self.run_wake())
+        await asyncio.wait_for(self.wol_sent.wait(), timeout=2)
+        await self.inactivity_tick()
+        self.assertEqual(self.events, ['wol'])
+        self.assertEqual(self.hass.states.get(POWER).state, 'on')
+        await asyncio.wait_for(task, timeout=2)
+        self.assertEqual(self.events, ['wol', 'ir'])
+        self.assertEqual(self.execution, 'finished')
 
 
 if __name__ == '__main__':
