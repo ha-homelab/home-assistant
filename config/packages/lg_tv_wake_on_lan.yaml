@@ -1,5 +1,23 @@
 # HA runs outside the home broadcast domain. RF ESPHome sends WOL locally.
+timer:
+  living_room_tv_wake_grace:
+    name: Living room TV wake grace
+    duration: "00:02:00"
+    restore: false
+
 script:
+  living_room_tv_restore_power:
+    alias: Living room TV - request outlet power
+    description: Request power independently so an offline or stalled outlet
+      cannot prevent the caller from checking its bounded confirmation deadline.
+    mode: single
+    max_exceeded: silent
+    sequence:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.living_tv_guard
+        continue_on_error: true
+
   living_room_tv_send_wake_packet:
     alias: Living room TV - send local wake packet
     description: Send WOL through RF ESPHome without making the caller depend on
@@ -13,8 +31,8 @@ script:
 automation:
   - id: living_room_tv_wake_on_lan
     alias: Living room TV - wake over Ethernet
-    description: Wake the wired LG through RF ESPHome on the home LAN, falling
-      back to Harmony PowerOn if the RF node is unavailable or waking is unconfirmed.
+    description: Restore and confirm the TV outlet for an explicit wake request,
+      then use local ESPHome WOL with Harmony PowerOn as a fallback.
     mode: single
     max_exceeded: silent
     triggers:
@@ -25,6 +43,46 @@ automation:
         value_template: >-
           {{ states('media_player.living_room_tv_77') not in
              ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+      - if: >-
+          {{ states('switch.living_tv_guard') not in ['on', 'off'] }}
+        then:
+          - stop: The LG TV outlet is unavailable; power cannot be confirmed.
+            error: true
+      # This is an explicit user request, not motion control. Do not change or
+      # consult lighting Sticky overrides. Single mode prevents duplicate holds.
+      - action: timer.start
+        target:
+          entity_id: timer.living_room_tv_wake_grace
+        data:
+          duration: "00:02:00"
+      - if: "{{ is_state('switch.living_tv_guard', 'off') }}"
+        then:
+          - action: script.turn_on
+            target:
+              entity_id: script.living_room_tv_restore_power
+          - wait_template: "{{ is_state('switch.living_tv_guard', 'on') }}"
+            timeout: "00:00:10"
+            continue_on_timeout: true
+          - if: "{{ not is_state('switch.living_tv_guard', 'on') }}"
+            then:
+              - stop: The LG TV outlet did not confirm power-on.
+                error: true
+          # Cold power needs time for the TV's receiver/network to start. A TV
+          # that boots directly into an on state can finish this wait early.
+          - wait_template: >-
+              {{ states('media_player.living_room_tv_77') in
+                 ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+            timeout: "00:00:30"
+            continue_on_timeout: true
+      - if: "{{ not is_state('switch.living_tv_guard', 'on') }}"
+        then:
+          - stop: The LG TV outlet lost power during startup.
+            error: true
+      - if: >-
+          {{ states('media_player.living_room_tv_77') in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+        then:
+          - stop: The LG TV confirmed power-on during startup.
       # Start independently: ServiceNotFound is not suppressed by continue_on_error.
       # A missing ESPHome action must not abort the parent's Harmony fallback.
       - action: script.turn_on
@@ -41,6 +99,10 @@ automation:
           {{ states('media_player.living_room_tv_77') not in
              ['on', 'playing', 'paused', 'idle', 'buffering'] }}
         then:
+          - if: "{{ not is_state('switch.living_tv_guard', 'on') }}"
+            then:
+              - stop: The LG TV outlet lost power before Harmony fallback.
+                error: true
           - action: remote.send_command
             target:
               entity_id: remote.harmonyhub
@@ -53,7 +115,8 @@ automation:
             timeout: "00:00:45"
             continue_on_timeout: true
       - if: >-
-          {{ states('media_player.living_room_tv_77') not in
+          {{ not is_state('switch.living_tv_guard', 'on') or
+             states('media_player.living_room_tv_77') not in
              ['on', 'playing', 'paused', 'idle', 'buffering'] }}
         then:
           - stop: The LG TV did not confirm power-on after Wake-on-LAN and Harmony PowerOn.

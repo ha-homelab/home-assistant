@@ -140,6 +140,13 @@ automation:
     - condition: state
       entity_id: switch.living_tv_guard
       state: 'on'
+      # Cover power restored by occupancy or an outlet's physical button too.
+      for: '00:02:00'
+    - condition: state
+      # The explicit wake request also protects a previously powered TV while
+      # it still reports off. Missing/unknown timer state must not cut power.
+      entity_id: timer.living_room_tv_wake_grace
+      state: idle
     then:
     - action: switch.turn_off
       target:

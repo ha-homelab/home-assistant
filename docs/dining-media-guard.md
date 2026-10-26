@@ -63,7 +63,16 @@ After **all four sensors have individually stayed off for ten minutes**:
   above are off.
 - Living TV Guard turns off only if `media_player.living_room_tv_77`, the native
   webOS entity, explicitly reports `off`. A DLNA entity reporting `idle` is not
-  proof that the TV is off. Living Sticky must also be off.
+  proof that the TV is off. Living Sticky must also be off. The outlet must have
+  continuously reported `on` for **two minutes**, and
+  `timer.living_room_tv_wake_grace` must be `idle`.
+
+The outlet-age check protects power restored by occupancy or a physical button.
+The timer protects an explicit [LG power-on request](lg-tv-wake-on-lan.md), even
+when the outlet was already on and the TV still reports `off` while waking. It
+lasts two minutes, is not restored after a Core restart, and duplicate in-flight
+wake requests do not extend it. Missing or unknown timer state blocks automatic
+TV power-off. The Dining outlet does not depend on either TV startup protection.
 
 If the TV is switched off later, its state transition immediately rechecks the
 same inactivity condition. `unknown`, `unavailable`, or missing sensor states
@@ -93,6 +102,11 @@ can shut down an outlet after Sticky is released. Manual control of an outlet
 does not disable occupancy management; enable its Sticky override to hold it in
 the chosen state across future activity, reloads and inactivity checks.
 
+An explicit TV power-on request may restore `switch.living_tv_guard` while
+lighting Sticky is on; this is direct user control, not occupancy control. It
+leaves Sticky unchanged. After the bounded startup grace, all normal inactivity,
+TV-state and room-override checks still apply.
+
 ## Verification and troubleshooting
 
 `tests/test_dining_media_evening.py` runs the actual automations against simulated
@@ -100,8 +114,10 @@ entities in an isolated Home Assistant instance. It covers each activity source,
 continuous shared inactivity, the last sensor's deadline, new movement, offline
 sensors, TV states, late TV shutdown, manual off, outlet recovery, startup/reload,
 one failed outlet, activity arriving between commands, room override isolation,
-unknown overrides, and Sticky changes during a wait or service call. Only the test copy
-shortens the ten-minute durations; physical loads are not switched by the tests.
+unknown overrides, Sticky changes during a wait or service call, newly restored
+outlet power and missing/active wake timers. `tests/test_lg_tv_wake.py` also runs
+both packages together for manual cold/warm wake during inactivity and shutdown
+after grace. Only test copies shorten durations; physical loads are not switched.
 
 Inspect the traces for **Media guards: Restore power on occupancy** and
 **Media guards: Turn off after shared inactivity**. The latter retains its stable
@@ -111,7 +127,8 @@ overrides, then the native LG state.
 Do not treat a missing motion report as proof of an empty room.
 
 Validate the full configuration before `automation.reload`; no Core restart is
-required. Preserve the independent `switch.dining_guard` curtain controller and
+required. Install the LG wake package's timer and helper, reload timer and script
+configuration, then reload both packages' automations together. Preserve the independent `switch.dining_guard` curtain controller and
 all lighting Sticky definitions.
 
 The source reconciliation for this package is tested offline. Merging it does
