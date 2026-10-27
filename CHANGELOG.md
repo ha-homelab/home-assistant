@@ -2,8 +2,17 @@
 
 ## Unreleased
 
+## [0.1.5] - 2026-10-26
+
 ### Fixed
 
+- Source configuration: restore the Living TV outlet for an explicit LG power-on
+  request, confirm outlet power, then allow cold startup before ESPHome Wake-on-LAN
+  and the discrete Harmony `PowerOn` fallback.
+- Protect manual LG wake from inactivity shutdown with a two-minute grace timer
+  and require two minutes of continuous outlet power before automatic shutdown.
+  Explicit wake leaves room Sticky overrides unchanged; automatic outlet control
+  continues to honor them.
 - Expose the Bath 2 ESPHome relay through `light.bath_2`; migrate motion, schedule
   and shutdown targets and exclude its state changes from screen notifications.
 - Extend room Sticky to scheduled lighting, energy-selected lights and all
@@ -16,6 +25,21 @@
   without pausing unrelated sibling lights.
 - Preserve manual ON provenance, existing motion timeouts and explicit controls;
   exercise the changes with Home Assistant runtime regression tests.
+
+### Upgrade
+
+- These automation fixes are source configuration changes. The wheel and source
+  distribution contain only the portable `notification_frame_cache` library,
+  whose implementation is unchanged; they do not install Home Assistant
+  configuration or firmware. Publishing this release does not deploy or restart HA.
+- Install the LG wake and Dining Media guard packages together so the timer,
+  helper and shutdown guards are present. Follow their deployment guides for
+  configuration validation and reloads; hardware acceptance is separate from CI.
+
+### Security
+
+- No credential, endpoint or private installation data is added to release
+  payloads. Existing package inventory and provenance checks remain required.
 
 ## [0.1.4] - 2026-10-20
 
