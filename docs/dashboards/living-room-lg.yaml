@@ -1,0 +1,8 @@
+# Merge this Power override into the existing living-room remote card.
+# Do not set mac: it bypasses the LG wake automation and calls HA WOL directly.
+type: custom:lg-remote-control
+entity: media_player.living_room_tv_77
+keys:
+  POWER:
+    service: script.living_room_tv_power_ott
+    data: {}

@@ -1,0 +1,92 @@
+# Opt-in behavior for the living-room LG remote's Power button.
+# Other power-on requests keep the existing LG wake automation unchanged.
+script:
+  living_room_tv_start_ott:
+    alias: Living room TV - start Media Station X
+    description: Wake the LG through its normal power-on path, then open the
+      installed Media Station X app with its existing OTT configuration.
+    mode: single
+    max_exceeded: silent
+    sequence:
+      - if: >-
+          {{ states('media_player.living_room_tv_77') not in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+        then:
+          - action: media_player.turn_on
+            target:
+              entity_id: media_player.living_room_tv_77
+      - wait_template: >-
+          {{ states('media_player.living_room_tv_77') in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+        timeout: "00:02:00"
+        continue_on_timeout: true
+      - if: >-
+          {{ states('media_player.living_room_tv_77') not in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+        then:
+          - stop: The LG TV did not confirm power-on; Media Station X was not requested.
+            error: true
+      - wait_template: >-
+          {{ 'Media Station X' in
+             (state_attr('media_player.living_room_tv_77', 'source_list') or []) }}
+        timeout: "00:00:30"
+        continue_on_timeout: true
+      - if: >-
+          {{ states('media_player.living_room_tv_77') not in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] or
+             'Media Station X' not in
+             (state_attr('media_player.living_room_tv_77', 'source_list') or []) }}
+        then:
+          - stop: The LG TV or its Media Station X app is unavailable.
+            error: true
+      - if: >-
+          {{ state_attr('media_player.living_room_tv_77', 'source') != 'Media Station X' }}
+        then:
+          - action: media_player.select_source
+            target:
+              entity_id: media_player.living_room_tv_77
+            data:
+              source: Media Station X
+      - wait_template: >-
+          {{ states('media_player.living_room_tv_77') in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] and
+             state_attr('media_player.living_room_tv_77', 'source') == 'Media Station X' }}
+        timeout: "00:00:30"
+        continue_on_timeout: true
+      - if: >-
+          {{ states('media_player.living_room_tv_77') not in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] or
+             state_attr('media_player.living_room_tv_77', 'source') != 'Media Station X' }}
+        then:
+          - stop: The LG TV did not confirm Media Station X as the active app.
+            error: true
+
+  living_room_tv_power_ott:
+    alias: Living room TV - Power with Media Station X
+    description: Turn an active TV off; otherwise wake it and open Media Station X.
+      The remote card uses this script for both states of its Power button.
+    mode: single
+    max_exceeded: silent
+    sequence:
+      - if: >-
+          {{ states('media_player.living_room_tv_77') in
+             ['on', 'playing', 'paused', 'idle', 'buffering'] }}
+        then:
+          # Cancel pending app selection before honoring an explicit power-off.
+          - action: script.turn_off
+            target:
+              entity_id: script.living_room_tv_start_ott
+          - action: media_player.turn_off
+            target:
+              entity_id: media_player.living_room_tv_77
+          - stop: LG power-off requested.
+      # Ignore duplicate wake requests while the TV is still off.
+      # Once the TV is active, Power remains available to cancel and turn it off.
+      # Do not call script.turn_on on an already-running single-mode script:
+      # HA can wait for that existing run before returning to this router.
+      - condition: state
+        entity_id: script.living_room_tv_start_ott
+        state: "off"
+      - action: script.turn_on
+        target:
+          entity_id: script.living_room_tv_start_ott

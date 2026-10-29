@@ -6,6 +6,48 @@ ESPHome node. The node broadcasts the magic packet on the home LAN. HA can run
 outside that broadcast domain; no SSH connection or running `syn` VM is needed.
 The other LG (`media_player.lg2`) is not targeted.
 
+## Remote Power button and OTT startup
+
+The optional `config/packages/lg_tv_ott_power.yaml` adds two scripts. Bind only
+the living-room remote card's `keys.POWER` to `script.living_room_tv_power_ott`,
+as shown in [the card example](dashboards/living-room-lg.yaml). An active TV is
+turned off normally. From standby, the script calls the normal
+`media_player.turn_on` path below and waits for the TV before selecting
+**Media Station X** (LG app ID `de.benzac.msx`). The app keeps its existing OTT
+startup configuration; HA does not replace its URL or send website credentials.
+Other TV power buttons, voice requests and physical remote use are unchanged.
+
+`script.living_room_tv_start_ott` is the separate idempotent start action: it
+can also open Media Station X on an already-active TV without turning it off.
+An already-active Media Station X session is left alone. Duplicate start
+requests are ignored while startup runs. The Power button can still turn an
+active TV off during startup: it cancels the pending app launch first.
+Confirmation waits allow 120 seconds for power-on, 30 seconds for the app list,
+and 30 seconds for app confirmation. Failures are reported rather than claiming
+the app opened. These are state confirmation timeouts, not hard deadlines on
+underlying service calls.
+
+Do **not** set `mac` on this `custom:lg-remote-control` card. That option makes
+its Power button call `wake_on_lan.send_magic_packet` directly, bypassing both
+the configured `POWER` action and our local ESPHome/Harmony wake sequence. It
+can therefore show “Action wake_on_lan.send_magic_packet not found” even while
+RF ESPHome works. Remove the stale `mac` override instead of enabling a second
+WOL path. Preserve the remaining card configuration and all other TV cards.
+
+Deploy the package, validate HA configuration, and reload scripts. Then save
+the targeted card through the Lovelace editor or supported configuration API;
+no Core restart is required. Storage-mode dashboards remain private runtime
+data and must not be copied into this public repository. Verify startup through
+script/automation traces and the TV's `source` attribute. App selection alone
+does not verify network access or playback inside the OTT website.
+
+To revert this optional behavior, remove only the card's `keys.POWER` override,
+then remove `lg_tv_ott_power.yaml` and reload scripts when no scripts are running.
+Keep `mac` absent and retain the shared wake package: the ordinary Power button
+will continue using the existing local wake and Harmony fallback.
+
+## Shared wake automation
+
 `config/packages/lg_tv_wake_on_lan.yaml` keeps the existing automation ID,
 `living_room_tv_wake_on_lan`, and official
 [`webostv.turn_on` trigger](https://www.home-assistant.io/triggers/webostv.turn_on/).
