@@ -38,6 +38,25 @@ class VerifyIdleTest(unittest.TestCase):
         self.assertEqual(result.stdout, 'script.running\n')
         self.assertEqual(result.stderr, '')
 
+    def test_invalid_counts_never_report_an_idle_system(self):
+        for current in [float('nan'), float('inf'), float('-inf'), -1, -0.5, True, False, '0', None]:
+            with self.subTest(current=current):
+                result = self.check_states([
+                    {'entity_id': 'automation.invalid', 'state': 'on',
+                     'attributes': {'current': current}},
+                ])
+                self.assertEqual(result.returncode, 2)
+                self.assertEqual(result.stdout, '')
+                self.assertIn('invalid running-action count', result.stderr)
+
+    def test_huge_positive_integer_still_reports_running(self):
+        result = self.check_states([
+            {'entity_id': 'automation.running', 'state': 'on',
+             'attributes': {'current': 10 ** 400}},
+        ])
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stdout, 'automation.running\n')
+
     def test_running_queued_automation_is_detected(self):
         result = self.check_states([
             {'entity_id': 'automation.queued', 'state': 'on',
