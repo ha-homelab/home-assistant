@@ -18,7 +18,8 @@ class ConsoleManifestTests(unittest.TestCase):
                    {"entity": "media_player.speaker", "name": "Speaker", "caps": 512, "group": "Speakers"}]
         result = module.build_console(catalog, targets)
         direct, resolved = result["stations"]
-        self.assertEqual(direct["sources"], {"media_player.preset": "Radio · 711"})
+        self.assertEqual(direct["sources"], {
+            "media_player.preset": "Radio · 711", "media_player.managed": "711 — Radio"})
         self.assertNotIn("url", resolved)
         self.assertEqual(set(resolved["sources"]), {"media_player.preset", "media_player.managed"})
         self.assertEqual(result["limits"][0]["entities"], ["media_player.preset", "media_player.managed"])

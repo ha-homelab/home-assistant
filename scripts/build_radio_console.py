@@ -18,7 +18,9 @@ def build_console(catalog, targets, phone_limit=4):
         if not station.get("resolver") and not station.get("hls"):
             item["url"] = station["url"]
         for target in targets:
-            if int(target.get("caps", 0)) & 512 and item.get("url"):
+            # Phones should use reviewed PBX presets, including their resolver
+            # and port policy; arbitrary URLs remain a separate player route.
+            if target.get("kind") != "phone" and int(target.get("caps", 0)) & 512 and item.get("url"):
                 continue
             number, name = station["extension"], station["name"]
             labels = (f"{number} — {name}", f"{name} · {number}")
