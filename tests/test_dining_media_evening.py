@@ -35,6 +35,8 @@ GRACE = 'timer.living_room_tv_wake_grace'
 
 @unittest.skipUnless(HA_AVAILABLE, 'Home Assistant runtime is not installed')
 class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
+    media_entity = MEDIA
+
     async def asyncSetUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix='media-occupancy-test-')
         self.hass = HomeAssistant(self.temp.name)
@@ -49,7 +51,7 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
             self.hass.services.async_register('switch', service, self.command)
         for sensor in SENSORS:
             self.hass.states.async_set(sensor, 'on')
-        for outlet in (MEDIA, TV_POWER):
+        for outlet in (self.media_entity, TV_POWER):
             self.hass.states.async_set(outlet, 'on')
         self.hass.states.async_set(TV, 'off')
         self.hass.states.async_set(GRACE, 'idle')
@@ -73,7 +75,7 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
                 for item in value:
                     shorten(item)
         shorten(self.config)
-        self.assertEqual(self.duration_count, 4)
+        self.assertEqual(self.duration_count, 5)
 
     async def asyncTearDown(self):
         await self.hass.async_stop(force=True)
@@ -108,12 +110,12 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         for sensor in SENSORS:
             with self.subTest(sensor=sensor):
                 self.set_sensors('off')
-                for outlet in (MEDIA, TV_POWER):
+                for outlet in (self.media_entity, TV_POWER):
                     self.hass.states.async_set(outlet, 'off')
                 self.calls.clear()
                 self.hass.states.async_set(sensor, 'on')
                 await self.settle(.04)
-                self.assertCountEqual(self.calls, [('turn_on', MEDIA), ('turn_on', TV_POWER)])
+                self.assertCountEqual(self.calls, [('turn_on', self.media_entity), ('turn_on', TV_POWER)])
 
     async def test_ten_minutes_quiet_switches_both_off(self):
         await self.load()
@@ -121,7 +123,7 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         await self.settle(.05)
         self.assertEqual(self.calls, [])
         await self.settle()
-        self.assertCountEqual(self.calls, [('turn_off', MEDIA), ('turn_off', TV_POWER)])
+        self.assertCountEqual(self.calls, [('turn_off', self.media_entity), ('turn_off', TV_POWER)])
 
     async def test_latest_sensor_must_complete_its_own_interval(self):
         await self.load()
@@ -133,7 +135,7 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         await self.settle(.05)
         self.assertEqual(self.calls, [])
         await self.settle()
-        self.assertCountEqual(self.calls, [('turn_off', MEDIA), ('turn_off', TV_POWER)])
+        self.assertCountEqual(self.calls, [('turn_off', self.media_entity), ('turn_off', TV_POWER)])
 
     async def test_new_activity_cancels_pending_shutdown(self):
         await self.load()
@@ -159,12 +161,12 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
             with self.subTest(tv=state):
                 self.set_sensors('on')
                 self.hass.states.async_set(TV, state)
-                self.hass.states.async_set(MEDIA, 'on')
+                self.hass.states.async_set(self.media_entity, 'on')
                 await self.settle(.02)
                 self.calls.clear()
                 self.set_sensors('off')
                 await self.settle()
-                self.assertEqual(self.calls, [('turn_off', MEDIA)])
+                self.assertEqual(self.calls, [('turn_off', self.media_entity)])
                 self.assertEqual(self.hass.states.get(TV_POWER).state, 'on')
 
     async def test_tv_off_after_timeout_triggers_tv_shutdown(self):
@@ -172,7 +174,7 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         await self.load()
         self.set_sensors('off')
         await self.settle()
-        self.assertEqual(self.calls, [('turn_off', MEDIA)])
+        self.assertEqual(self.calls, [('turn_off', self.media_entity)])
         self.hass.states.async_set(TV, 'off')
         await self.settle(.04)
         self.assertEqual(self.calls[-1], ('turn_off', TV_POWER))
@@ -180,32 +182,32 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
     async def test_manual_off_waits_for_new_activity(self):
         await self.load()
         self.hass.states.async_set(TV_POWER, 'off')
-        self.hass.states.async_set(MEDIA, 'off')
+        self.hass.states.async_set(self.media_entity, 'off')
         await self.settle()
         self.assertEqual(self.calls, [])
         self.hass.states.async_set(SENSORS[1], 'off')
         await self.settle(.02)
         self.hass.states.async_set(SENSORS[1], 'on')
         await self.settle(.04)
-        self.assertCountEqual(self.calls, [('turn_on', MEDIA), ('turn_on', TV_POWER)])
+        self.assertCountEqual(self.calls, [('turn_on', self.media_entity), ('turn_on', TV_POWER)])
 
     async def test_unavailable_outlet_recovery_restores_occupied_power(self):
         await self.load()
-        self.hass.states.async_set(MEDIA, 'unavailable')
+        self.hass.states.async_set(self.media_entity, 'unavailable')
         await self.settle(.02)
-        self.hass.states.async_set(MEDIA, 'off')
+        self.hass.states.async_set(self.media_entity, 'off')
         await self.settle(.04)
-        self.assertEqual(self.calls, [('turn_on', MEDIA)])
+        self.assertEqual(self.calls, [('turn_on', self.media_entity)])
 
     async def test_startup_and_reload_reconcile_existing_presence(self):
-        self.hass.states.async_set(MEDIA, 'off')
+        self.hass.states.async_set(self.media_entity, 'off')
         await self.load()
-        self.assertEqual(self.calls, [('turn_on', MEDIA)])
+        self.assertEqual(self.calls, [('turn_on', self.media_entity)])
         self.calls.clear()
-        self.hass.states.async_set(MEDIA, 'off')
+        self.hass.states.async_set(self.media_entity, 'off')
         self.hass.bus.async_fire('automation_reloaded')
         await self.settle(.04)
-        self.assertEqual(self.calls, [('turn_on', MEDIA)])
+        self.assertEqual(self.calls, [('turn_on', self.media_entity)])
 
     async def test_recheck_recovers_timer_lost_on_reload_without_early_off(self):
         # Sensors predate automation setup, so there is no off-transition timer.
@@ -220,10 +222,10 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.calls, [])
         await self.settle()
         await recheck()
-        self.assertCountEqual(self.calls, [('turn_off', MEDIA), ('turn_off', TV_POWER)])
+        self.assertCountEqual(self.calls, [('turn_off', self.media_entity), ('turn_off', TV_POWER)])
 
     async def test_outlet_failure_does_not_block_other_outlet(self):
-        self.fail_target = MEDIA
+        self.fail_target = self.media_entity
         await self.load()
         self.set_sensors('off')
         await self.settle()
@@ -232,19 +234,19 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
     async def test_activity_during_first_shutdown_protects_tv(self):
         await self.load()
         def occupancy_returns(service, target):
-            if service == 'turn_off' and target == MEDIA:
+            if service == 'turn_off' and target == self.media_entity:
                 self.hass.states.async_set(SENSORS[0], 'on')
         self.after_command = occupancy_returns
         self.set_sensors('off')
         await self.settle()
         self.assertNotIn(('turn_off', TV_POWER), self.calls)
-        self.assertEqual(self.hass.states.get(MEDIA).state, 'on')
+        self.assertEqual(self.hass.states.get(self.media_entity).state, 'on')
 
     async def test_room_overrides_fail_closed_for_each_restore_source(self):
         self.set_sensors('off')
         await self.load()
-        for sticky, blocked in ((LIVING_STICKY, {MEDIA, TV_POWER}),
-                                (DINING_STICKY, {MEDIA})):
+        for sticky, blocked in ((LIVING_STICKY, {self.media_entity, TV_POWER}),
+                                (DINING_STICKY, {self.media_entity})):
             for state in ('on', 'unknown', 'unavailable', None):
                 for sensor in SENSORS:
                     with self.subTest(sticky=sticky, state=state, sensor=sensor):
@@ -255,18 +257,18 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
                             self.hass.states.async_remove(sticky)
                         else:
                             self.hass.states.async_set(sticky, state)
-                        for outlet in (MEDIA, TV_POWER):
+                        for outlet in (self.media_entity, TV_POWER):
                             self.hass.states.async_set(outlet, 'off')
                         self.calls.clear()
                         self.hass.states.async_set(sensor, 'on')
                         await self.settle(.02)
                         self.assertCountEqual(self.calls, [
-                            ('turn_on', outlet) for outlet in {MEDIA, TV_POWER} - blocked])
+                            ('turn_on', outlet) for outlet in {self.media_entity, TV_POWER} - blocked])
 
     async def test_room_overrides_fail_closed_for_shutdown(self):
         await self.load()
-        for sticky, blocked in ((LIVING_STICKY, {MEDIA, TV_POWER}),
-                                (DINING_STICKY, {MEDIA})):
+        for sticky, blocked in ((LIVING_STICKY, {self.media_entity, TV_POWER}),
+                                (DINING_STICKY, {self.media_entity})):
             for state in ('on', 'unknown', 'unavailable', None):
                 with self.subTest(sticky=sticky, state=state):
                     self.set_sensors('on')
@@ -276,14 +278,14 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
                         self.hass.states.async_remove(sticky)
                     else:
                         self.hass.states.async_set(sticky, state)
-                    for outlet in (MEDIA, TV_POWER):
+                    for outlet in (self.media_entity, TV_POWER):
                         self.hass.states.async_set(outlet, 'on')
                     await self.settle(.02)
                     self.calls.clear()
                     self.set_sensors('off')
                     await self.settle()
                     self.assertCountEqual(self.calls, [
-                        ('turn_off', outlet) for outlet in {MEDIA, TV_POWER} - blocked])
+                        ('turn_off', outlet) for outlet in {self.media_entity, TV_POWER} - blocked])
 
     async def test_sticky_enabled_during_inactivity_wait_blocks_shutdown(self):
         await self.load()
@@ -295,7 +297,7 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_sticky_is_rechecked_between_restore_commands(self):
         self.set_sensors('off')
-        for outlet in (MEDIA, TV_POWER):
+        for outlet in (self.media_entity, TV_POWER):
             self.hass.states.async_set(outlet, 'off')
         await self.load()
         self.after_command = lambda *_: self.hass.states.async_set(LIVING_STICKY, 'on')
@@ -308,11 +310,11 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         self.after_command = lambda *_: self.hass.states.async_set(LIVING_STICKY, 'on')
         self.set_sensors('off')
         await self.settle()
-        self.assertEqual(self.calls, [('turn_off', MEDIA)])
+        self.assertEqual(self.calls, [('turn_off', self.media_entity)])
 
     async def test_occupancy_is_rechecked_between_restore_commands(self):
         self.set_sensors('off')
-        for outlet in (MEDIA, TV_POWER):
+        for outlet in (self.media_entity, TV_POWER):
             self.hass.states.async_set(outlet, 'off')
         await self.load()
         self.after_command = lambda *_: self.set_sensors('unknown')
@@ -322,12 +324,12 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_sticky_blocks_recovery_and_reconciliation(self):
         self.hass.states.async_set(LIVING_STICKY, 'on')
-        self.hass.states.async_set(MEDIA, 'off')
+        self.hass.states.async_set(self.media_entity, 'off')
         await self.load()
         self.hass.bus.async_fire('automation_reloaded')
-        self.hass.states.async_set(MEDIA, 'unavailable')
+        self.hass.states.async_set(self.media_entity, 'unavailable')
         await self.settle(.02)
-        self.hass.states.async_set(MEDIA, 'off')
+        self.hass.states.async_set(self.media_entity, 'off')
         await self.settle(.04)
         self.assertEqual(self.calls, [])
         self.hass.states.async_set(LIVING_STICKY, 'off')
@@ -337,17 +339,46 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         await self.settle(.02)
         self.hass.states.async_set(SENSORS[0], 'on')
         await self.settle(.04)
-        self.assertEqual(self.calls, [('turn_on', MEDIA)])
+        self.assertEqual(self.calls, [('turn_on', self.media_entity)])
 
     async def test_failed_restore_does_not_block_other_outlet(self):
         self.set_sensors('off')
-        for outlet in (MEDIA, TV_POWER):
+        for outlet in (self.media_entity, TV_POWER):
             self.hass.states.async_set(outlet, 'off')
         await self.load()
         self.fail_target = TV_POWER
         self.hass.states.async_set(SENSORS[0], 'on')
         await self.settle(.04)
-        self.assertEqual(self.calls, [('turn_on', MEDIA)])
+        self.assertEqual(self.calls, [('turn_on', self.media_entity)])
+
+    async def test_peer_media_failure_does_not_block_this_outlet(self):
+        peer = 'switch.living_bookshelf' if self.media_entity == MEDIA else MEDIA
+        self.fail_target = peer
+        self.set_sensors('off')
+        for outlet in (self.media_entity, peer):
+            self.hass.states.async_set(outlet, 'off')
+        await self.load()
+        self.hass.states.async_set(SENSORS[0], 'on')
+        await self.settle(.04)
+        self.assertIn(('turn_on', self.media_entity), self.calls)
+        self.hass.states.async_set(peer, 'on')
+        self.calls.clear()
+        self.set_sensors('off')
+        await self.settle()
+        self.assertIn(('turn_off', self.media_entity), self.calls)
+
+    async def test_activity_after_dining_shutdown_preserves_bookshelf(self):
+        for outlet in (MEDIA, 'switch.living_bookshelf'):
+            self.hass.states.async_set(outlet, 'on')
+        await self.load()
+        def became_unknown(service, target):
+            if service == 'turn_off' and target == MEDIA:
+                self.hass.states.async_set(SENSORS[0], 'unknown')
+        self.after_command = became_unknown
+        self.set_sensors('off')
+        await self.settle()
+        self.assertEqual(self.calls, [('turn_off', MEDIA)])
+        self.assertEqual(self.hass.states.get('switch.living_bookshelf').state, 'on')
 
 
     async def test_new_outlet_power_has_a_grace_even_when_rooms_are_already_quiet(self):
@@ -372,7 +403,7 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         for state in ('active', 'paused', 'unknown', 'unavailable', None):
             with self.subTest(state=state):
                 self.set_sensors('on')
-                for outlet in (MEDIA, TV_POWER):
+                for outlet in (self.media_entity, TV_POWER):
                     self.hass.states.async_set(outlet, 'on')
                 if state is None:
                     self.hass.states.async_remove(GRACE)
@@ -381,8 +412,13 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
                 self.calls.clear()
                 self.set_sensors('off')
                 await self.settle()
-                self.assertEqual(self.calls, [('turn_off', MEDIA)])
+                self.assertEqual(self.calls, [('turn_off', self.media_entity)])
                 self.assertEqual(self.hass.states.get(TV_POWER).state, 'on')
+
+
+class BookshelfOccupancyTest(MediaOccupancyTest):
+    """The bookshelf must satisfy the same behavioral contract as Dining Media."""
+    media_entity = 'switch.living_bookshelf'
 
 
 if __name__ == '__main__':

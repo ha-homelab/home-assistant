@@ -3,7 +3,7 @@
 automation:
 - id: ha_homelab_media_guards_restore_on_occupancy
   alias: 'Media guards: Restore power on occupancy'
-  description: Restore both media outlets when Living presence or Lobby/Dining
+  description: Restore media outlets and Living bookshelf when Living presence or Lobby/Dining
     motion is active, respecting the corresponding room Sticky overrides.
     Reconcile startup, automation reload and outlet recovery.
   triggers:
@@ -22,6 +22,7 @@ automation:
     entity_id:
     - switch.living_tv_guard
     - switch.dining_media_guard
+    - switch.living_bookshelf
     from:
     - unknown
     - unavailable
@@ -71,6 +72,28 @@ automation:
       target:
         entity_id: switch.dining_media_guard
       continue_on_error: true
+  - if:
+    - condition: state
+      entity_id:
+      - binary_sensor.living_room_presence
+      - binary_sensor.rf_lobby_motion
+      - binary_sensor.rf_dinner_motion
+      - binary_sensor.rf_dinner_two_motion
+      match: any
+      state: 'on'
+    - condition: state
+      entity_id:
+      - input_boolean.living_room_sticky
+      - input_boolean.dining_room_sticky
+      state: 'off'
+    - condition: state
+      entity_id: switch.living_bookshelf
+      state: 'off'
+    then:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.living_bookshelf
+      continue_on_error: true
   mode: restart
   trace:
     stored_traces: 5
@@ -78,7 +101,7 @@ automation:
 - id: ha_homelab_dining_media_guard_evening_power_off
   alias: 'Media guards: Turn off after shared inactivity'
   description: After all four Living/Lobby/Dining sensors are off for ten minutes,
-    turn off Dining Media guard and, only when the native LG TV is off, Living TV
+    turn off Dining Media guard and Living bookshelf and, only when the native LG TV is off, Living TV
     Guard. Room Sticky overrides preserve manual outlet states. Unknown or
     unavailable sensor states never count as inactivity.
   triggers:
@@ -120,6 +143,29 @@ automation:
     - action: switch.turn_off
       target:
         entity_id: switch.dining_media_guard
+      continue_on_error: true
+  # Activity and overrides may change while the first outlet command runs.
+  - if:
+    - condition: state
+      entity_id:
+      - binary_sensor.living_room_presence
+      - binary_sensor.rf_lobby_motion
+      - binary_sensor.rf_dinner_motion
+      - binary_sensor.rf_dinner_two_motion
+      state: 'off'
+      for: '00:10:00'
+    - condition: state
+      entity_id:
+      - input_boolean.living_room_sticky
+      - input_boolean.dining_room_sticky
+      state: 'off'
+    - condition: state
+      entity_id: switch.living_bookshelf
+      state: 'on'
+    then:
+    - action: switch.turn_off
+      target:
+        entity_id: switch.living_bookshelf
       continue_on_error: true
   # Recheck occupancy after the first service call before cutting TV power.
   - condition: state
