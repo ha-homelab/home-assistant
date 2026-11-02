@@ -13,6 +13,18 @@ input_select:
     - 'Deti FM: Toddlers · 708'
     - 'Deti FM: Lullabies · 709'
     - 'Deti FM: Kids songs · 710'
+    - Mega Dance Radio · 711
+    - Kavkaz Hit · 712
+    - Europa Plus · 713
+    - 1.FM Baroque Music · 714
+    - Radio Swiss Classic · 715
+    - Radio Swiss Jazz · 716
+    - Sanctuary Dark Electro · 717
+    - Chante France · 718
+    - Mix 104.9 Darwin · 719
+    - RT1 Black Beats · 720
+    - Radio Krasnodar 107 · 721
+    - White noise · 722
   lifesize_222_destination:
     name: LifeSize 222 destination
     options:
@@ -63,6 +75,18 @@ input_select:
     - '225'
     - '226'
     - '222'
+    - '711'
+    - '712'
+    - '713'
+    - '714'
+    - '715'
+    - '716'
+    - '717'
+    - '718'
+    - '719'
+    - '720'
+    - '721'
+    - '722'
   living_dot_alarm_repeat:
     name: Living Echo Dot alarm repeat
     options:
@@ -129,6 +153,7 @@ script:
             - call
             - hangup
             - radio_stop
+            - radio_play
             - answer
             - reject
             - ringer
@@ -210,6 +235,18 @@ script:
             - 'Deti FM: Toddlers · 708'
             - 'Deti FM: Lullabies · 709'
             - 'Deti FM: Kids songs · 710'
+            - Mega Dance Radio · 711
+            - Kavkaz Hit · 712
+            - Europa Plus · 713
+            - 1.FM Baroque Music · 714
+            - Radio Swiss Classic · 715
+            - Radio Swiss Jazz · 716
+            - Sanctuary Dark Electro · 717
+            - Chante France · 718
+            - Mix 104.9 Darwin · 719
+            - RT1 Black Beats · 720
+            - Radio Krasnodar 107 · 721
+            - White noise · 722
     sequence:
     - variables:
         stations:
@@ -223,11 +260,23 @@ script:
           'Deti FM: Toddlers · 708': '708'
           'Deti FM: Lullabies · 709': '709'
           'Deti FM: Kids songs · 710': '710'
+          Mega Dance Radio · 711: '711'
+          Kavkaz Hit · 712: '712'
+          Europa Plus · 713: '713'
+          1.FM Baroque Music · 714: '714'
+          Radio Swiss Classic · 715: '715'
+          Radio Swiss Jazz · 716: '716'
+          Sanctuary Dark Electro · 717: '717'
+          Chante France · 718: '718'
+          Mix 104.9 Darwin · 719: '719'
+          RT1 Black Beats · 720: '720'
+          Radio Krasnodar 107 · 721: '721'
+          White noise · 722: '722'
     - condition: template
       value_template: '{{ source in stations }}'
     - action: script.lifesize_222_action
       data:
-        mode: call
+        mode: radio_play
         value: '{{ stations[source] | int }}'
     - action: input_select.select_option
       target:
@@ -529,7 +578,7 @@ script:
       a reminder with the original words. Never cancels other alarms or reminders.
 shell_command:
   lifesize_222_native: python3 /config/.private/lifesize/lifesize_ha_bridge.py /config/.private/lifesize/config.json
-    {{ mode if mode in ['status', 'call', 'hangup', 'radio_stop', 'answer', 'reject', 'ringer', 'volume',
+    {{ mode if mode in ['status', 'call', 'hangup', 'radio_play', 'radio_stop', 'answer', 'reject', 'ringer', 'volume',
     'autoanswer', 'automute', 'dnd', 'mic'] else 'invalid' }} {{ value | int(0) }}
 command_line:
 - sensor:

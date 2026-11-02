@@ -66,13 +66,17 @@ Energy controls use their own grouping rules instead of phone keywords; for
 example, `dynamic_ess` must not match a microphone group and `available_version`
 must not match a Bluetooth group.
 
-On Media, each phone and Echo occupies a normal-width masonry card. Do not put
+On Media, each phone and Echo occupies a normal-width section below all existing
+players. Sparse section placement and a full-width separator keep the phones
+below the tallest legacy row. Do not put
 the whole endpoint inventory inside another three-column Grid card: that divides
 one dashboard column into tiny players. Each endpoint uses
 [`custom:mini-media-player`](https://github.com/kalkih/mini-media-player#shortcuts-object)
 with a persistent heading, volume controls and two columns of preset buttons.
 The heading identifies an endpoint even when it is offline. Unrelated existing
-players and remote controls retain their configuration.
+players and remote controls retain their configuration. The
+[radio and speaker console](radio-console.md) appears above the phone section,
+below the existing players, for selecting a station and one or more outputs.
 
 Presets are device-specific. Cisco and LifeSize buttons use `type: source` with
 the exact strings advertised in each player's `source_list`. Their PBX radio
@@ -148,6 +152,42 @@ The native phone constrains which settings can change while idle or in a call.
 Speaker volume, microphone mute and call DND require a connected call; ringer,
 auto-answer and auto-mute changes require an idle phone. Auto-answer is a
 persistent phone preference, not an instruction to answer only the next call.
+
+LifeSize radio playback supports **Play/Stop**, not Pause. Its mini-media-player
+uses `hide.play_pause: true` and `hide.play_stop: false`; the default toggle calls
+`media_player.media_play_pause`, which this player does not implement. Do not add
+a fictitious Pause capability just to satisfy a frontend button.
+
+Changing a LifeSize station uses the adapter's `radio_play` action. It can end
+only one observed outgoing, allowlisted radio call, waits for that call to end,
+and then dials the new radio extension. Ordinary calls, incoming calls and a new
+call appearing during that wait are protected. Selecting the currently connected
+station is a no-op. Native call-state guards run again immediately before a
+hangup or dial; uncertain actions are not retried.
+
+The phone reports local destinations as either `701` or `sip:701`. The adapter
+recognizes both for radio ownership and playback state, while preserving the
+original call record for the native safety check. Remote SIP addresses such as
+`sip:701@example.org` do not count as local radio calls.
+
+A background status poll and a button press share the same per-device lock.
+Mutations wait up to 25 seconds to acquire it before opening the SSH connection;
+status polls remain nonblocking. This wait never retries a command or a failed
+readback. If the lock remains busy, the request fails without sending anything.
+
+After reviewing and deploying an updated PBX radio catalog, synchronize the HA
+station selector, script field and guarded source mapping from that same catalog:
+
+```sh
+python3 scripts/sync_lifesize_radio_catalog.py \
+  config/packages/phones_controls.yaml /private/path/radio-catalog.json \
+  /private/path/updated-phones-controls.yaml
+```
+
+Preserve any private runtime changes when applying the generated package. Update
+the private adapter's `allowed_destinations` and `radio_destinations` consistently
+with the deployed radio extensions. Reload the affected helpers, scripts and
+shell commands; a new integration or HA restart is not needed for this change.
 
 The command-line sensor refreshes native state periodically and after a
 successful action. Offline SSH state makes the player unavailable instead of

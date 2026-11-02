@@ -65,6 +65,10 @@ base palette, the white-on-white form regression, and browser verification.
 controls from playback, keeps offline phones visible, and exposes the complete
 Victron device inventory without duplicating old sidebar panels.
 
+[Radio and speaker console](docs/radio-console.md) selects a station or audio URL
+and one or more outputs, with native phone routing, capacity checks and visible
+per-speaker results.
+
 [Vacuum maps](docs/vacuum-maps.md) adds a private, interactive Roborock view with
 room and zone selection, navigation, cleaning settings, and maintenance status.
 The reusable generator keeps house maps out of source control and documents

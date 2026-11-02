@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Expand a nested endpoint grid into readable, individual media cards.
+"""Place readable endpoint media cards after the existing Media controls.
 
 Read the live dashboard and a private ``devices`` manifest. Each device supplies
 an entity, display name, icon, explicit shortcuts, and (for source shortcuts) the
@@ -43,6 +43,9 @@ def _card(device):
                 raise ValueError("Do not put credentials in media shortcut URLs")
         else:
             raise ValueError("Only supported source or music shortcuts are accepted")
+    transport = device.get("transport", "play_pause")
+    if transport not in ("play_pause", "play_stop"):
+        raise ValueError("Transport must be play_pause or play_stop")
     icon = device.get("icon", "mdi:speaker")
     player = {
         "type": "custom:mini-media-player", "entity": entity,
@@ -52,6 +55,10 @@ def _card(device):
         "shortcuts": {"columns": 2, "column_height": 48,
                       "align_text": "left", "buttons": shortcuts},
     }
+    if transport == "play_stop":
+        # Radio-call endpoints cannot pause. mini-media-player's default button
+        # always calls media_play_pause, even when only PLAY is advertised.
+        player["hide"].update(play_pause=True, play_stop=False)
     # Some card versions replace their own header with "Unavailable". Keep an
     # independent heading so an offline device is still identifiable.
     return {"type": "vertical-stack", "cards": [
@@ -60,7 +67,7 @@ def _card(device):
 
 
 def migrate_media_view(main_config, players_manifest):
-    """Return a copy with just the explicit endpoint block replaced.
+    """Return a sections view with endpoints strictly below the legacy cards.
 
     Fail closed on missing/ambiguous blocks instead of overwriting an unrelated
     edit. Re-running against this renderer's unchanged output is a no-op.
@@ -68,6 +75,10 @@ def migrate_media_view(main_config, players_manifest):
     """
     devices = players_manifest["devices"]
     replacements = [_card(device) for device in devices]
+    # Accept the exact prior renderer output during the one-time transport
+    # migration, without accepting arbitrary edits to generated cards.
+    previous = [_card({k: v for k, v in device.items() if k != "transport"})
+                for device in devices]
     ids = [device["entity"] for device in devices]
     if not ids or len(set(ids)) != len(ids):
         raise ValueError("Player inventory must be nonempty and unique")
@@ -76,7 +87,25 @@ def migrate_media_view(main_config, players_manifest):
     if len(views) != 1:
         raise ValueError("Expected exactly one Media view")
     view = views[0]
-    if view.get("type") == "sections" or view.get("panel"):
+    separator = {"type": "grid", "column_span": 3, "cards": [
+        {"type": "heading", "heading": "Phones and Echo", "heading_style": "title",
+         "icon": "mdi:speaker-multiple", "grid_options": {"columns": 12}},
+    ]}
+    endpoint_sections = [separator]
+    for wrapper in replacements:
+        cards = copy.deepcopy(wrapper["cards"])
+        for card in cards:
+            card["grid_options"] = {"columns": 12}
+        endpoint_sections.append({"type": "grid", "column_span": 1, "cards": cards})
+    if view.get("type") == "sections":
+        sections = view.get("sections", [])
+        if (view.get("max_columns") == 3
+                and view.get("dense_section_placement") is False
+                and sections[-len(endpoint_sections):] == endpoint_sections
+                and sum(section == separator for section in sections) == 1):
+            return result
+        raise ValueError("Media sections differ from the generated layout; re-read before editing")
+    if view.get("panel"):
         raise ValueError("This migration expects an ordinary masonry view")
     cards = view["cards"]
     matches = []
@@ -84,10 +113,17 @@ def migrate_media_view(main_config, players_manifest):
         if card.get("type") == "grid" and _players(card) == ids:
             matches.append((index, 1))
         sequence = cards[index:index + len(ids)]
-        if sequence == replacements:
+        if sequence == replacements or sequence == previous:
             matches.append((index, len(ids)))
     if len(matches) != 1:
         raise ValueError("Expected one unambiguous endpoint block; re-read the live dashboard")
     index, count = matches[0]
-    cards[index:index + count] = replacements
+    del cards[index:index + count]
+    # A full-span separator starts a new row after every existing section. With
+    # sparse placement, later endpoints cannot fill gaps beside legacy cards.
+    view["sections"] = [{"type": "grid", "column_span": 1, "cards": [card]}
+                        for card in cards] + endpoint_sections
+    del view["cards"]
+    view.pop("panel", None)
+    view.update(type="sections", max_columns=3, dense_section_placement=False)
     return result

@@ -33,13 +33,23 @@ class MediaLayoutTests(unittest.TestCase):
         self.assertEqual(result["views"][0], original["views"][0])
         media = result["views"][1]
         self.assertEqual(media["badges"], original["views"][1]["badges"])
-        self.assertEqual(media["cards"][-1], original["views"][1]["cards"][-1])
-        self.assertEqual(len(media["cards"]), 3)
-        for wrapper, device in zip(media["cards"], manifest["devices"]):
+        self.assertNotIn("cards", media)
+        self.assertEqual(media["type"], "sections")
+        self.assertEqual(media["max_columns"], 3)
+        self.assertFalse(media["dense_section_placement"])
+        sections = media["sections"]
+        self.assertEqual(sections[0]["cards"], [original["views"][1]["cards"][-1]])
+        self.assertEqual(sections[1]["column_span"], 3)
+        self.assertEqual(sections[1]["cards"][0]["heading"], "Phones and Echo")
+        self.assertEqual(len(sections), 4)
+        for wrapper, device in zip(sections[2:], manifest["devices"]):
+            self.assertEqual(wrapper["column_span"], 1)
             self.assertEqual(wrapper["cards"][0]["heading"], device["name"])
+            self.assertEqual(wrapper["cards"][0]["grid_options"], {"columns": 12})
             player = wrapper["cards"][1]
             self.assertEqual(player["entity"], device["entity"])
             self.assertEqual(player["type"], "custom:mini-media-player")
+            self.assertEqual(player["grid_options"], {"columns": 12})
             self.assertEqual(player["shortcuts"]["columns"], 2)
             self.assertNotIn("conditions", wrapper)
 
@@ -51,9 +61,47 @@ class MediaLayoutTests(unittest.TestCase):
     def test_manual_edit_to_generated_cards_is_not_overwritten(self):
         config, manifest = self.fixture()
         first = module.migrate_media_view(config, manifest)
-        first["views"][1]["cards"][0]["cards"][1]["artwork"] = "none"
+        first["views"][1]["sections"][2]["cards"][1]["artwork"] = "none"
         with self.assertRaises(ValueError):
             module.migrate_media_view(first, manifest)
+
+    def test_prior_generated_cards_move_after_legacy_and_use_play_stop(self):
+        config, manifest = self.fixture()
+        previous = [module._card(device) for device in manifest["devices"]]
+        legacy = config["views"][1]["cards"][-1]
+        manifest["devices"][0]["transport"] = "play_stop"
+        for order in (previous + [legacy], [legacy] + previous):
+            with self.subTest(order=order):
+                config["views"][1]["cards"] = order
+                result = module.migrate_media_view(config, manifest)
+                sections = result["views"][1]["sections"]
+                self.assertEqual(sections[0]["cards"], [legacy])
+                hide = sections[2]["cards"][1]["hide"]
+                self.assertTrue(hide["play_pause"])
+                self.assertFalse(hide["play_stop"])
+                self.assertNotIn("play_pause", sections[3]["cards"][1]["hide"])
+                self.assertEqual(module.migrate_media_view(result, manifest), result)
+
+    def test_legacy_order_preserved_and_later_console_survives_rerun(self):
+        config, manifest = self.fixture()
+        before = {"type": "markdown", "content": "Before"}
+        after = {"type": "markdown", "content": "After"}
+        config["views"][1]["cards"].insert(0, before)
+        config["views"][1]["cards"].append(after)
+        result = module.migrate_media_view(config, manifest)
+        sections = result["views"][1]["sections"]
+        self.assertEqual([s["cards"][0] for s in sections[:3]],
+                         [before, config["views"][1]["cards"][2], after])
+        console = {"type": "grid", "column_span": 3,
+                   "cards": [{"type": "markdown", "content": "Radio console"}]}
+        sections.insert(3, console)
+        self.assertEqual(module.migrate_media_view(result, manifest), result)
+
+    def test_unknown_transport_is_rejected(self):
+        config, manifest = self.fixture()
+        manifest["devices"][0]["transport"] = "toggle"
+        with self.assertRaises(ValueError):
+            module.migrate_media_view(config, manifest)
 
     def test_unrelated_or_ambiguous_block_is_rejected(self):
         config, manifest = self.fixture()
