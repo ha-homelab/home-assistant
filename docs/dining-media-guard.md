@@ -137,12 +137,13 @@ required. Install the LG wake package's timer and helper, reload timer and scrip
 configuration, then reload both packages' automations together. Preserve the independent `switch.dining_guard` curtain controller and
 all lighting Sticky definitions.
 
-For an existing installation with deliberately different media-power overrides,
-extend its installed Dining Media guard rule to the bookshelf without replacing
-that policy with repository defaults. Add the bookshelf to recovery triggers,
-activity restoration and inactivity shutdown together. Inspect the deployed
-configuration before applying; a source test pass alone cannot establish which
-override policy is currently running.
+The deployed rules must enforce the same Sticky policy for Dining Media guard
+and Living bookshelf: both Living and Dining Sticky must explicitly be `off`
+before either outlet changes automatically. A runtime configuration that ignores
+Sticky is stale and must be corrected in both restore and shutdown actions,
+including startup, reload and recovery paths. Preserve unrelated timers and TV
+power checks when reconciling this drift. Inspect the deployed configuration;
+a source test pass alone cannot establish which policy is currently running.
 
 The source reconciliation for this package is tested offline. Merging it does
 not prove a live deployment or physical outlet response; those are separate
