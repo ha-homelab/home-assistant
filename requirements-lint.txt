@@ -1,2 +1,2 @@
 # Common-error checks for all maintained Python source.
-ruff==0.14.0
+ruff==0.17.3
