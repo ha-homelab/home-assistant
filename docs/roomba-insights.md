@@ -34,6 +34,23 @@ alone does not deploy them or create the integration entry. Removing Roomba
 Insights detaches only its own observers and leaves the native connection
 running.
 
+### Native client compatibility
+
+Version 0.1.1 supports both the threaded roombapy 1.x client and the async
+`RoombaClient` in roombapy 2.x, used by Home Assistant 2026.11. It reads the
+native client's connection state and detaches its own subscriptions with the
+returned unsubscribe handles when available. The legacy callback-list fallback
+removes only this integration's listeners. A failed partial subscription is
+also cleaned up; neither path opens or closes the robot's MQTT connection.
+
+An `AttributeError` mentioning `roomba_connected` or `on_message_callbacks`
+after a Core upgrade indicates an older copy of this component. Deploy the
+complete updated `roomba_insights` directory, including `compat.py`, and load it
+at a coordinated maintenance point. Reloading the config entry alone does not
+guarantee that Python imports the updated module. Verify that connected native
+robots report connected telemetry, then check that unloading Roomba Insights
+leaves the native vacuum entities working.
+
 ### Pairing a waiting image safely
 
 HA suppresses an image entity's `extra_state_attributes` while it is

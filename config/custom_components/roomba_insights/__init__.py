@@ -11,6 +11,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.util import dt as dt_util
 
+from .compat import is_connected, subscribe_callback
 from .const import NATIVE_DOMAIN, SCAN_SECONDS
 from .telemetry import Telemetry
 from .trail import CleaningTrail
@@ -41,11 +42,16 @@ class NativeBinding:
         self.entry_id = entry.entry_id
         self.robot = robot
         self.active = True
+        self._unsubscribers = []
         self.telemetry = Telemetry()
         self.trail = CleaningTrail()
         self.telemetry.update(self.reported(), received_at=dt_util.utcnow().isoformat(), initial=True)
-        robot.register_on_message_callback(self.on_message)
-        robot.register_on_disconnect_callback(self.on_disconnect)
+        try:
+            for kind, callback in (("message", self.on_message), ("disconnect", self.on_disconnect)):
+                self._unsubscribers.append(subscribe_callback(robot, kind, callback))
+        except Exception:
+            self.close()
+            raise
 
     def reported(self):
         state = self.robot.master_state.get("state", {})
@@ -73,12 +79,9 @@ class NativeBinding:
     def close(self):
         self.active = False
         self.trail.break_path(reason="disconnected")
-        for callbacks, ours in (
-            (self.robot.on_message_callbacks, self.on_message),
-            (self.robot.on_disconnect_callbacks, self.on_disconnect),
-        ):
-            if ours in callbacks:
-                callbacks.remove(ours)
+        unsubscribers, self._unsubscribers = self._unsubscribers, []
+        for unsubscribe in unsubscribers:
+            unsubscribe()
 
 
 class InsightsManager:
@@ -128,7 +131,7 @@ class InsightsManager:
                     self.last_trails.pop(entry_id, None)
             binding = self.bindings.get(entry_id)
             if binding is not None:
-                if not binding.robot.roomba_connected:
+                if not is_connected(binding.robot):
                     binding.trail.break_path(reason="disconnected")
                 supports_pose = binding.telemetry.data.get("pose_supported") or binding.telemetry.data.get("position") is not None
                 if supports_pose and entry_id not in self.images and self.add_images is not None:
@@ -172,7 +175,7 @@ class InsightsManager:
         telemetry = binding.telemetry if binding else self.last_known.get(entry_id, Telemetry())
         connected = bool(binding and entry is not None and entry.state == ConfigEntryState.LOADED
                          and getattr(getattr(entry, "runtime_data", None), "roomba", None) is binding.robot
-                         and binding.robot.roomba_connected)
+                         and is_connected(binding.robot))
         return telemetry.snapshot(connected=connected, entry_state=state,
                                   source_entity_id=source_entity_id)
 
