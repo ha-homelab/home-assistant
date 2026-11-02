@@ -1,17 +1,39 @@
-# Automatic HACS maintenance
+# Automatic HACS and Marketplace maintenance
 
 [Deployment evidence](releases/2026-09-15-hacs-maintenance.md) records the enabled
 installation, source revision, validation and the remaining live execution boundary.
 
-The `hacs_maintenance` package updates installed HACS repositories daily at
+The `hacs_maintenance` package updates installed HACS or Marketplace repositories daily at
 **06:00 America/Los_Angeles**, using Home Assistant's configured timezone. Disable
 the automation named **HACS maintenance: update repositories and restart once** to
 pause future runs. The package does not update Home Assistant Core, container
 images, Supervisor, or device firmware.
 
+## Home Assistant 2026.11 migration
+
+Home Assistant 2026.11 migrates HACS to its built-in Marketplace integration.
+The migration adopts repository entities and devices, then removes the legacy
+HACS component and stores. An absent `custom_components/hacs` directory alone
+does not indicate data loss: first check that the existing config entry and
+repository entities now belong to `marketplace`. Do not restore HACS over a
+completed Marketplace migration.
+
+The coordinator and direct installer accept the union of `hacs` and
+`marketplace` update entities, deduplicated by entity ID. Their existing
+automation, script and helper IDs remain unchanged because the Core updater
+uses them as mutual-exclusion guards. Both platforms use the same backup,
+version, timeout and restart checks. Marketplace retains the device category
+`integration`, which requests a restart after a successful installation;
+plugin and theme updates do not. The legacy HACS restart-summary check remains
+available, but Marketplace does not expose that summary: the persistent latch
+records restarts required by installations performed by this package. Follow
+Marketplace's own notices for installations performed outside this package.
+If Marketplace requires acceptance of its warning, accept it through its UI;
+the maintenance job stops on that error and never grants acceptance itself.
+
 ## Operation
 
-1. Snapshot available (`on`) HACS update entities. Install ordinary repositories
+1. Snapshot available (`on`) HACS and Marketplace update entities. Install ordinary repositories
    sequentially and `update.hacs_update` last. When there are no updates and no
    pending restart, do nothing, including no backup.
 2. Reject a busy/unavailable backup manager, a running installer, or unavailable
@@ -115,7 +137,12 @@ the maintenance policy.
 - [HACS restart requirements](https://www.hacs.xyz/docs/use/update/)
 - [HA backup service implementation](https://github.com/home-assistant/core/blob/2026.9.1/homeassistant/components/backup/services.py)
 - [HA backup completion and upload errors](https://github.com/home-assistant/core/blob/2026.9.1/homeassistant/components/backup/manager.py)
+- [Marketplace migration](https://github.com/home-assistant/core/blob/2026.11.0b2/homeassistant/components/marketplace/migration.py)
+- [Marketplace update entities](https://github.com/home-assistant/core/blob/2026.11.0b2/homeassistant/components/marketplace/update.py)
+- [Marketplace device categories](https://github.com/home-assistant/core/blob/2026.11.0b2/homeassistant/components/marketplace/entity.py)
 
 The restart-summary contract and backup success fence were checked against the
 installed HACS and Home Assistant 2026.9.1 source. Revalidate these contracts when
-upgrading the HA image or changing backup destinations.
+upgrading the HA image or changing backup destinations. Marketplace compatibility
+is checked against the 2026.11.0b2 source and the same isolated runtime scenarios
+for both entity platforms, including mixed inventories and failure guards.
