@@ -13,10 +13,86 @@ COMPONENT = ROOT / "config/custom_components/roomba_insights"
 spec = importlib.util.spec_from_file_location("roomba_insights_telemetry", COMPONENT / "telemetry.py")
 model = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(model)
+compat_spec = importlib.util.spec_from_file_location("roomba_insights_compat", COMPONENT / "compat.py")
+compat = importlib.util.module_from_spec(compat_spec)
+compat_spec.loader.exec_module(compat)
 
 P = {"point": {"x": 0, "y": -42}, "theta": 180}
 COMMAND = {"command": "start", "pmap_id": "synthetic-map", "user_pmapv_id": "test-v1",
            "regions": [{"region_id": "1", "type": "rid", "region_name": "Test room"}]}
+
+
+class AsyncRobot:
+    """roombapy 2.x public contract; no legacy attributes or network access."""
+
+    def __init__(self):
+        self.connected = True
+        self.master_state = {"state": {"reported": {"pose": deepcopy(P), "cap": {"pose": 1}}}}
+        self._message_callbacks = [object()]
+        self._disconnect_callbacks = [object()]
+
+    @staticmethod
+    def _register(callbacks, callback):
+        callbacks.append(callback)
+
+        def detach():
+            if callback in callbacks:
+                callbacks.remove(callback)
+
+        return detach
+
+    def register_on_message_callback(self, callback):
+        return self._register(self._message_callbacks, callback)
+
+    def register_on_disconnect_callback(self, callback):
+        return self._register(self._disconnect_callbacks, callback)
+
+    def connect(self):
+        raise AssertionError("Insights must not open a native connection")
+
+    def disconnect(self):
+        raise AssertionError("Insights must not close a native connection")
+
+
+class ClientCompatibilityTest(unittest.TestCase):
+    def test_connection_state_supports_both_apis_and_fails_closed(self):
+        for robot, expected in [
+            (SimpleNamespace(roomba_connected=True), True),
+            (SimpleNamespace(roomba_connected=False), False),
+            (SimpleNamespace(connected=True), True),
+            (SimpleNamespace(connected=False, roomba_connected=True), False),
+            (SimpleNamespace(connected=None, roomba_connected=True), False),
+            (SimpleNamespace(connected="false"), False),
+            (object(), False),
+        ]:
+            with self.subTest(robot=robot):
+                self.assertIs(compat.is_connected(robot), expected)
+
+    def test_async_handles_preserve_other_listeners_and_detach_idempotently(self):
+        robot = AsyncRobot()
+        for kind, callbacks in [("message", robot._message_callbacks), ("disconnect", robot._disconnect_callbacks)]:
+            with self.subTest(kind=kind):
+                owner = callbacks[0]
+                callback = lambda *_: None
+                detach = compat.subscribe_callback(robot, kind, callback)
+                self.assertEqual(callbacks, [owner, callback])
+                detach()
+                detach()
+                self.assertEqual(callbacks, [owner])
+
+    def test_legacy_handles_preserve_other_listeners_and_detach_idempotently(self):
+        for kind in ("message", "disconnect"):
+            with self.subTest(kind=kind):
+                owner = object()
+                callbacks = [owner]
+                robot = SimpleNamespace(**{f"on_{kind}_callbacks": callbacks,
+                    f"register_on_{kind}_callback": callbacks.append})
+                callback = lambda *_: None
+                detach = compat.subscribe_callback(robot, kind, callback)
+                self.assertEqual(callbacks, [owner, callback])
+                detach()
+                detach()
+                self.assertEqual(callbacks, [owner])
 
 
 class TelemetryTest(unittest.TestCase):
@@ -242,6 +318,41 @@ class LifecycleTest(unittest.TestCase):
             self.binding.on_message(payload)
         self.assertEqual(len(self.jobs), 4)
 
+    def test_async_client_disconnect_reconnect_and_cleanup(self):
+        self.binding.close()
+        robot = AsyncRobot()
+        owner_message, owner_disconnect = robot._message_callbacks[0], robot._disconnect_callbacks[0]
+        self.entry.runtime_data.roomba = robot
+        binding = integration.NativeBinding(self.manager, self.entry, robot)
+        self.manager.bindings["test"] = binding
+        self.assertTrue(self.manager.snapshot("test", None)["connected"])
+        robot.connected = False
+        binding.on_disconnect("offline")
+        self.assertFalse(self.manager.snapshot("test", None)["connected"])
+        robot.connected = True
+        binding.on_message({"state": {"reported": {"pose": deepcopy(P)}}})
+        self.assertTrue(self.manager.snapshot("test", None)["connected"])
+        binding.close()
+        binding.close()
+        self.assertEqual(robot._message_callbacks, [owner_message])
+        self.assertEqual(robot._disconnect_callbacks, [owner_disconnect])
+        queued = list(self.jobs)
+        binding.on_message({"state": {"reported": {"pose": deepcopy(P)}}})
+        binding.on_disconnect("late")
+        self.assertEqual(self.jobs, queued)
+
+    def test_partial_subscription_failure_detaches_first_listener(self):
+        robot = AsyncRobot()
+        original = list(robot._message_callbacks)
+
+        def fail(_callback):
+            raise RuntimeError("subscription failed")
+
+        robot.register_on_disconnect_callback = fail
+        with self.assertRaisesRegex(RuntimeError, "subscription failed"):
+            integration.NativeBinding(self.manager, self.entry, robot)
+        self.assertEqual(robot._message_callbacks, original)
+
 @unittest.skipUnless(HA_AVAILABLE, "Requires Home Assistant runtime for setup tests")
 class SetupTest(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
@@ -331,6 +442,25 @@ class SetupTest(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(AbortFlow) as caught:
             await flow.async_step_user({})
         self.assertEqual(caught.exception.reason, "already_configured")
+
+    async def test_async_client_platform_setup_reconcile_and_unload(self):
+        robot = AsyncRobot()
+        owners = (list(robot._message_callbacks), list(robot._disconnect_callbacks))
+        self.natives[0].runtime_data.roomba = robot
+        self.assertTrue(await integration.async_setup_entry(self.hass, self.companion))
+        await self.hass.async_block_till_done()
+        manager = self.companion.runtime_data
+        manager.async_reconcile()
+        self.assertTrue(manager.snapshot(self.natives[0].entry_id, None)["connected"])
+        self.assertEqual(len(manager.bindings), 1)
+        self.assertEqual(len(manager.images), 1)
+        self.assertEqual(len(robot._message_callbacks), len(owners[0]) + 1)
+        robot.connected = False
+        manager.async_reconcile()
+        self.assertFalse(manager.snapshot(self.natives[0].entry_id, None)["connected"])
+        self.assertTrue(await integration.async_unload_entry(self.hass, self.companion))
+        self.assertEqual(robot._message_callbacks, owners[0])
+        self.assertEqual(robot._disconnect_callbacks, owners[1])
 
 
 if __name__ == "__main__":
