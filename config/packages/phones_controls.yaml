@@ -1,0 +1,647 @@
+# Device controls; private SSH configuration is installed separately.
+input_select:
+  lifesize_222_station:
+    name: LifeSize 222 station
+    options:
+    - Matryoshka Radio London · 701
+    - Echo online · 702
+    - RADIO BOB! Live · 703
+    - RADIO BOB! Metal · 704
+    - RADIO BOB! Gothic · 705
+    - SomaFM PopTron · 706
+    - Radyo Viva · 707
+    - 'Deti FM: Toddlers · 708'
+    - 'Deti FM: Lullabies · 709'
+    - 'Deti FM: Kids songs · 710'
+  lifesize_222_destination:
+    name: LifeSize 222 destination
+    options:
+    - '201'
+    - '202'
+    - '203'
+    - '204'
+    - '205'
+    - '206'
+    - '207'
+    - '208'
+    - '600'
+    - '601'
+    - '620'
+    - '630'
+    - '640'
+    - '701'
+    - '702'
+    - '703'
+    - '704'
+    - '705'
+    - '706'
+    - '707'
+    - '802'
+    - '209'
+    - '708'
+    - '709'
+    - '710'
+    - '210'
+    - '211'
+    - '212'
+    - '213'
+    - '214'
+    - '215'
+    - '216'
+    - '217'
+    - '218'
+    - '219'
+    - '220'
+    - '221'
+    - '621'
+    - '641'
+    - '803'
+    - '555'
+    - '777'
+    - '223'
+    - '224'
+    - '225'
+    - '226'
+    - '222'
+  living_dot_alarm_repeat:
+    name: Living Echo Dot alarm repeat
+    options:
+    - once
+    - daily
+    - weekdays
+    - weekends
+  living_dot_alarm_mode:
+    name: Living Echo Dot alarm mode
+    options:
+    - Sound and ring
+    - Light only
+    - Spoken reminder
+input_number:
+  lifesize_222_ringer:
+    name: LifeSize 222 desired ringer volume
+    min: 0
+    max: 10
+    step: 1
+    mode: slider
+  living_dot_timer_minutes:
+    name: Living Echo Dot timer minutes
+    min: 1
+    max: 180
+    step: 1
+    unit_of_measurement: min
+    mode: box
+input_text:
+  living_dot_timer_label:
+    name: Living Echo Dot timer label
+    max: 40
+  living_dot_alarm_label:
+    name: Living Echo Dot alarm label or reminder text
+    max: 40
+  living_dot_timer_id:
+    name: Living Echo Dot panel timer ID
+    max: 80
+  living_dot_alarm_id:
+    name: Living Echo Dot panel alarm ID
+    max: 80
+  living_dot_reminder_id:
+    name: Living Echo Dot panel reminder ID
+    max: 80
+  living_dot_reminder_owned_label:
+    name: Living Echo Dot saved reminder text
+    max: 40
+input_datetime:
+  living_dot_alarm_time:
+    name: Living Echo Dot alarm time
+    has_date: false
+    has_time: true
+script:
+  lifesize_222_action:
+    alias: LifeSize 222 native action
+    mode: queued
+    max: 3
+    fields:
+      mode:
+        required: true
+        selector:
+          select:
+            options:
+            - status
+            - call
+            - hangup
+            - radio_stop
+            - answer
+            - reject
+            - ringer
+            - volume
+            - autoanswer
+            - automute
+            - dnd
+            - mic
+      value:
+        default: 0
+        selector:
+          number:
+            min: 0
+            max: 99999999
+            mode: box
+    sequence:
+    - action: shell_command.lifesize_222_native
+      data:
+        mode: '{{ mode }}'
+        value: '{{ value | default(0) | int }}'
+      response_variable: result
+    - if:
+      - condition: template
+        value_template: '{{ result.returncode != 0 }}'
+      then:
+      - stop: '{{ result.stdout }}'
+        error: true
+    - action: homeassistant.update_entity
+      target:
+        entity_id: sensor.lifesize_222_status
+  lifesize_222_dial:
+    alias: LifeSize 222 dial
+    mode: single
+    sequence:
+    - action: script.lifesize_222_action
+      data:
+        mode: call
+        value: '{{ states(''input_select.lifesize_222_destination'') | int }}'
+  lifesize_222_answer:
+    alias: LifeSize 222 answer
+    mode: single
+    sequence:
+    - action: script.lifesize_222_action
+      data:
+        mode: answer
+        value: 0
+  lifesize_222_hangup:
+    alias: LifeSize 222 hangup
+    mode: single
+    sequence:
+    - action: script.lifesize_222_action
+      data:
+        mode: hangup
+        value: 0
+  lifesize_222_set_ringer:
+    alias: LifeSize 222 set ringer
+    mode: single
+    sequence:
+    - action: script.lifesize_222_action
+      data:
+        mode: ringer
+        value: '{{ states(''input_number.lifesize_222_ringer'') | int }}'
+  lifesize_222_radio:
+    alias: LifeSize 222 radio
+    mode: single
+    fields:
+      source:
+        required: true
+        selector:
+          select:
+            options:
+            - Matryoshka Radio London · 701
+            - Echo online · 702
+            - RADIO BOB! Live · 703
+            - RADIO BOB! Metal · 704
+            - RADIO BOB! Gothic · 705
+            - SomaFM PopTron · 706
+            - Radyo Viva · 707
+            - 'Deti FM: Toddlers · 708'
+            - 'Deti FM: Lullabies · 709'
+            - 'Deti FM: Kids songs · 710'
+    sequence:
+    - variables:
+        stations:
+          Matryoshka Radio London · 701: '701'
+          Echo online · 702: '702'
+          RADIO BOB! Live · 703: '703'
+          RADIO BOB! Metal · 704: '704'
+          RADIO BOB! Gothic · 705: '705'
+          SomaFM PopTron · 706: '706'
+          Radyo Viva · 707: '707'
+          'Deti FM: Toddlers · 708': '708'
+          'Deti FM: Lullabies · 709': '709'
+          'Deti FM: Kids songs · 710': '710'
+    - condition: template
+      value_template: '{{ source in stations }}'
+    - action: script.lifesize_222_action
+      data:
+        mode: call
+        value: '{{ stations[source] | int }}'
+    - action: input_select.select_option
+      target:
+        entity_id: input_select.lifesize_222_station
+      data:
+        option: '{{ source }}'
+  living_dot_timer_start:
+    alias: 'Living Echo Dot: start local timer'
+    mode: single
+    max_exceeded: silent
+    sequence:
+    - condition: state
+      entity_id: binary_sensor.living_dot_connected
+      state: 'on'
+    - variables:
+        minutes: '{{ states(''input_number.living_dot_timer_minutes'')|int(0) }}'
+        label: '{{ ''techo5_audiocenter: '' ~ states(''input_text.living_dot_timer_label'')|trim }}'
+    - condition: template
+      value_template: '{{ 1 <= minutes <= 180 and label|length <= 80 }}'
+    - action: esphome.living_echo_dot_timer_start
+      data:
+        duration: '{{ minutes|string ~ '' minutes'' }}'
+        label: '{{ label }}'
+      response_variable: started
+    - condition: template
+      value_template: '{{ started is mapping and started.id is defined and started.id is string and started.id.startswith(''local:'')
+        and started.id|length <= 80 }}'
+    - action: input_text.set_value
+      data:
+        value: '{{ started.id }}'
+      target:
+        entity_id: input_text.living_dot_timer_id
+    description: Creates a device-owned timer and remembers its ID. Older timers are not canceled; this
+      panel subsequently controls the most recently created timer.
+  living_dot_alarm_set:
+    alias: 'Living Echo Dot: set local alarm'
+    mode: single
+    max_exceeded: silent
+    sequence:
+    - condition: state
+      entity_id: binary_sensor.living_dot_connected
+      state: 'on'
+    - variables:
+        at: '{{ states(''input_datetime.living_dot_alarm_time'')[:5] }}'
+        days: '{{ states(''input_select.living_dot_alarm_repeat'') }}'
+        label: '{{ ''techo5_audiocenter: '' ~ states(''input_text.living_dot_alarm_label'')|trim }}'
+        style: '{{ states(''input_select.living_dot_alarm_mode'') }}'
+    - condition: template
+      value_template: '{{ at|regex_match(''^([01][0-9]|2[0-3]):[0-5][0-9]$'') and days in [''once'',''daily'',''weekdays'',''weekends'']
+        and style in [''Sound and ring'',''Light only'',''Spoken reminder''] and label|length <= 80 }}'
+    - if:
+      - condition: template
+        value_template: '{{ style == ''Spoken reminder'' }}'
+      then:
+      - action: script.living_dot_reminder_set
+      - stop: Spoken reminder handled separately from panel alarms
+    - choose:
+      - conditions: '{{ style == ''Light only'' }}'
+        sequence:
+        - action: esphome.living_echo_dot_alarm_set_light_only
+          data:
+            time: '{{ at }}'
+            days: '{{ days }}'
+            label: '{{ label }}'
+      default:
+      - action: esphome.living_echo_dot_alarm_set
+        data:
+          time: '{{ at }}'
+          days: '{{ days }}'
+          label: '{{ label }}'
+    - action: esphome.living_echo_dot_alarms_list
+      response_variable: listing
+    - variables:
+        ours: '{{ listing.alarms|default([])|selectattr(''time'',''equalto'',at)|selectattr(''days'',''in'',[days,
+          ''every day'' if days == ''daily'' else days, ''everyday'' if days == ''daily'' else days])|selectattr(''label'',''equalto'',label)|rejectattr(''reminder'')|list
+          }}'
+    - condition: template
+      value_template: '{{ ours|length == 1 and ours[0].id is string and ours[0].id|length <= 80 }}'
+    - action: input_text.set_value
+      data:
+        value: '{{ ours[0].id }}'
+      target:
+        entity_id: input_text.living_dot_alarm_id
+    description: Explicitly arms an alarm or a separately tracked spoken reminder in the device time zone.
+      Editing helpers alone does not arm it. A light-only alarm can brighten the ring before its due time.
+  living_dot_timer_control:
+    alias: 'Living Echo Dot: control panel timer'
+    mode: single
+    max_exceeded: silent
+    sequence:
+    - condition: state
+      entity_id: binary_sensor.living_dot_connected
+      state: 'on'
+    - condition: template
+      value_template: '{{ operation in [''pause'',''resume'',''cancel'',''add five minutes''] }}'
+    - variables:
+        owned_id: '{{ states(''input_text.living_dot_timer_id'') }}'
+    - condition: template
+      value_template: '{{ owned_id.startswith(''local:'') and owned_id|length <= 80 }}'
+    - action: esphome.living_echo_dot_alarms_list
+      response_variable: listing
+    - variables:
+        ours: '{{ listing.timers|default([])|selectattr(''id'',''equalto'',owned_id)|selectattr(''local'',''equalto'',true)|selectattr(''label'',''match'',''^techo5_audiocenter:
+          '')|list }}'
+    - condition: template
+      value_template: '{{ ours|length == 1 }}'
+    - choose:
+      - conditions: '{{ operation == ''pause'' }}'
+        sequence:
+        - action: esphome.living_echo_dot_timer_pause
+          data:
+            id: '{{ owned_id }}'
+      - conditions: '{{ operation == ''resume'' }}'
+        sequence:
+        - action: esphome.living_echo_dot_timer_resume
+          data:
+            id: '{{ owned_id }}'
+      - conditions: '{{ operation == ''add five minutes'' }}'
+        sequence:
+        - action: esphome.living_echo_dot_timer_add
+          data:
+            id: '{{ owned_id }}'
+            duration: 5 minutes
+      - conditions: '{{ operation == ''cancel'' }}'
+        sequence:
+        - action: esphome.living_echo_dot_timer_cancel
+          data:
+            id: '{{ owned_id }}'
+        - action: input_text.set_value
+          data:
+            value: ''
+          target:
+            entity_id: input_text.living_dot_timer_id
+    fields:
+      operation:
+        required: true
+        selector:
+          select:
+            options:
+            - pause
+            - resume
+            - cancel
+            - add five minutes
+  living_dot_alarm_control:
+    alias: 'Living Echo Dot: control panel alarm'
+    mode: single
+    max_exceeded: silent
+    sequence:
+    - condition: state
+      entity_id: binary_sensor.living_dot_connected
+      state: 'on'
+    - condition: template
+      value_template: '{{ operation in [''enable'',''disable'',''delete''] }}'
+    - variables:
+        owned_id: '{{ states(''input_text.living_dot_alarm_id'') }}'
+    - condition: template
+      value_template: '{{ owned_id not in ['''', ''unknown'', ''unavailable''] and owned_id|length <=
+        80 }}'
+    - action: esphome.living_echo_dot_alarms_list
+      response_variable: listing
+    - variables:
+        ours: '{{ listing.alarms|default([])|selectattr(''id'',''equalto'',owned_id)|selectattr(''label'',''match'',''^techo5_audiocenter:
+          '')|rejectattr(''reminder'')|list }}'
+    - condition: template
+      value_template: '{{ ours|length == 1 }}'
+    - choose:
+      - conditions: '{{ operation == ''enable'' }}'
+        sequence:
+        - action: esphome.living_echo_dot_alarm_turn_on_id
+          data:
+            id: '{{ owned_id }}'
+      - conditions: '{{ operation == ''disable'' }}'
+        sequence:
+        - action: esphome.living_echo_dot_alarm_turn_off_id
+          data:
+            id: '{{ owned_id }}'
+      - conditions: '{{ operation == ''delete'' }}'
+        sequence:
+        - action: esphome.living_echo_dot_alarm_delete_id
+          data:
+            id: '{{ owned_id }}'
+        - action: input_text.set_value
+          data:
+            value: ''
+          target:
+            entity_id: input_text.living_dot_alarm_id
+    fields:
+      operation:
+        required: true
+        selector:
+          select:
+            options:
+            - enable
+            - disable
+            - delete
+  living_dot_reminder_set:
+    alias: 'Living Echo Dot: set local spoken reminder'
+    mode: single
+    max_exceeded: silent
+    sequence:
+    - condition: state
+      entity_id: binary_sensor.living_dot_connected
+      state: 'on'
+    - variables:
+        at: '{{ states(''input_datetime.living_dot_alarm_time'')[:5] }}'
+        days: '{{ states(''input_select.living_dot_alarm_repeat'') }}'
+        words: '{{ states(''input_text.living_dot_alarm_label'')|trim }}'
+    - condition: template
+      value_template: '{{ at|regex_match(''^([01][0-9]|2[0-3]):[0-5][0-9]$'') and days in [''once'',''daily'',''weekdays'',''weekends'']
+        and words not in ['''', ''unknown'', ''unavailable''] and words|length <= 40 }}'
+    - action: esphome.living_echo_dot_reminder_set
+      response_variable: created
+      data:
+        time: '{{ at }}'
+        days: '{{ days }}'
+        label: '{{ words }}'
+        ring_on: ''
+    - condition: template
+      value_template: '{{ created is mapping and created.id is defined and created.id is string and created.id
+        not in ['''', ''all''] and created.id|length <= 80 }}'
+    - action: esphome.living_echo_dot_alarms_list
+      response_variable: listing
+    - variables:
+        ours: '{{ listing.alarms|default([])|selectattr(''id'',''equalto'',created.id)|selectattr(''reminder'',''equalto'',true)|selectattr(''label'',''equalto'',words)|list
+          }}'
+    - condition: template
+      value_template: '{{ ours|length == 1 }}'
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.living_dot_reminder_id
+      data:
+        value: '{{ created.id }}'
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.living_dot_reminder_owned_label
+      data:
+        value: '{{ words }}'
+    description: Creates a native spoken reminder on this Dot only, using the alarm time/repeat/text inputs.
+      Its separate returned ID and original words are checked before subsequent control.
+  living_dot_reminder_control:
+    alias: 'Living Echo Dot: control panel reminder'
+    mode: single
+    max_exceeded: silent
+    sequence:
+    - condition: state
+      entity_id: binary_sensor.living_dot_connected
+      state: 'on'
+    - condition: template
+      value_template: '{{ operation in [''enable'',''disable'',''delete''] }}'
+    - variables:
+        owned_id: '{{ states(''input_text.living_dot_reminder_id'') }}'
+        owned_words: '{{ states(''input_text.living_dot_reminder_owned_label'') }}'
+    - condition: template
+      value_template: '{{ owned_id not in ['''', ''all'', ''unknown'', ''unavailable''] and owned_id|length
+        <= 80 and owned_words not in ['''', ''unknown'', ''unavailable''] }}'
+    - action: esphome.living_echo_dot_alarms_list
+      response_variable: listing
+    - variables:
+        ours: '{{ listing.alarms|default([])|selectattr(''id'',''equalto'',owned_id)|selectattr(''reminder'',''equalto'',true)|selectattr(''label'',''equalto'',owned_words)|list
+          }}'
+    - condition: template
+      value_template: '{{ ours|length == 1 }}'
+    - choose:
+      - conditions: '{{ operation == ''enable'' }}'
+        sequence:
+        - action: esphome.living_echo_dot_alarm_turn_on_id
+          data:
+            id: '{{ owned_id }}'
+      - conditions: '{{ operation == ''disable'' }}'
+        sequence:
+        - action: esphome.living_echo_dot_alarm_turn_off_id
+          data:
+            id: '{{ owned_id }}'
+      - conditions: '{{ operation == ''delete'' }}'
+        sequence:
+        - action: esphome.living_echo_dot_alarm_delete_id
+          data:
+            id: '{{ owned_id }}'
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.living_dot_reminder_id
+          data:
+            value: ''
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.living_dot_reminder_owned_label
+          data:
+            value: ''
+    fields:
+      operation:
+        required: true
+        selector:
+          select:
+            options:
+            - enable
+            - disable
+            - delete
+    description: Controls only the remembered reminder ID if the native listing still identifies it as
+      a reminder with the original words. Never cancels other alarms or reminders.
+shell_command:
+  lifesize_222_native: python3 /config/.private/lifesize/lifesize_ha_bridge.py /config/.private/lifesize/config.json
+    {{ mode if mode in ['status', 'call', 'hangup', 'radio_stop', 'answer', 'reject', 'ringer', 'volume',
+    'autoanswer', 'automute', 'dnd', 'mic'] else 'invalid' }} {{ value | int(0) }}
+command_line:
+- sensor:
+    name: LifeSize 222 status
+    unique_id: lifesize_222_native_status
+    command: python3 /config/.private/lifesize/lifesize_ha_bridge.py /config/.private/lifesize/config.json
+      status
+    command_timeout: 55
+    scan_interval: 120
+    value_template: '{{ value_json.state }}'
+    json_attributes:
+    - registered
+    - calls
+    - settings
+    - error
+template:
+- sensor:
+  - name: LifeSize 222 speaker level
+    unique_id: lifesize_222_speaker_level
+    availability: '{{ states(''sensor.lifesize_222_status'') in [''idle'',''playing''] }}'
+    state: '{{ (state_attr(''sensor.lifesize_222_status'',''settings'') or {}).get(''call_volume'',{}).get(''value'',0)
+      / 100 }}'
+  switch:
+  - name: LifeSize 222 microphone mute
+    unique_id: lifesize_222_microphone_mute
+    availability: '{{ states(''sensor.lifesize_222_status'') in [''idle'',''playing''] }}'
+    state: '{{ (state_attr(''sensor.lifesize_222_status'',''settings'') or {}).get(''mic_muted'',false)
+      }}'
+    turn_on:
+    - action: script.lifesize_222_action
+      data:
+        mode: mic
+        value: 1
+    turn_off:
+    - action: script.lifesize_222_action
+      data:
+        mode: mic
+        value: 0
+  - name: LifeSize 222 auto answer
+    unique_id: lifesize_222_auto_answer
+    availability: '{{ states(''sensor.lifesize_222_status'') in [''idle'',''playing''] }}'
+    state: '{{ (state_attr(''sensor.lifesize_222_status'',''settings'') or {}).get(''autoanswer'',false)
+      }}'
+    turn_on:
+    - action: script.lifesize_222_action
+      data:
+        mode: autoanswer
+        value: 1
+    turn_off:
+    - action: script.lifesize_222_action
+      data:
+        mode: autoanswer
+        value: 0
+  - name: LifeSize 222 auto mute
+    unique_id: lifesize_222_auto_mute
+    availability: '{{ states(''sensor.lifesize_222_status'') in [''idle'',''playing''] }}'
+    state: '{{ (state_attr(''sensor.lifesize_222_status'',''settings'') or {}).get(''autoanswer_mic_muted'',false)
+      }}'
+    turn_on:
+    - action: script.lifesize_222_action
+      data:
+        mode: automute
+        value: 1
+    turn_off:
+    - action: script.lifesize_222_action
+      data:
+        mode: automute
+        value: 0
+  - name: LifeSize 222 call do not disturb
+    unique_id: lifesize_222_call_do_not_disturb
+    availability: '{{ states(''sensor.lifesize_222_status'') in [''idle'',''playing''] }}'
+    state: '{{ (state_attr(''sensor.lifesize_222_status'',''settings'') or {}).get(''dnd'',false) }}'
+    turn_on:
+    - action: script.lifesize_222_action
+      data:
+        mode: dnd
+        value: 1
+    turn_off:
+    - action: script.lifesize_222_action
+      data:
+        mode: dnd
+        value: 0
+- binary_sensor:
+  - name: Living Dot connected
+    unique_id: living_dot_connected
+    state: '{{ states(''media_player.echo_dot_002_speaker'') not in [''unavailable'',''unknown''] }}'
+media_player:
+- platform: universal
+  name: LifeSize 222
+  unique_id: lifesize_222_radio
+  device_class: speaker
+  state_template: '{{ states(''sensor.lifesize_222_status'') }}'
+  commands:
+    media_play:
+      action: script.lifesize_222_radio
+      data:
+        source: '{{ states(''input_select.lifesize_222_station'') }}'
+    media_stop:
+      action: script.lifesize_222_action
+      data:
+        mode: radio_stop
+        value: 0
+    select_source:
+      action: script.lifesize_222_radio
+      data:
+        source: '{{ source }}'
+    volume_set:
+      action: script.lifesize_222_action
+      data:
+        mode: volume
+        value: '{{ (volume_level | float * 100) | round | int }}'
+  attributes:
+    source: input_select.lifesize_222_station
+    source_list: input_select.lifesize_222_station|options
+    volume_level: sensor.lifesize_222_speaker_level
