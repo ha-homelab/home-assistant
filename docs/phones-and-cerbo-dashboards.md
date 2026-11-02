@@ -39,17 +39,75 @@ the explicit device name and navigation available even before an integration
 has created its first state during HA startup. The default renderer uses native
 Tile cards and does not require Mushroom.
 
-Cerbo GX uses the same renderer with a separate manifest. Its inventory is
-selected by the integration entry owning the GX firmware update entity, then
-grouped by device. The overview links to the controller and the associated
-batteries, inverter, chargers, meters and accessories. The firmware tile opens
-the normal update dialog; opening the dashboard never installs an update.
+Cerbo GX's inventory is selected by the integration entry owning the GX firmware
+update entity, then grouped by device. The initial inventory renderer creates a
+separate dashboard; the layout migration below moves its contents into a
+**Cerbo GX** tab in the main Lovelace dashboard. All controller settings and
+statuses are inline on that tab, including complete charging schedules. Other
+ecosystem devices retain detail subviews with a back link to the same tab.
+The firmware tile opens the normal update dialog; opening the dashboard never
+installs an update.
 
 Keep manifests, generated dashboards, registry exports and room assignments
 private. Before saving via `lovelace/config/save`, re-read the current dashboard
 and compare the section being replaced. Preserve unrelated concurrent edits.
 Validate explicit entity references against the current registry and check the
 rendered overview, an offline endpoint and each added control type in the UI.
+
+## Main dashboard layout
+
+The Cerbo tab lives at `/lovelace/cerbo-gx`. Its old sidebar entry is hidden;
+the previous dashboard remains available for existing bookmarks. The new tab
+does not require an **All GX settings and statuses** button: controller controls
+are already present, grouped into firmware and health, Dynamic ESS, charging
+limits, grid control, battery and solar measurements, and charging schedules.
+The migration checks that every original ecosystem entity remains represented.
+Energy controls use their own grouping rules instead of phone keywords; for
+example, `dynamic_ess` must not match a microphone group and `available_version`
+must not match a Bluetooth group.
+
+On Media, each phone and Echo occupies a normal-width masonry card. Do not put
+the whole endpoint inventory inside another three-column Grid card: that divides
+one dashboard column into tiny players. Each endpoint uses
+[`custom:mini-media-player`](https://github.com/kalkih/mini-media-player#shortcuts-object)
+with a persistent heading, volume controls and two columns of preset buttons.
+The heading identifies an endpoint even when it is offline. Unrelated existing
+players and remote controls retain their configuration.
+
+Presets are device-specific. Cisco and LifeSize buttons use `type: source` with
+the exact strings advertised in each player's `source_list`. Their PBX radio
+sources are not interchangeable with arbitrary stream URLs. Echo buttons use
+compatible direct HTTP(S) music presets from the existing reference player;
+Sonos-specific protocols and device-specific private feeds are not copied.
+The renderer never calls a playback service.
+
+Prepare an updated main dashboard from fresh private exports:
+
+```sh
+python3 scripts/prepare_lovelace_layout.py \
+  private-main.json private-cerbo.json private-media-manifest.json \
+  private-main-updated.json
+```
+
+The media manifest has a `devices` array. Each device contains `entity`, `name`,
+an optional `icon`, `shortcuts`, and `source_list` when source presets are used.
+Each shortcut has `name`, `type`, `id`, and optionally `icon`. IDs and stream URLs
+come from the private deployment, not a public list of household devices.
+
+The two migration modules are pure transformations. They preserve unrelated
+views, keep ecosystem subviews out of the top tab bar, and reject ambiguous
+targets or edits to previously generated cards. The CLI writes only the new
+private JSON file with owner-only permissions; it does not deploy or restart HA.
+Before applying, re-read the live configuration and compare it with the input
+export. Save through `lovelace/config/save` only if it still matches, verify the
+result, then hide the old sidebar entry with `lovelace/dashboards/update`.
+
+Check in the browser that the new Cerbo tab opens, its controller settings are
+visible without another page, and device detail views return to it. On Media,
+check a connected player and an offline player, preset labels, and card width.
+Validate every source preset against the live player's advertised sources and
+verify music playback support before copying stream presets. Layout verification
+does not require starting audio throughout the house or changing energy settings.
 
 ## LifeSize media and native controls
 
