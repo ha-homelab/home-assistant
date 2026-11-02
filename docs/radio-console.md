@@ -111,8 +111,8 @@ The output is owner-readable only. Phones receive exact source labels already
 present in their metadata, preserving the reviewed PBX preset's port and resolver
 policy. Other direct audio-capable players use the catalog URL; JSON resolver
 endpoints and HLS presets are kept on existing phone source routes instead of
-being mistaken for generic audio URLs. Missing sources
-are not invented. Refresh the inventory after deploying a new PBX catalog and
+being mistaken for generic audio URLs. A missing phone preset stops generation
+instead of silently switching to the arbitrary-URL route. Refresh the inventory after deploying a new PBX catalog and
 reloading the affected HA controls. Keep endpoints and generated output private.
 
 The LifeSize adapter uses native outgoing SIP radio calls, so it does not need

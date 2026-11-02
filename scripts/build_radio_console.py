@@ -27,6 +27,8 @@ def build_console(catalog, targets, phone_limit=4):
             source = next((label for label in target.get("source_list", []) if label in labels), None)
             if source:
                 item["sources"][target["entity"]] = source
+            elif target.get("kind") == "phone":
+                raise ValueError("Refresh phone source inventory before building the radio console")
         stations.append(item)
     groups = [{"name": group, "entities": [t["entity"] for t in targets if t["group"] == group]}
               for group in dict.fromkeys(t["group"] for t in targets)]

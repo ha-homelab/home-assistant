@@ -30,6 +30,13 @@ class ConsoleManifestTests(unittest.TestCase):
                                       [{"entity": "media_player.preset", "name": "Preset", "caps": 2048, "group": "Phones", "source_list": ["Wrong · 722"]}])
         self.assertEqual(result["stations"][0]["sources"], {})
 
+    def test_phone_missing_source_cannot_fall_back_to_arbitrary_url(self):
+        with self.assertRaisesRegex(ValueError, "Refresh phone source inventory"):
+            module.build_console(
+                {"stations": {"x": {"name": "New", "extension": "722", "url": "https://example.org/live"}}},
+                [{"entity": "media_player.phone", "name": "Phone", "caps": 2560,
+                  "group": "Phones", "kind": "phone", "source_list": ["Old · 701"]}])
+
 
 if __name__ == "__main__":
     unittest.main()
