@@ -73,6 +73,8 @@ async def warm_stream(url=STREAM_URL, startup=STARTUP_SECONDS, hold=HOLD_SECONDS
                         response.raise_for_status()
                         ready = await first_frame_ready(response.content, frame_sink=frame_sink)
                     except (aiohttp.ClientError, ValueError):
+                        # A transient HTTP or incomplete-frame failure is retried
+                        # below, within the unchanged overall startup deadline.
                         pass
                     if not ready:
                         if response is not None:
@@ -88,6 +90,8 @@ async def warm_stream(url=STREAM_URL, startup=STARTUP_SECONDS, hold=HOLD_SECONDS
                         if frame_sink:
                             frame_sink.feed(chunk)
             except TimeoutError:
+                # Expiry is the expected end of the bounded post-ready hold;
+                # the finally block still closes the established response.
                 pass
             finally:
                 response.close()

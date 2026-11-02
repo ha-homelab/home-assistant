@@ -170,7 +170,7 @@ class RecorderPolicyTest(unittest.TestCase):
             f"sensor.{channel}_power_1s_power_on_l1" for channel in EMPORIA_CHANNELS
         }
         exact = self.policy["exclude"]["entities"]
-        self.assertTrue(reviewed_exclusions <= set(exact))
+        self.assertLessEqual(reviewed_exclusions, set(exact))
         self.assertFalse(CELL_ENTITIES & set(exact))
         for glob in self.policy["exclude"]["entity_globs"]:
             with self.subTest(glob=glob):
