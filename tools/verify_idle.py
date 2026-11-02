@@ -7,6 +7,7 @@ On success, stdout is empty. Read a fresh state export immediately before reload
 
 import argparse
 import json
+import math
 from pathlib import Path
 
 
@@ -24,7 +25,8 @@ def running_entity_ids(states):
         if not isinstance(attributes, dict):
             raise ValueError('State export contains invalid automation/script attributes')
         current = attributes.get('current', 0)
-        if not isinstance(current, (int, float)):
+        if (isinstance(current, bool) or not isinstance(current, (int, float))
+                or current < 0 or (isinstance(current, float) and not math.isfinite(current))):
             raise ValueError('State export contains an invalid running-action count')
         if current > 0 or (entity_id.startswith('script.') and state.get('state') == 'on'):
             running.add(entity_id)
@@ -38,7 +40,7 @@ def main():
     try:
         running = running_entity_ids(json.loads(args.states.read_text()))
     except (OSError, ValueError) as error:
-        parser.error(str(error))
+        return parser.error(str(error))
     for entity_id in running:
         print(entity_id)
     return 1 if running else 0
