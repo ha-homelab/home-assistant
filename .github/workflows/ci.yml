@@ -172,17 +172,13 @@ jobs:
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_notification_frame_cache.py -v
-    - name: Execute bounded water valve recovery scenarios
+    - name: Execute water fallback, valve recovery and availability scenarios
       timeout-minutes: 5
       env:
         REQUIRE_PRIVATE_DEPENDENCIES: '1'
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --env REQUIRE_PRIVATE_DEPENDENCIES
         --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly" --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
-        -m unittest discover -s tests -p test_water_valve_recovery.py -v
-    - name: Render water availability and calendar boundary scenarios
-      run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
-        --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
-        -m unittest discover -s tests -p test_water_calendar_templates.py -v
+        -m unittest discover -s tests -p 'test_water_*.py' -v
     - name: Verify read-only vacuum positions, map identity and stale-data handling
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918

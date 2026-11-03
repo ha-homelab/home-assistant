@@ -12,6 +12,11 @@
   - condition: state
     entity_id: switch.pump_power_enable
     state: 'off'
+  - condition: template
+    value_template: >-
+      {{ not is_state('script.water_flo_failover', 'on')
+         and not (is_number(states('sensor.water_pressure_psi'))
+                  and states('sensor.water_pressure_psi') | float(0) < 20) }}
   actions:
   - service: switch.turn_on
     entity_id: switch.pump_power_enable

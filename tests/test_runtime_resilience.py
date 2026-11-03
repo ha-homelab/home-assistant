@@ -26,7 +26,10 @@ try:
     from homeassistant.helpers.template import Template
     from homeassistant.setup import async_setup_component
     from homeassistant.components.html5.services import SERVICE_SEND_MESSAGE_SCHEMA
-    from homeassistant.components.mqtt import MQTT_PUBLISH_SCHEMA
+    try:
+        from homeassistant.components.mqtt.services import MQTT_PUBLISH_SCHEMA
+    except ImportError:  # Older supported HA releases keep the schema in __init__.
+        from homeassistant.components.mqtt import MQTT_PUBLISH_SCHEMA
     import yaml
 except ImportError:
     if os.environ.get("REQUIRE_HA_RUNTIME") == "1":
@@ -947,16 +950,18 @@ class RuntimeResilienceTest(unittest.IsolatedAsyncioTestCase):
         for number in [101, 102]:
             config = self.automation(number)
             trigger = config['triggers'][0]
-            self.assertEqual(trigger['entity_id'], 'sensor.kmc_water_and_laundry_power')
-            self.assertEqual(trigger['above'], 700)
-            self.assertEqual(trigger['for'], {'minutes': 3 if number == 101 else 5})
+            if number == 101:
+                self.assertEqual(trigger['entity_id'], 'sensor.kmc_water_and_laundry_power')
+                self.assertEqual(trigger['above'], 700)
+            else:
+                self.assertIn('sensor.kmc_water_and_laundry_power', trigger['value_template'])
+            self.assertEqual(trigger['for'], {'minutes': 3 if number == 101 else 2})
             self.events.clear()
             await self.make_script({'sequence': config['actions']}).async_run(context=Context())
-            self.assertEqual(self.events[0], ('switch.turn_off', {'entity_id': ['switch.pump_power_enable']}))
-            self.assertEqual(self.events[-2:], [('delay', 10.0), ('script.turn_on', {
-                'entity_id': ['script.water_valve_after_pump'], 'variables': {
-                    'pump_state': 'off', 'valve_state': 'on', 'max_cm': 19 if number == 101 else 23,
-                    **({'min_cm': 5} if number == 101 else {})}})])
+            self.assertEqual(self.events[0], ('script.turn_on', {
+                'entity_id': ['script.water_flo_failover'], 'variables': {
+                    'reason': f'ESPHome outlet above 700 W for {3 if number == 101 else 2} minutes'}}))
+            self.assertFalse(any(service == 'delay' for service, _ in self.events))
 
 
 if __name__ == '__main__':
