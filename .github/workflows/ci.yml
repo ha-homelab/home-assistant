@@ -119,7 +119,7 @@ jobs:
     - name: Execute explicit Core update approvals without deployment I/O
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
-        -m unittest discover -s tests -p test_core_updates.py -v
+        -m unittest discover -s tests -p 'test_core_update*.py' -v
     - name: Execute lighting recovery scenarios in the deployed HA image
       env:
         REQUIRE_PRIVATE_DEPENDENCIES: '1'
