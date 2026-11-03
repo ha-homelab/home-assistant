@@ -3,8 +3,6 @@ from copy import deepcopy
 import re
 from urllib.parse import urlsplit
 
-import aiohttp
-
 VERSION = re.compile(r'20\d{2}\.(?:[1-9]|1[0-2])\.(?:0|[1-9]\d*)(?:b[1-9]\d*)?\Z')
 CANDIDATE = re.compile(r'[0-9a-f]{32}\Z')
 ACTIVE = {'preparing', 'backup', 'preflight', 'deploying', 'verifying'}
@@ -52,6 +50,7 @@ class Client:
         self.authorization = authorization
 
     async def request(self, path, payload=None):
+        import aiohttp
         try:
             async with self.session.request('POST' if payload is not None else 'GET', self.url + path,
                     json=payload, headers={'Authorization': self.authorization}, allow_redirects=False,
