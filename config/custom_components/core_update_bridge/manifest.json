@@ -1,0 +1,10 @@
+{
+  "domain": "core_update_bridge",
+  "name": "Home Assistant Core Updates",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://github.com/ha-homelab/home-assistant/blob/main/docs/core-updates.md",
+  "integration_type": "service",
+  "iot_class": "local_polling",
+  "version": "0.1.0"
+}

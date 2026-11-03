@@ -3,6 +3,10 @@
 # The existing igw_google_voice package keeps REST command logging at warning.
 # Do not add a duplicate logger key here; HA rejects duplicate package scalars.
 
+core_update_bridge:
+  url: http://ha-core-updater.homeassistant.svc.cluster.local:8099
+  authorization: !secret ha_core_updater_authorization
+
 rest_command:
   core_update_approve:
     url: http://ha-core-updater.homeassistant.svc.cluster.local:8099/approve

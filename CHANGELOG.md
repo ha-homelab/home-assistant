@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add a native Home Assistant Core update entity backed by the independent k3s
+  updater. Install sends a captured version/candidate approval once; progress
+  survives a Core restart and release notes include the prepared PR.
+- Keep stable-only discovery and the existing notification/dashboard actions.
+  No update is installed during integration setup or release discovery.
+
 ## [0.1.5] - 2026-10-26
 
 ### Fixed
