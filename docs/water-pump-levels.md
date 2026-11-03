@@ -56,6 +56,10 @@ warning counts alone do not. Missing or ambiguous alert information also
 blocks opening. The pump stays off and a persistent notification describes
 the unresolved condition.
 
+Both waits require `wait.completed`: a pump acknowledgement or Flo recovery
+arriving after the timeout cannot revive the expired request, even if the state
+changes before the next action evaluates its guard.
+
 Opening is attempted once, only while pump-off is still confirmed. A manual
 pump restart cancels a pending opening; a later manual/safety valve closure is
 not repeatedly undone. Level-based pump startup yields while fallback runs or

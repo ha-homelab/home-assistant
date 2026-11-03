@@ -174,6 +174,34 @@ class WaterFloFailoverTest(unittest.IsolatedAsyncioTestCase):
         await self.settle()
         self.assertEqual(self.calls, [(PUMP, 'turn_off')])
 
+    async def assert_recovery_after_wait_timeout_is_rejected(self, entity, seconds):
+        """Recover after HA records timeout, before the next action reads state."""
+        original_wait = script_helper._ScriptRun._async_step_wait_template
+        timed_out = []
+
+        async def recover_after_timeout(run):
+            await original_wait(run)
+            if not run._variables['wait']['completed']:
+                timed_out.append(entity)
+                self.set(entity, 'off')
+
+        with patch.object(script_helper._ScriptRun, '_async_step_wait_template',
+                          recover_after_timeout):
+            await self.request()
+            await self.advance(seconds)
+        self.assertEqual(timed_out, [entity])
+        self.assertEqual(self.hass.states.get(entity).state, 'off')
+        self.assertEqual(self.hass.states.get(SCRIPT).state, 'off')
+        self.assertEqual(self.calls, [(PUMP, 'turn_off')])
+
+    async def test_valve_recovery_between_timeout_and_next_action_is_rejected(self):
+        self.set(VALVE, 'unavailable')
+        await self.assert_recovery_after_wait_timeout_is_rejected(VALVE, 300)
+
+    async def test_pump_ack_between_timeout_and_next_action_is_rejected(self):
+        self.auto_pump_ack = False
+        await self.assert_recovery_after_wait_timeout_is_rejected(PUMP, 15)
+
     async def test_unknown_alert_status_does_not_open(self):
         self.set(ALERTS, 'unavailable')
         await self.request()

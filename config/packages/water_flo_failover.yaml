@@ -28,13 +28,13 @@ script:
         continue_on_timeout: true
       - if:
           - condition: template
-            value_template: "{{ not is_state('switch.pump_power_enable', 'off') }}"
+            value_template: "{{ not wait.completed or not is_state('switch.pump_power_enable', 'off') }}"
         then:
           - action: persistent_notification.create
             data:
               notification_id: water_flo_failover
               title: Water fallback needs attention
-              message: 'Pump shutdown was not confirmed. Flo was not opened. Check pump power and connectivity.'
+              message: 'Pump shutdown was not confirmed within 15 seconds. Flo was not opened. Check pump power and connectivity.'
           - stop: Pump shutdown not confirmed
       # Resolve the one alert sensor belonging to this valve, including renamed
       # installations, without embedding a household address in this package.
@@ -60,7 +60,8 @@ script:
       - if:
           - condition: template
             value_template: >-
-              {{ states('switch.shutoff_valve') not in ['on', 'off']
+              {{ not wait.completed
+                 or states('switch.shutoff_valve') not in ['on', 'off']
                  or not (is_state(flo_alert_entity, 'off')
                          or (is_state(flo_alert_entity, 'on')
                              and state_attr(flo_alert_entity, 'critical') | int(-1) == 0)) }}
@@ -69,7 +70,7 @@ script:
             data:
               notification_id: water_flo_failover
               title: Water fallback needs attention
-              message: 'The pump is off. Flo was not opened because its valve/alert status is unavailable or a critical alert is active.'
+              message: 'The pump is off. Flo was not opened because the wait expired, its valve/alert status is unavailable or a critical alert is active.'
           - stop: Flo safety status does not permit opening
       - if:
           - condition: state
