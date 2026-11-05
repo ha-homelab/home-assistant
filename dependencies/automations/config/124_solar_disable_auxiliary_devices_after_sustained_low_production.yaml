@@ -44,6 +44,7 @@
   - service: script.notify
     data:
       message: Solar 3 or 4 producing below 150W for five minutes
+      also_devices: false
     continue_on_error: true
   mode: single
   trace:
