@@ -53,12 +53,13 @@
       notify_data:
         title: '{{ motion_name }}'
         message: '{{ motion_name }}'
-  - action: script.notify_optional
-    data:
-      notify_service: notify.lg_webos_tv_oled77c5pua_dusqljr
-      notification_category: '{{ motion_category }}'
-      notify_data:
-        message: '{{ motion_name }}'
+  # Native LG TV popups are retired; OTTplay delivers TV notifications.
+  # - action: script.notify_optional
+  #   data:
+  #     notify_service: notify.lg_webos_tv_oled77c5pua_dusqljr
+  #     notification_category: '{{ motion_category }}'
+  #     notify_data:
+  #       message: '{{ motion_name }}'
   mode: single
   trace:
     stored_traces: 5

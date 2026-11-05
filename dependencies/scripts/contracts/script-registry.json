@@ -295,7 +295,7 @@
       "file": "config/television/notify_front_snapshot.yaml",
       "alias": "Living room TV: notify with front-camera snapshot",
       "icon": "mdi:cctv",
-      "description": "Send the front-camera message and snapshot icon through the registered living-room LG TV notifier."
+      "description": "Retain the existing filtered browser copy; OTTplay handles TV notifications."
     },
     "tv_pic3": {
       "entity_id": "script.tv_pic3",

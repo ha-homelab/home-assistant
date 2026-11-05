@@ -188,13 +188,12 @@ class RuntimeResilienceTest(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(any(action in ['notify.mobile_app_als_iphone2', 'notify.pushbullet']
                                  for action, _ in self.events))
 
-    async def test_tv_snapshot_uses_registered_webos_service_and_supported_icon_field(self):
+    async def test_retired_tv_snapshot_preserves_browser_policy_without_native_popup(self):
         self.hass.services.async_register('notify', 'lg_webos_tv_oled77c5pua_dusqljr', self.record)
         self.hass.states.async_set('media_player.living_room_tv_77', 'playing')
         await self.make_script(self.source_script('tv_pic2')).async_run(context=Context())
-        self.assertEqual(self.events[0], ('notify.lg_webos_tv_oled77c5pua_dusqljr',
-            {'message': 'Someone at the Front Camera', 'data': {'icon': '/config/www/front_camera_alert.jpg'}}))
-        self.assertEqual(len(self.events), 1)
+        # Front-camera browser/phone copies remain suppressed by the existing policy.
+        self.assertEqual(self.events, [])
         self.assertEqual(self.mobile_events, [])
 
     async def test_tv_browser_uses_privately_configured_home_assistant_origin(self):
@@ -398,7 +397,9 @@ class RuntimeResilienceTest(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(json.loads(wire['payload']), {'title': 'Info', 'message': expected})
                 self.assertEqual(wire['topic'], 'living_room/notifications')
                 self.assertTrue(wire['retain'])
-                for destination in ['notify.roomba', 'notify.inew', 'notify.lg_webos_tv_oled77c5pua_dusqljr']:
+                self.assertNotIn('notify.lg_webos_tv_oled77c5pua_dusqljr',
+                                 [service for service, _ in self.events])
+                for destination in ['notify.roomba', 'notify.inew']:
                     payload = next(data for service, data in self.events if service == destination)
                     self.assertEqual(payload['message'], expected)
                     if 'title' in payload:
