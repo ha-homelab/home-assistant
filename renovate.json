@@ -1,6 +1,52 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "local>victron-venus/venus-os-ci-toolkit:renovate-ci"
-  ]
+    "local>victron-venus/venus-os-ci-toolkit:renovate-fleet"
+  ],
+  "enabledManagers": [
+    "github-actions",
+    "custom.regex",
+    "custom.jsonata",
+    "pep621",
+    "pip_requirements"
+  ],
+  "ignorePaths": [
+    "**/vendor/**",
+    "**/node_modules/**",
+    "**/fixtures/**",
+    "**/tools/browser-compatibility/**",
+    ".github/cosign/**",
+    "dependencies/**",
+    "public/**",
+    ".github/requirements-build.txt"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "pep621",
+        "pip_requirements"
+      ],
+      "matchFileNames": [
+        "/^[^/]+$/"
+      ],
+      "schedule": [
+        "* * 1 * *"
+      ]
+    },
+    {
+      "description": "These generated locks use compile flags unsupported by the pinned Renovate parser; regenerate them through the documented source workflow.",
+      "matchManagers": [
+        "pip_requirements"
+      ],
+      "matchFileNames": [
+        ".github/requirements-build.txt"
+      ],
+      "enabled": false
+    }
+  ],
+  "pip_requirements": {
+    "managerFilePatterns": [
+      "/(^|/)([^/]*[-_])?requirements[^/]*\\.(txt|pip)$/"
+    ]
+  }
 }
