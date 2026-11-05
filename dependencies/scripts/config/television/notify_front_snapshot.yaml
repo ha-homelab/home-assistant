@@ -1,17 +1,31 @@
 # Stable entity: script.tv_pic2
-# Send the front-camera message and supported snapshot icon to the registered living-room LG TV.
+# Native LG popups are retired; retain the browser copy through its existing policy filters.
 tv_pic2:
   alias: 'Living room TV: notify with front-camera snapshot'
-  description: Send the front-camera message and snapshot icon through the registered living-room LG TV notifier.
+  description: Retain the existing filtered browser copy; OTTplay handles TV notifications.
   icon: mdi:cctv
   mode: single
   sequence:
+  # Native LG TV popup retained for reference; do not enable alongside OTTplay.
+  # - action: script.notify_optional
+  #   data:
+  #     notify_service: notify.lg_webos_tv_oled77c5pua_dusqljr
+  #     also_chrome: true
+  #     chrome_image: /local/front_camera_alert.jpg?{{ as_timestamp(now()) }}
+  #     notify_data:
+  #       data:
+  #         icon: /config/www/front_camera_alert.jpg
+  #       message: Someone at the Front Camera
+  - variables:
+      snapshot_url: /local/front_camera_alert.jpg?{{ as_timestamp(now()) }}
   - action: script.notify_optional
     data:
-      notify_service: notify.lg_webos_tv_oled77c5pua_dusqljr
-      also_chrome: true
-      chrome_image: /local/front_camera_alert.jpg?{{ as_timestamp(now()) }}
+      notify_service: html5.send_message
       notify_data:
-        data:
-          icon: /config/www/front_camera_alert.jpg
+        entity_id: notify.chrome
+        title: Home Assistant
         message: Someone at the Front Camera
+        image: '{{ snapshot_url }}'
+        icon: '{{ snapshot_url }}'
+        data:
+          url: '{{ snapshot_url }}'
