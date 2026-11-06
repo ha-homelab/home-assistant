@@ -116,6 +116,11 @@ The [automation and script audit](docs/runtime-resilience.md) documents shared o
 notification handling, MQTT escaping/queues, confirmed entity fixes and remaining
 device dependencies.
 
+[Local Samsung appliances](docs/local-samsung-appliances.md) documents the LocalThings
+installation, its current limits, and setting or scheduling the range clock.
+[RuView OTT notifications](docs/ruview-ott-notifications.md) records the temporary
+banner exclusion and how to restore its preserved rules without changing sensing.
+
 [Cooktop notifications](docs/cooktop-notifications.md) use the official SmartThings
 aggregate cooktop state to notify Chrome and Vitaly iPhone Air, with the household
 mute and a short duplicate-suppression interval.
