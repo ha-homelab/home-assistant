@@ -3414,7 +3414,7 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "72fc83ffe189a401b56bd62f12a66f5e87f54ee91acd1d56c9d559309d04bcfd",
+      "behavior_sha256": "baa33f134f7c11fc5e23bab15ce952a836b6f1a62ff914ce3875df1030a90876",
       "references": [
         "script.notify",
         "sensor.heater_one_energy_power",
@@ -3427,7 +3427,7 @@
         "switch.turn_on"
       ],
       "imported_behavior_sha256": "dda42502a66bbbd329cec944566d5e8ecf4c324d247beaafa459325710448707",
-      "behavior_change": "2026-09-22 runtime resilience audit; 2026-10-10: replace the former Old lamp relay with MPPT fan; preserve all solar thresholds, timers, conditions, Heater Three actions and notifications."
+      "behavior_change": "2026-09-22 runtime resilience audit; 2026-10-10: replace the former Old lamp relay with MPPT fan; preserve all solar thresholds, timers, conditions, Heater Three actions and notifications. 2026-11-05: suppress optional spoken device copies only; retain desktop notifications and all power-control behavior."
     },
     {
       "order": 124,
@@ -3450,7 +3450,7 @@
         "condition",
         "action"
       ],
-      "behavior_sha256": "3e146a94f184c0440c918f4b6e3788043e4078bab924e05888793d27eafb871e",
+      "behavior_sha256": "72aa040330d8c59cd3cd06f1f0f0583fabd6e9e420a48260e135a602d3e6e82a",
       "references": [
         "script.notify",
         "sensor.heater_one_energy_power",
@@ -3463,7 +3463,7 @@
         "switch.turn_off"
       ],
       "imported_behavior_sha256": "1e35e1fc16ec4cbbf23ed404f365e371c69ec96f5464d62241e13f973ed5f51e",
-      "behavior_change": "2026-09-22 runtime resilience audit; 2026-10-10: replace the former Old lamp relay with MPPT fan; preserve all solar thresholds, timers, conditions, Heater Three actions and notifications."
+      "behavior_change": "2026-09-22 runtime resilience audit; 2026-10-10: replace the former Old lamp relay with MPPT fan; preserve all solar thresholds, timers, conditions, Heater Three actions and notifications. 2026-11-05: suppress optional spoken device copies only; retain desktop notifications and all power-control behavior."
     },
     {
       "order": 125,

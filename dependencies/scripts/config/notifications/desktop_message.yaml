@@ -12,12 +12,19 @@ notify:
       selector:
         text:
           multiline: true
+    also_devices:
+      name: Also notify local devices
+      description: Forward a spoken copy to configured phones and speakers.
+      default: true
+      selector:
+        boolean:
   mode: single
   sequence:
   - action: script.notify_optional
     data:
       notify_service: notify.roomba
       also_chrome: true
+      also_devices: '{{ also_devices | default(true) | bool }}'
       notify_data:
         title: '{{ message }}'
         message: '{{ message }} {{ as_timestamp(now()) | timestamp_custom(''%H:%M'', true) }}'
