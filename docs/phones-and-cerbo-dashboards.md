@@ -26,6 +26,13 @@ and Zero Grid are removed. Shared energy sensors and inverter controls remain.
 python3 scripts/build_phones_dashboard.py private-manifest.json private-dashboard.json
 ```
 
+The dashboard, radio-console and LifeSize catalog generators share a private
+output writer. It creates temporary files with mode `0600` before writing,
+replaces the destination only after successful serialization, and rejects
+destinations that alias an input or are symbolic links. Failed generation
+leaves the previous output intact. Use a separate output path for every
+command; inputs are never intended to be edited in place.
+
 The manifest contains `url_path`, optional `title` and `icon`, a `devices` list,
 and optional `extra_views`. Each device specifies a unique `key`, `title`,
 `family`, a status entity, optional player, explicit entity IDs, and optional
