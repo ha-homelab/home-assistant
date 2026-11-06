@@ -18,11 +18,13 @@ Switch01–03 do not inherit those automation roles.
 
 Water rules 101/102/128/129 now control the first KMC's
 `switch.pump_power_enable`. Both power protections stay enabled and use
-`sensor.kmc_water_and_laundry_power` above 700 W for 3 and 5 minutes respectively.
-The owner selected this uncalibrated total for all three KMC outputs; it is not
-pump-only consumption. Water-level guards, delays, valve requests and
-notification actions are unchanged. The former Zigbee pump relay can be reused
-without carrying these control references with it.
+`sensor.kmc_water_and_laundry_power` above 700 W. Rule 102 now allows two
+continuous minutes while pump power is on and works without the tank-level
+sensor. Rule 101 retains its three-minute low-level backup. Both request the
+shared guarded Flo fallback before sending optional notifications. The owner
+selected the total for all three KMC outputs; it is not pump-only consumption.
+See the root water-pump guide for low-pressure protection and valve safety
+checks. The former Zigbee pump relay is not used by these rules.
 
 The bundled automation library for **ha-homelab**, running on the `h7` Home Assistant container in k3s. It contains **98 active automations** from the original 130-rule import, with readable English names, stable identities, descriptions, explicit execution modes, and five stored traces per automation.
 
@@ -140,12 +142,13 @@ Validation rejects duplicate YAML keys, duplicate identities, missing files, cha
 
 ## Water pump level thresholds
 
-The water-level rules stop `switch.pump_switch` and turn on
+The water-level rules stop `switch.pump_power_enable` and turn on
 `switch.shutoff_valve` below **26 cm**, then start the pump and turn off the valve
 above **27 cm**. At exactly 26 or 27 cm, and between those values, neither
 threshold fires. This retains a 1 cm gap to avoid repeated switching.
-The existing lower-reading guard (`above: 1`), pump-state conditions, high-power
-protections and notification routing are preserved. Notification text uses the
+The existing lower-reading guard (`above: 1`) and pump-state conditions remain.
+Pump startup also yields to active Flo fallback or pressure below 20 psi.
+Notification text uses the
 new thresholds. The historical automation entity IDs containing `18` and `19`
 remain stable; their names do not define the active thresholds.
 
@@ -231,15 +234,17 @@ instance.
 
 ## Bounded water-valve recovery
 
-Rules 101/102/128/129 send their explicit Flo valve request to the root
+Level rules 128/129 send their explicit Flo valve request to the root
 `script.water_valve_after_pump` helper using `script.turn_on`. The pump automation
 therefore remains available for new level crossings while Flo is offline. A
 request waits at most five minutes for Flo, rechecks its original water range and
 pump state, and makes at most one valve service call. A newer request supersedes
 an older one; completed requests never undo subsequent manual or safety closures.
 The helper sends no pump commands and adds no periodic state enforcement. Deploy
-the root helper before reloading these callers. High-power cutoffs, ten-second
-delays, notifications and stable identities remain unchanged.
+the root helper before reloading these callers. The independent high-power
+protections (101/102) instead use `script.water_flo_failover`, which stops the
+pump and checks Flo alerts without requiring a tank-level reading. Rule 102
+uses the two-minute cutoff described above; all registry identities remain stable.
 
 ## Independent device recovery
 

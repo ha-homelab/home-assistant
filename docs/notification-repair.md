@@ -1,5 +1,22 @@
 # Chrome and TV notification repair · 2026-09-22
 
+## Current TV delivery policy · 2026-11-04
+
+Native LG/webOS popup delivery is retired in favor of OTTplay. The five
+automations for motion, switch state, cover opening/closing and access-point
+connectivity retain their original LG actions as comments. Their other
+notification destinations and MQTT delivery remain active.
+
+`script.tv_pic2` also retains its former LG action as comments. Its browser copy
+still passes through the existing optional-notification policy, which suppresses
+Front-camera browser and phone messages. No additional notification is introduced.
+TV power, application launch, screen controls and the webOS integration remain
+available. The historical repair notes below describe the previous policy.
+
+To restore native popups, review and uncomment the relevant LG action blocks;
+for `tv_pic2`, replace the browser-only sequence rather than keeping both copies.
+Validate configuration and reload the affected automations/scripts.
+
 The owner confirmed that `notify.mobile_app_als_iphone2` and `notify.pushbullet`
 are retired, Chrome HTML5 push should work, and living-room TV motion messages
 are still in use.

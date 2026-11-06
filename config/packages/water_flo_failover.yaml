@@ -1,0 +1,121 @@
+# Emergency fallback uses measured Flo pressure, not the generic alert count.
+# A critical Flo alert can stop the pump but must never reopen its safety valve.
+script:
+  water_flo_failover:
+    alias: 'Water: stop the pump and switch to Flo'
+    description: Confirm pump shutdown, then make one bounded request to open Flo without requiring the tank-level sensor.
+    mode: single
+    max_exceeded: silent
+    fields:
+      reason:
+        description: The measured condition that requested fallback.
+        selector:
+          text:
+    sequence:
+      - action: script.turn_off
+        target:
+          entity_id: script.water_valve_after_pump
+      - if:
+          - condition: template
+            value_template: "{{ not is_state('switch.pump_power_enable', 'off') }}"
+        then:
+          - action: switch.turn_off
+            target:
+              entity_id: switch.pump_power_enable
+            continue_on_error: true
+      - wait_template: "{{ is_state('switch.pump_power_enable', 'off') }}"
+        timeout: '00:00:15'
+        continue_on_timeout: true
+      - if:
+          - condition: template
+            value_template: "{{ not wait.completed or not is_state('switch.pump_power_enable', 'off') }}"
+        then:
+          - action: persistent_notification.create
+            data:
+              notification_id: water_flo_failover
+              title: Water fallback needs attention
+              message: 'Pump shutdown was not confirmed within 15 seconds. Flo was not opened. Check pump power and connectivity.'
+          - stop: Pump shutdown not confirmed
+      # Resolve the one alert sensor belonging to this valve, including renamed
+      # installations, without embedding a household address in this package.
+      - variables:
+          flo_alert_ids: >-
+            {{ device_entities(device_id('switch.shutoff_valve'))
+               | select('match', '^binary_sensor\\.') | list }}
+      - variables:
+          flo_alert_entity: "{{ flo_alert_ids[0] if flo_alert_ids | count == 1 else '' }}"
+      - wait_template: >-
+          {{ not is_state('switch.pump_power_enable', 'off')
+             or (is_state(flo_alert_entity, 'on')
+                 and state_attr(flo_alert_entity, 'critical') | int(-1) > 0)
+             or (states('switch.shutoff_valve') in ['on', 'off']
+                 and (is_state(flo_alert_entity, 'off')
+                      or (is_state(flo_alert_entity, 'on')
+                          and state_attr(flo_alert_entity, 'critical') | int(-1) == 0))) }}
+        timeout: '00:05:00'
+        continue_on_timeout: true
+      - condition: state
+        entity_id: switch.pump_power_enable
+        state: 'off'
+      - if:
+          - condition: template
+            value_template: >-
+              {{ not wait.completed
+                 or states('switch.shutoff_valve') not in ['on', 'off']
+                 or not (is_state(flo_alert_entity, 'off')
+                         or (is_state(flo_alert_entity, 'on')
+                             and state_attr(flo_alert_entity, 'critical') | int(-1) == 0)) }}
+        then:
+          - action: persistent_notification.create
+            data:
+              notification_id: water_flo_failover
+              title: Water fallback needs attention
+              message: 'The pump is off. Flo was not opened because the wait expired, its valve/alert status is unavailable or a critical alert is active.'
+          - stop: Flo safety status does not permit opening
+      - if:
+          - condition: state
+            entity_id: switch.shutoff_valve
+            state: 'off'
+        then:
+          - action: switch.turn_on
+            target:
+              entity_id: switch.shutoff_valve
+            continue_on_error: true
+      - action: persistent_notification.create
+        data:
+          notification_id: water_flo_failover
+          title: Water supply fallback
+          message: >-
+            {{ reason | default('Water protection requested fallback', true) }}.
+            Pump power is off. Flo reports {{ states('switch.shutoff_valve') }}
+            (on means open). Check the water supply if pressure does not recover.
+
+automation:
+  - id: ha_homelab_water_low_pressure_flo_fallback
+    alias: 'Water: switch to Flo on low pressure'
+    description: Pressure below 20 psi for 30 seconds stops the pump and requests Flo opening, independently of tank-level availability.
+    triggers:
+      - trigger: template
+        value_template: >-
+          {% set pressure = states('sensor.water_pressure_psi') | float(none) %}
+          {{ pressure is not none and is_number(pressure) and 0 <= pressure < 20 }}
+        for: '00:00:30'
+      - trigger: homeassistant
+        event: start
+        id: startup
+    actions:
+      - if: "{{ trigger.id | default('') == 'startup' }}"
+        then:
+          - delay: '00:00:30'
+      - condition: template
+        value_template: >-
+          {% set pressure = states('sensor.water_pressure_psi') | float(none) %}
+          {{ pressure is not none and is_number(pressure) and 0 <= pressure < 20 }}
+      - action: script.turn_on
+        target:
+          entity_id: script.water_flo_failover
+        data:
+          variables:
+            reason: 'Flo pressure below 20 psi (approximately 138 kPa)'
+    mode: single
+    max_exceeded: silent

@@ -1,0 +1,8 @@
+{
+  "title": "Home Assistant Core Updates",
+  "config": {
+    "step": {"user": {"title": "Connect the Core updater", "description": "Connect the existing private k3s updater. This does not start an update.", "data": {"url": "Updater base URL", "authorization": "Existing Bearer authorization"}}},
+    "error": {"invalid_settings": "Check the base URL and existing Bearer authorization."},
+    "abort": {"already_configured": "The Core updater is already configured."}
+  }
+}

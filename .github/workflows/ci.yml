@@ -8,13 +8,13 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-    - uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25
+    - uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
       with:
         egress-policy: audit
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         persist-credentials: false
-    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       with:
         python-version: '3.13'
     - run: pip install -r requirements.txt
@@ -76,10 +76,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-    - uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25
+    - uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
       with:
         egress-policy: audit
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         persist-credentials: false
     - name: Verify RF matching and guarded transmission without hardware I/O
@@ -121,7 +121,7 @@ jobs:
     - name: Execute explicit Core update approvals without deployment I/O
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
-        -m unittest discover -s tests -p test_core_updates.py -v
+        -m unittest discover -s tests -p 'test_core_update*.py' -v
     - name: Execute lighting recovery scenarios in the deployed HA image
       env:
         REQUIRE_PRIVATE_DEPENDENCIES: '1'
@@ -174,17 +174,13 @@ jobs:
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_notification_frame_cache.py -v
-    - name: Execute bounded water valve recovery scenarios
+    - name: Execute water fallback, valve recovery and availability scenarios
       timeout-minutes: 5
       env:
         REQUIRE_PRIVATE_DEPENDENCIES: '1'
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --env REQUIRE_PRIVATE_DEPENDENCIES
         --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly" --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
-        -m unittest discover -s tests -p test_water_valve_recovery.py -v
-    - name: Render water availability and calendar boundary scenarios
-      run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
-        --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
-        -m unittest discover -s tests -p test_water_calendar_templates.py -v
+        -m unittest discover -s tests -p 'test_water_*.py' -v
     - name: Verify read-only vacuum positions, map identity and stale-data handling
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918

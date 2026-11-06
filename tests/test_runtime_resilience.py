@@ -26,7 +26,10 @@ try:
     from homeassistant.helpers.template import Template
     from homeassistant.setup import async_setup_component
     from homeassistant.components.html5.services import SERVICE_SEND_MESSAGE_SCHEMA
-    from homeassistant.components.mqtt import MQTT_PUBLISH_SCHEMA
+    try:
+        from homeassistant.components.mqtt.services import MQTT_PUBLISH_SCHEMA
+    except ImportError:  # Older supported HA releases keep the schema in __init__.
+        from homeassistant.components.mqtt import MQTT_PUBLISH_SCHEMA
     import yaml
 except ImportError:
     if os.environ.get("REQUIRE_HA_RUNTIME") == "1":
@@ -185,13 +188,12 @@ class RuntimeResilienceTest(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(any(action in ['notify.mobile_app_als_iphone2', 'notify.pushbullet']
                                  for action, _ in self.events))
 
-    async def test_tv_snapshot_uses_registered_webos_service_and_supported_icon_field(self):
+    async def test_retired_tv_snapshot_preserves_browser_policy_without_native_popup(self):
         self.hass.services.async_register('notify', 'lg_webos_tv_oled77c5pua_dusqljr', self.record)
         self.hass.states.async_set('media_player.living_room_tv_77', 'playing')
         await self.make_script(self.source_script('tv_pic2')).async_run(context=Context())
-        self.assertEqual(self.events[0], ('notify.lg_webos_tv_oled77c5pua_dusqljr',
-            {'message': 'Someone at the Front Camera', 'data': {'icon': '/config/www/front_camera_alert.jpg'}}))
-        self.assertEqual(len(self.events), 1)
+        # Front-camera browser/phone copies remain suppressed by the existing policy.
+        self.assertEqual(self.events, [])
         self.assertEqual(self.mobile_events, [])
 
     async def test_tv_browser_uses_privately_configured_home_assistant_origin(self):
@@ -395,7 +397,9 @@ class RuntimeResilienceTest(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(json.loads(wire['payload']), {'title': 'Info', 'message': expected})
                 self.assertEqual(wire['topic'], 'living_room/notifications')
                 self.assertTrue(wire['retain'])
-                for destination in ['notify.roomba', 'notify.inew', 'notify.lg_webos_tv_oled77c5pua_dusqljr']:
+                self.assertNotIn('notify.lg_webos_tv_oled77c5pua_dusqljr',
+                                 [service for service, _ in self.events])
+                for destination in ['notify.roomba', 'notify.inew']:
                     payload = next(data for service, data in self.events if service == destination)
                     self.assertEqual(payload['message'], expected)
                     if 'title' in payload:
@@ -947,16 +951,18 @@ class RuntimeResilienceTest(unittest.IsolatedAsyncioTestCase):
         for number in [101, 102]:
             config = self.automation(number)
             trigger = config['triggers'][0]
-            self.assertEqual(trigger['entity_id'], 'sensor.kmc_water_and_laundry_power')
-            self.assertEqual(trigger['above'], 700)
-            self.assertEqual(trigger['for'], {'minutes': 3 if number == 101 else 5})
+            if number == 101:
+                self.assertEqual(trigger['entity_id'], 'sensor.kmc_water_and_laundry_power')
+                self.assertEqual(trigger['above'], 700)
+            else:
+                self.assertIn('sensor.kmc_water_and_laundry_power', trigger['value_template'])
+            self.assertEqual(trigger['for'], {'minutes': 3 if number == 101 else 2})
             self.events.clear()
             await self.make_script({'sequence': config['actions']}).async_run(context=Context())
-            self.assertEqual(self.events[0], ('switch.turn_off', {'entity_id': ['switch.pump_power_enable']}))
-            self.assertEqual(self.events[-2:], [('delay', 10.0), ('script.turn_on', {
-                'entity_id': ['script.water_valve_after_pump'], 'variables': {
-                    'pump_state': 'off', 'valve_state': 'on', 'max_cm': 19 if number == 101 else 23,
-                    **({'min_cm': 5} if number == 101 else {})}})])
+            self.assertEqual(self.events[0], ('script.turn_on', {
+                'entity_id': ['script.water_flo_failover'], 'variables': {
+                    'reason': f'ESPHome outlet above 700 W for {3 if number == 101 else 2} minutes'}}))
+            self.assertFalse(any(service == 'delay' for service, _ in self.events))
 
 
 if __name__ == '__main__':

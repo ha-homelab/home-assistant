@@ -6,8 +6,8 @@ The YAML object key is the stable script identifier. Display names and file loca
 
 Chrome callers now use modern HTML5 delivery to the registered `notify.chrome`
 entity. The owner retired the old iPhone and Pushbullet destinations; their active
-calls are removed. `tv_pic2` uses the confirmed LG notifier and supported camera
-icon field. The original service-snapshot notes below describe the import, not
+calls are removed. Native LG popup calls are now retained as comments; `tv_pic2`
+preserves its filtered browser copy while OTTplay handles TV notifications. The original service-snapshot notes below describe the import, not
 current delivery status.
 
 ## Scope
@@ -463,12 +463,12 @@ Open the h7-hosted front-camera snapshot URL with the webOS launcher.
 
 **Living room TV: notify with front-camera snapshot**
 
-Send the existing front-camera notification and attachment data to the living room TV.
+Retain the existing filtered browser copy; OTTplay handles TV notifications.
 
 - Entity: `script.tv_pic2`
 - File: [config/television/notify_front_snapshot.yaml](../config/television/notify_front_snapshot.yaml)
 - Source file: `scripts/receiver_turn_on.yaml`
-- Review note: The existing h2 attachment URL and local image paths are retained; changing the notification format needs TV verification.
+- Review note: The retired native LG action remains commented for reference. The browser copy retains the existing notification filters.
 - Not registered in the source service snapshot: `notify.living_room_tv`. Keep the script until the owner reviews its callers and device integration.
 
 ## `tv_pic3`
