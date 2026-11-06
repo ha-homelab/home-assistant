@@ -1,5 +1,15 @@
 # Dining Media guard
 
+> **Living bookshelf is temporarily excluded from occupancy control.** Its
+> recovery trigger and both action blocks are commented out while it supplies
+> a Zigbee router. Leave the outlet on. Resume only after that router has a
+> separate power supply; there is no automatic next-day reactivation. The
+> bookshelf policy below is retained for that later restoration.
+
+To resume, uncomment both marked bookshelf action blocks and its recovery entry,
+re-enable `BookshelfOccupancyTest`, restore its duration-count expectation, and
+validate before reloading automations.
+
 The converted JH-G01U outlet is **Dining Media guard**, controlled through
 `switch.dining_media_guard`. It restores the former Dining guard 2 role: power
 for the dining-room speakers, printer and associated equipment. The separate
@@ -25,8 +35,11 @@ Assistant restart is not required.
 
 ## Shared occupancy control
 
-The package `config/packages/dining_media_guard_evening.yaml` now owns both
-`switch.dining_media_guard` and `switch.living_tv_guard`. The filename and original
+The package `config/packages/dining_media_guard_evening.yaml` owns
+`switch.dining_media_guard`, `switch.living_bookshelf`, and `switch.living_tv_guard`.
+Living bookshelf follows the same occupancy and inactivity policy as Dining
+Media guard; it has no separate sensor, daylight, or television-state condition.
+The filename and original
 shutdown automation ID are retained for deployed-installation compatibility.
 The previous Living-lamp/sunset/15-minute rule is replaced, and automation 108 no
 longer controls Dining Media guard. Its fireplace and Living guard actions retain
@@ -47,7 +60,7 @@ or a lamp's state. This does not turn on lamps or the curtain supply.
 Room Sticky overrides protect both automatic turn-on and turn-off:
 
 - Living TV Guard requires `input_boolean.living_room_sticky` to be `off`.
-- Dining Media guard requires both `input_boolean.living_room_sticky` and
+- Dining Media guard and Living bookshelf require both `input_boolean.living_room_sticky` and
   `input_boolean.dining_room_sticky` to be `off`. This keeps the original Living
   override and also honors the outlet's Dining room ownership.
 - An override that is `on`, `unknown`, `unavailable`, or absent blocks its outlet.
@@ -59,7 +72,7 @@ global Curtains Sticky controls curtains only; it is not a media-power override.
 
 After **all four sensors have individually stayed off for ten minutes**:
 
-- Dining Media guard turns off regardless of the TV state, if both overrides
+- Dining Media guard and Living bookshelf turn off regardless of the TV state, if both overrides
   above are off.
 - Living TV Guard turns off only if `media_player.living_room_tv_77`, the native
   webOS entity, explicitly reports `off`. A DLNA entity reporting `idle` is not
@@ -72,7 +85,8 @@ The timer protects an explicit [LG power-on request](lg-tv-wake-on-lan.md), even
 when the outlet was already on and the TV still reports `off` while waking. It
 lasts two minutes, is not restored after a Core restart, and duplicate in-flight
 wake requests do not extend it. Missing or unknown timer state blocks automatic
-TV power-off. The Dining outlet does not depend on either TV startup protection.
+TV power-off. Dining Media guard and Living bookshelf do not depend on either
+TV startup protection.
 
 If the TV is switched off later, its state transition immediately rechecks the
 same inactivity condition. `unknown`, `unavailable`, or missing sensor states
@@ -94,7 +108,8 @@ are off. A regular manual
 `on` to `off` transition does not itself switch an outlet back on: the next
 activity event or explicit reconciliation can restore it. Commands are sent only
 when an outlet actually needs to change state. A failure of one outlet does not
-block the other, and inactivity is checked again before cutting TV power.
+block the others. Occupancy is rechecked before a later outlet command, so
+returning activity protects the bookshelf as well as TV power.
 
 Turning Sticky off does not itself restore power; the next activity or explicit
 reconciliation does. If the room is already vacant, the periodic inactivity check
@@ -110,7 +125,8 @@ TV-state and room-override checks still apply.
 ## Verification and troubleshooting
 
 `tests/test_dining_media_evening.py` runs the actual automations against simulated
-entities in an isolated Home Assistant instance. It covers each activity source,
+entities in an isolated Home Assistant instance. The same behavioral suite runs
+for both Dining Media guard and Living bookshelf. It covers each activity source,
 continuous shared inactivity, the last sensor's deadline, new movement, offline
 sensors, TV states, late TV shutdown, manual off, outlet recovery, startup/reload,
 one failed outlet, activity arriving between commands, room override isolation,
@@ -130,6 +146,14 @@ Validate the full configuration before `automation.reload`; no Core restart is
 required. Install the LG wake package's timer and helper, reload timer and script
 configuration, then reload both packages' automations together. Preserve the independent `switch.dining_guard` curtain controller and
 all lighting Sticky definitions.
+
+The deployed rules must enforce the same Sticky policy for Dining Media guard
+and Living bookshelf: both Living and Dining Sticky must explicitly be `off`
+before either outlet changes automatically. A runtime configuration that ignores
+Sticky is stale and must be corrected in both restore and shutdown actions,
+including startup, reload and recovery paths. Preserve unrelated timers and TV
+power checks when reconciling this drift. Inspect the deployed configuration;
+a source test pass alone cannot establish which policy is currently running.
 
 The source reconciliation for this package is tested offline. Merging it does
 not prove a live deployment or physical outlet response; those are separate

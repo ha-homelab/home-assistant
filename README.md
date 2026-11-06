@@ -61,6 +61,14 @@ location inventories stay in the private h3 configuration and HA registries.
 [Lovelace input contrast](docs/lovelace-input-contrast.md) explains the dark theme's
 base palette, the white-on-white form regression, and browser verification.
 
+[Phones, Media and Cerbo GX](docs/phones-and-cerbo-dashboards.md) separates endpoint
+controls from playback, keeps offline phones visible, and exposes the complete
+Victron device inventory without duplicating old sidebar panels.
+
+[Radio and speaker console](docs/radio-console.md) selects a station or audio URL
+and one or more outputs, with native phone routing, capacity checks and visible
+per-speaker results.
+
 [LG remote volume safety](docs/lg-remote-volume-safety.md) explains the runaway
 hold-button defect and the reviewed single-step card replacement.
 

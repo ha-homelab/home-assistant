@@ -93,13 +93,8 @@
     ],
     "script.tv_random_channel": [
       ".storage/lovelace.lovelace"
-    ],
-    "automation.zero_grid___smart_battery_management": [
-      ".storage/lovelace.zero_grid"
     ]
   },
-  "preexisting_unresolved": [
-    "automation.zero_grid___smart_battery_management"
-  ],
+  "preexisting_unresolved": [],
   "migration_policy": "Preserve existing entity IDs, so valid references require no replacement."
 }

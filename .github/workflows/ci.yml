@@ -42,6 +42,8 @@ jobs:
     - run: python -m compileall -q tools config/python_scripts config/custom_zha_quirks
     - name: Test Core update card confirmation and stale-candidate handling
       run: node tests/core_update_card.cjs config/www/core-update-card.js
+    - name: Test radio console routing and group capacity
+      run: node tests/radio_console_card.cjs
     - name: Fetch pinned LocalTuya source for hotfix regression tests
       run: "curl --fail --location --retry 2 --max-time 30 \\\n  https://raw.githubusercontent.com/xZetsubou/hass-localtuya/3d0c0ec737b59ebfb1eea65df42f5d902eafaecc/custom_components/localtuya/cover.py\
         \ \\\n  --output \"$RUNNER_TEMP/localtuya-cover.py\"\necho \"e5a0f563de34a0252cd2f732f264deab9f6e9c9dc5d32fbf9ee4e34545424af9\
