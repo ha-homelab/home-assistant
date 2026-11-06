@@ -12,7 +12,7 @@ The existing SmartThings integration and all 52 pre-existing cloud entity IDs we
 
 The Family Hub refrigerator is **not paired yet**. Its normal setup attempt returned `no_response`, with no model or port resolved. Subsequent bounded public OCF discovery on UDP 5683 and 49153 received no response from either the actual HA runtime or a Mac directly on the home LAN. The router has a matching neighbor for the reserved candidate address, but that does not prove this is the current appliance-control endpoint. The user reported that the fridge screen is asleep and deferred waking it until later. Confirmation of the address on the Family Hub Wi-Fi screen is pending; screen sleep has not been established as the cause. The incomplete setup flow was closed, and no further appliance probes are scheduled. That observed result is different from the upstream `unknown_ca` report discussed below; certificate rejection has not been demonstrated on this refrigerator.
 
-One clock-synchronization command completed without a Home Assistant service error. The physical clock display has not yet been confirmed. Fan, lamp, heating, cooking, power and filter-reset controls were not exercised; their presence is not proof of physical operation.
+One clock-synchronization command completed without a Home Assistant service error. The user confirmed that the physical clock display now shows the correct time. Fan, lamp, heating, cooking, power and filter-reset controls were not exercised; their presence is not proof of physical operation.
 
 ### Local entities now registered
 
@@ -58,7 +58,7 @@ The clock command is explicitly marked as not requiring Smart Control by the int
 
 ### Observed result
 
-On November 6, 2026 at **02:37 PST**, the clock button completed without a service error while the range was idle and Smart Control was off. Home Assistant's configured time zone was verified. Physical display confirmation is pending; this is not a measured accuracy or drift result.
+On November 6, 2026 at **02:37 PST**, the clock button completed without a service error while the range was idle and Smart Control was off. Home Assistant's configured time zone was verified. The user then confirmed the correct time on the physical display. This verifies one successful clock correction, not long-term clock accuracy or resistance to later power interruptions.
 
 ### Optional automatic synchronization
 
