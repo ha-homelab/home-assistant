@@ -28,7 +28,7 @@ class PhonesDashboardTests(unittest.TestCase):
         result = module.build({"url_path": "phones", "devices": devices})
         self.assertEqual(len(result["views"]), 16)
         for device, view in zip(devices, result["views"][1:]):
-            self.assertTrue(set(device["entities"]) <= module.entity_refs(view))
+            self.assertLessEqual(set(device["entities"]), module.entity_refs(view))
         self.assertNotIn("conditional", str(result))
 
     def test_same_entity_is_not_duplicated_in_generated_groups(self):

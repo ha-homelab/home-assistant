@@ -51,8 +51,8 @@ class CerboViewMigrationTests(unittest.TestCase):
         home = by_path["cerbo-gx"]
         self.assertFalse(home["subview"])
         self.assertNotIn("gx", by_path)
-        self.assertTrue(module._entity_refs(cerbo["views"][1]) <= module._entity_refs(home))
-        self.assertTrue(module._entity_refs(cerbo) <= module._entity_refs(result))
+        self.assertLessEqual(module._entity_refs(cerbo["views"][1]), module._entity_refs(home))
+        self.assertLessEqual(module._entity_refs(cerbo), module._entity_refs(result))
         self.assertTrue(by_path["cerbo-device-1"]["subview"])
         self.assertEqual(by_path["cerbo-device-1"]["back_path"], "/lovelace/cerbo-gx")
         self.assertNotIn("/cerbo-gx/", str(result))
