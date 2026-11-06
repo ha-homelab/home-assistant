@@ -20,7 +20,9 @@
   "notes": [
     "Only the existing portable notification_frame_cache library is packaged. The household configuration, endpoint-bearing helpers, credentials, runtime cache and child automation/script libraries are outside the distribution inventory.",
     "Both existing configuration and pinned HA runtime validation jobs remain required, including the existing configuration-overlay build. No deploy, stage, promote, live camera or device operation is part of release publication.",
-    "The optional maintainer auto-approval is metadata-only after successful Quality gate completion and matching current PR head; it remains separate from callable validation permissions."
+    "The optional maintainer auto-approval is metadata-only after successful Quality gate completion and matching current PR head; it remains separate from callable validation permissions.",
+    "Documentation-only routing preserves full validation for semantic package readme metadata: docs/notification-frame-cache.md. Ordinary archive copies remain documentation-scoped.",
+    "The configured release-note file remains a full-validation input so its current release section, upgrade notes and security notes are checked."
   ],
   "versioning": {
     "schema": 1,
@@ -55,5 +57,19 @@
   },
   "fuzzing": {
     "toolkit_ref": "18e8ce037bc8305649bc4a40e9ecab81ae4100af"
+  },
+  "change_scope": {
+    "documentation_paths": [
+      "GOVERNANCE.md",
+      "ROADMAP.md"
+    ],
+    "required_paths": [
+      "CHANGELOG.md",
+      "docs/notification-frame-cache.md"
+    ],
+    "always_validate_workflows": [
+      "codeql.yml",
+      "ci.yml"
+    ]
   }
 }
