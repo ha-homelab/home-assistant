@@ -7,7 +7,9 @@ No network requests, entity enablement, service calls, or availability filtering
 import argparse
 import copy
 import json
+import os
 from pathlib import Path
+import tempfile
 
 
 def entity_refs(value):
@@ -106,9 +108,24 @@ def main():
     parser.add_argument("manifest", type=Path)
     parser.add_argument("output", type=Path)
     args = parser.parse_args()
+    if args.output.is_symlink():
+        parser.error("Output must not be a symbolic link")
+    if args.output.resolve() == args.manifest.resolve() or (
+        args.output.exists() and args.output.samefile(args.manifest)
+    ):
+        parser.error("Output must not overwrite the source manifest")
     result = build(json.loads(args.manifest.read_text()))
-    args.output.write_text(json.dumps(result, indent=2) + "\n")
-    args.output.chmod(0o600)
+    # mkstemp creates a private file before any manifest-derived bytes are
+    # written. Replace only after serialization succeeds, retaining old output
+    # on failure and never following an output symlink into another file.
+    descriptor, temporary = tempfile.mkstemp(prefix=f".{args.output.name}.", dir=args.output.parent)
+    try:
+        with os.fdopen(descriptor, "w") as stream:
+            json.dump(result, stream, indent=2)
+            stream.write("\n")
+        os.replace(temporary, args.output)
+    finally:
+        Path(temporary).unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
