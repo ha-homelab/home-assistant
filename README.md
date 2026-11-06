@@ -69,6 +69,9 @@ Victron device inventory without duplicating old sidebar panels.
 and one or more outputs, with native phone routing, capacity checks and visible
 per-speaker results.
 
+[LG remote volume safety](docs/lg-remote-volume-safety.md) explains the runaway
+hold-button defect and the reviewed single-step card replacement.
+
 [Vacuum maps](docs/vacuum-maps.md) adds a private, interactive Roborock view with
 room and zone selection, navigation, cleaning settings, and maintenance status.
 The reusable generator keeps house maps out of source control and documents
