@@ -18,7 +18,7 @@ One clock-synchronization command completed without a Home Assistant service err
 
 **Range hood Local** exposes the hood fan; lamp and lamp-brightness controls; alarm, energy, energy-saved, filter-usage and filter-status readings; automatic-operation and after-run status; a firmware-update-available indicator; and connection-mode/last-response diagnostics. It also registers filter-reset and cancel-after-run buttons. Filter capacity is disabled by the integration by default. Existence of these controls does not mean they were activated during installation.
 
-**Range Local** exposes oven cavity state, temperature, machine state, progress, operation time and estimated finish; aggregate cooktop running state, warming-center state, active-burner count and five individual burner indicators; door, child-lock, Smart Control, running, cloud-connection and firmware-update-available status; and connection-mode/last-response diagnostics. Registered controls include power, lamp, sound, energy saving, cooktop-on alert, setpoint, cook time, cooking mode, sync clock and stop. Their physical effects remain untested, and the physical positions of the five burner indicators have not been mapped here.
+**Range Local** exposes oven cavity state, temperature, machine state, progress, operation time and estimated finish; aggregate cooktop running state, warming-center state, active-burner count and five individual burner indicators; door, child-lock, Smart Control, running, cloud-connection and firmware-update-available status; and connection-mode/last-response diagnostics. Registered controls include power, lamp, sound, energy saving, cooktop-on alert, setpoint, cook time, cooking mode, sync clock and stop. Only clock synchronization has been physically confirmed. Other control effects remain untested, and the physical positions of the five burner indicators have not been mapped here.
 
 ## What remains on the cloud path
 
@@ -147,7 +147,7 @@ Migrate one proven mapping at a time. Preserve existing sticky, notification, de
 
 ## Reviewed baseline and references
 
-LocalThings v0.36.0 was installed through native Marketplace on Home Assistant 2026.11.0. Independent manifest verification matched the upstream tagged file; the resolved protocol library is smartthings-local 0.1.24. The hood and range subsequently paired and returned local observations as described above. The refrigerator remains unresolved, and physical control effects, extended reliability and Internet-outage behavior have not been accepted.
+LocalThings v0.36.0 was installed through native Marketplace on Home Assistant 2026.11.0. Independent manifest verification matched the upstream tagged file; the resolved protocol library is smartthings-local 0.1.24. The hood and range subsequently paired and returned local observations as described above. The refrigerator remains unresolved. Apart from the confirmed clock correction, physical control effects, extended reliability and Internet-outage behavior have not been accepted.
 
 - [LocalThings stable release](https://github.com/mbillow/localthings/releases/tag/v0.36.0)
 - [Setup and known behavior](https://github.com/mbillow/localthings/blob/v0.36.0/README.md)
