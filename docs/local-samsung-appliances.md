@@ -10,7 +10,11 @@ LocalThings **0.36.0** is installed through Marketplace on Home Assistant **2026
 
 The existing SmartThings integration and all 52 pre-existing cloud entity IDs were retained. Their automation consumers have not been replaced. Existing automatic updates remain enabled under the installation's normal maintenance policy.
 
-The Family Hub refrigerator is **not paired yet**. Its normal setup attempt returned `no_response`, with no model or port resolved. Subsequent bounded public OCF discovery on UDP 5683 and 49153 received no response from either the actual HA runtime or a Mac directly on the home LAN. The router has a matching neighbor for the reserved candidate address, but that does not prove this is the current appliance-control endpoint. The user reported that the fridge screen is asleep and deferred waking it until later. Confirmation of the address on the Family Hub Wi-Fi screen is pending; screen sleep has not been established as the cause. The incomplete setup flow was closed, and no further appliance probes are scheduled. That observed result is different from the upstream `unknown_ca` report discussed below; certificate rejection has not been demonstrated on this refrigerator.
+The Family Hub refrigerator is **not paired locally yet**. The first attempt returned `no_response` while the user reported the screen asleep. After the user unlocked the panel, a new bounded check confirmed a reachable matching router neighbor and two successful ICMP replies. Normal LocalThings setup then reached `credential_psk`: the selected endpoint answered, rejected the automatic certificate, and its plaintext credential metadata suggested a PSK. The earlier no-response result is therefore no longer the current blocker. This sequence does not establish that unlocking alone caused recovery. No authenticated local device identity or protected refrigerator readings have been obtained.
+
+The existing SmartThings refrigerator entry still exposes its 19 cloud entities. A keys-only check found cloud OAuth credentials, but no saved refrigerator OwnerPSK or peer PSK; the existing hood and range use certificate credentials. These are different authentication mechanisms. The user originally provisioned the refrigerator with an iPhone and still has that phone and its SmartThings installation. Do not substitute a cloud access token or the public owner UUID for a secret local key.
+
+A subsequent bounded, read-only inventory from the directly connected Mac received plaintext `oic.d.refrigerator` identity, the Family Hub name and the expected model/firmware. It found no additional multicast responders; that absence cannot exclude another stack. The selected interface advertised a PSK capability (`sct=1`) and an existing owner. One certificate-only attempt on the standard 5684 fallback also failed with `unknown_ca`. No credential was regenerated for that last check, and no appliance or security settings were written. The pending setup flow was closed without creating a LocalThings entry.
 
 One clock-synchronization command completed without a Home Assistant service error. The user confirmed that the physical clock display now shows the correct time. Fan, lamp, heating, cooking, power and filter-reset controls were not exercised; their presence is not proof of physical operation.
 
@@ -117,9 +121,19 @@ Observe each local entity through naturally occurring operation before assigning
 
 A successful initial read does not establish reliable continuous updates. In particular, an upstream report for the `TP1X_DA-KS-RANGE-0101X` range family on firmware ending `40240205` describes silently stale burner state and rejected lamp commands. Do not promote such a range to the only automation input based on setup success alone.
 
-For the `25K_REF_LCD_FHUB10.0` Family Hub family on firmware `20251031.075639`, upstream reports automatic certificate rejection (`unknown_ca`). A confirmed secure UDP responder therefore does not establish a usable authenticated session. Our current normal setup stopped earlier with `no_response`; do not relabel that failure as a certificate problem without further evidence.
+For the `25K_REF_LCD_FHUB10.0` Family Hub family on firmware `20251031.075639`, upstream reports automatic certificate rejection (`unknown_ca`). Our resumed normal setup also rejected its automatic certificate and offered PSK import. Reaching this menu proves neither that a particular key will work nor that local pairing is complete. A confirmed secure UDP responder does not establish a usable authenticated session.
 
 The `AHD-WW-TP1-22-COMMON` range-hood family has a fixture in the reviewed stable release and is a reasonable first candidate. A fixture confirms a supported resource map, not the current credentials or network behavior of every individual appliance.
+
+## Family Hub credential boundary
+
+LocalThings 0.36.0 imports an already-provisioned OwnerPSK or pairwise peer credential. It does not acquire a key, take ownership, or write OCF security resources. Pairing is accepted only after the supplied credential authenticates and the appliance returns its device identity over that authenticated session.
+
+The upstream recovery examples cover a WD86 washer and an LCD oven, using rooted Android and model-specific tooling. They are not a verified recovery procedure for this Family Hub or its original iPhone. Likewise, a reported additive peer grant on another refrigerator family does not establish support here. Removing the refrigerator from SmartThings, resetting it, or running another model's onboarding sequence is not part of this rollout.
+
+No verified iPhone/Finder-backup recovery path for this model was found in the reviewed upstream material. A retained SmartThings app or cloud login is not proof that an exportable local key is available. Inspecting an existing suitable Android installation could be a separate investigation; it must not be described as a working Family Hub solution before its credential authenticates to this refrigerator.
+
+A normal cloud status response only verifies the SmartThings path. Keep those entities and consumers until local authentication, identity and fresh protected readings are independently verified. See the [tagged credential-acquisition documentation](https://github.com/mbillow/localthings/blob/v0.36.0/docs/credential-acquisition.md) for the supported import interface and the limits of the published recovery examples.
 
 ## Preserve existing automations
 
