@@ -8,13 +8,13 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-    - uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25
+    - uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
       with:
         egress-policy: audit
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         persist-credentials: false
-    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       with:
         python-version: '3.13'
     - run: pip install -r requirements.txt
@@ -55,8 +55,15 @@ jobs:
         \  $RUNNER_TEMP/vehicle-info-card.js\" | sha256sum --check\n  cp \"$RUNNER_TEMP/vehicle-info-card.js\" \"$cached\"\
         \nfi\ncp \"$cached\" \"$RUNNER_TEMP/vehicle-info-card.js\"\necho \"ea1a5f23dfd4f28a2b2eb48d99adc2f40b65d3d2e36a8364442d6ddfdca9dcfe\
         \  $RUNNER_TEMP/vehicle-info-card.js\" | sha256sum --check\n"
+    - name: Fetch reviewed LG remote card for volume regression tests
+      run: |
+        curl --fail --location --retry 2 --connect-timeout 15 --max-time 90 \
+          https://github.com/madmicio/LG-WebOS-Remote-Control/releases/download/2.1.0/lg-remote-control.js \
+          --output "$RUNNER_TEMP/lg-remote-control.js"
+        echo "45fda8299d5553662b2bdd53616ec99daadc09431b5d19df1c199235c1e8825e  $RUNNER_TEMP/lg-remote-control.js" | sha256sum --check
     - run: python -m unittest discover -s tests -v
       env:
+        LG_REMOTE_CONTROL_SOURCE: ${{ runner.temp }}/lg-remote-control.js
         LOCAL_TUYA_COVER_SOURCE: ${{ runner.temp }}/localtuya-cover.py
         VEHICLE_INFO_CARD_SOURCE: ${{ runner.temp }}/vehicle-info-card.js
     - name: Scan source and comments with the pinned secret scanner
@@ -74,10 +81,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-    - uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25
+    - uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
       with:
         egress-policy: audit
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         persist-credentials: false
     - name: Verify RF matching and guarded transmission without hardware I/O
