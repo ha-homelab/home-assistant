@@ -325,6 +325,41 @@ class RuntimeResilienceTest(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(services.count('notify.imac21'), 1)
             self.assertEqual(services.count('persistent_notification.create'), int(name == 'notifymax'))
 
+    async def test_desktop_device_copy_preserves_explicit_false_and_default(self):
+        deliveries = []
+        async def capture_optional(call):
+            deliveries.append(dict(call.data))
+            await self.optional(call)
+        self.hass.services.async_register('script', 'notify_optional', capture_optional)
+        for arguments, expected in [({}, True), ({'also_devices': True}, True),
+                                    ({'also_devices': False}, False)]:
+            with self.subTest(arguments=arguments):
+                deliveries.clear()
+                self.events.clear()
+                await self.make_script(self.source_script('notify')).async_run(
+                    {'message': 'Energy notification', **arguments}, context=Context())
+                self.assertEqual(len(deliveries), 2)
+                self.assertIs(deliveries[0]['also_devices'], expected)
+                self.assertNotIn('also_devices', deliveries[1])
+                self.assertEqual([event[0] for event in self.events],
+                                 ['notify.roomba', 'html5.send_message', 'notify.imac21'])
+
+    async def test_solar_actions_keep_power_control_without_device_copy(self):
+        self.hass.services.async_register('script', 'notify', self.record)
+        for number, action in [(123, 'switch.turn_on'), (124, 'switch.turn_off')]:
+            with self.subTest(number=number):
+                self.events.clear()
+                config = self.automation(number)
+                await self.make_script({'sequence': config['actions']}).async_run(
+                    {}, context=Context())
+                self.assertEqual(self.events[:2], [
+                    (action, {'entity_id': ['switch.mppt_fan']}),
+                    (action, {'entity_id': ['switch.heater_three']})])
+                self.assertEqual(len(self.events), 3)
+                self.assertEqual(self.events[2][0], 'script.notify')
+                self.assertIs(self.events[2][1]['also_devices'], False)
+                self.assertTrue(self.events[2][1]['message'].startswith('Solar '))
+
     async def test_motion_copy_respects_mute_and_ignores_retired_postbox(self):
         self.hass.services.async_register('script', 'notify_mqtt', self.record)
         config = self.automation(70)

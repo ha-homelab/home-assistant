@@ -54,6 +54,31 @@ in use for 14 shutdown rules. Broader automation modes, power thresholds, househ
 schedules and device assignments are preserved. Power-control and safety routines
 were not combined into a generic blueprint: their guards and ordering differ.
 
+## Optional spoken copies
+
+`script.notify` accepts `also_devices: false` to suppress an optional spoken
+copy to phones and speakers. Omitting the field keeps the existing device-copy
+default. The flag is forwarded once, alongside the Chrome copy; desktop and
+browser delivery do not depend on it. Installation-specific device routing in
+`script.notify_optional` must honor this flag. The shared default router has no
+device speech transport, so passing the flag alone does not enable speech.
+
+The two Solar production-threshold automations pass `also_devices: false`.
+Their thresholds, five-minute delays, guards and power-control actions remain
+unchanged. Other callers retain their existing notification behavior.
+
+```yaml
+action: script.notify
+data:
+  message: Solar production changed
+  also_devices: false
+```
+
+For an installation that overrides the notification scripts or these Solar
+automations, carry the same changes into its reviewed override files before a
+later deployment. Updating only the public source cannot replace private
+whole-file overrides. Reload the updated script before its caller automations.
+
 ## Source and runtime consistency
 
 The root IGW package is synchronized with the already deployed local Cast service
