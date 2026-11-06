@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import stat
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -10,7 +11,8 @@ from unittest.mock import patch
 PATH = Path(__file__).resolve().parents[1] / "scripts/build_phones_dashboard.py"
 spec = importlib.util.spec_from_file_location("phones_dashboard", PATH)
 module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(module)
+with patch.object(sys, "path", [str(PATH.parent), *sys.path]):
+    spec.loader.exec_module(module)
 
 
 class PhonesDashboardTests(unittest.TestCase):

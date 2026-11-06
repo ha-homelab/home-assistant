@@ -2,8 +2,12 @@
 """Render a private radio console from a reviewed catalog and live player metadata."""
 import argparse
 import json
-import os
 from pathlib import Path
+
+if __package__:
+    from .private_output import UnsafeOutputError, private_output
+else:
+    from private_output import UnsafeOutputError, private_output
 
 
 def build_console(catalog, targets, phone_limit=4):
@@ -45,14 +49,13 @@ def main():
     parser.add_argument("targets", type=Path)
     parser.add_argument("output", type=Path)
     args = parser.parse_args()
-    if args.output.resolve() in (args.catalog.resolve(), args.targets.resolve()):
-        parser.error("Output must not overwrite a source file")
     result = build_console(json.loads(args.catalog.read_text()), json.loads(args.targets.read_text()))
-    descriptor = os.open(args.output, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-    with os.fdopen(descriptor, "w") as output:
-        os.fchmod(output.fileno(), 0o600)
-        json.dump(result, output, indent=2)
-        output.write("\n")
+    try:
+        with private_output(args.output, (args.catalog, args.targets)) as output:
+            json.dump(result, output, indent=2)
+            output.write("\n")
+    except UnsafeOutputError as exc:
+        parser.error(str(exc))
 
 
 if __name__ == "__main__":

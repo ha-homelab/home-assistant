@@ -1,10 +1,14 @@
 import importlib.util
 from pathlib import Path
+import sys
 import unittest
+from unittest.mock import patch
 
-spec = importlib.util.spec_from_file_location("console_manifest", Path(__file__).resolve().parents[1] / "scripts/build_radio_console.py")
+PATH = Path(__file__).resolve().parents[1] / "scripts/build_radio_console.py"
+spec = importlib.util.spec_from_file_location("console_manifest", PATH)
 module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(module)
+with patch.object(sys, "path", [str(PATH.parent), *sys.path]):
+    spec.loader.exec_module(module)
 
 
 class ConsoleManifestTests(unittest.TestCase):

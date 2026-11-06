@@ -1,12 +1,15 @@
 import copy
 import importlib.util
 from pathlib import Path
+import sys
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("radio_catalog", ROOT / "scripts/sync_lifesize_radio_catalog.py")
 module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(module)
+with patch.object(sys, "path", [str(ROOT / "scripts"), *sys.path]):
+    spec.loader.exec_module(module)
 
 
 class RadioCatalogTests(unittest.TestCase):

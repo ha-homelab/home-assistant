@@ -8,6 +8,11 @@ import re
 
 import yaml
 
+if __package__:
+    from .private_output import UnsafeOutputError, private_output
+else:
+    from private_output import UnsafeOutputError, private_output
+
 
 def sync_catalog(package, catalog):
     stations = catalog.get("stations", {})
@@ -46,9 +51,11 @@ def main():
     parser.add_argument("output", type=Path)
     args = parser.parse_args()
     result = sync_catalog(yaml.safe_load(args.package.read_text()), json.loads(args.catalog.read_text()))
-    args.output.touch(mode=0o600, exist_ok=True)
-    args.output.chmod(0o600)
-    args.output.write_text(yaml.safe_dump(result, sort_keys=False, allow_unicode=True, width=120))
+    try:
+        with private_output(args.output, (args.package, args.catalog)) as stream:
+            yaml.safe_dump(result, stream, sort_keys=False, allow_unicode=True, width=120)
+    except UnsafeOutputError as exc:
+        parser.error(str(exc))
 
 
 if __name__ == "__main__":
