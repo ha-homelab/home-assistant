@@ -1,7 +1,6 @@
 """Execute the vendored merger with mocked metadata; never call GitHub."""
 # Narrow actual-ref regressions from Toolkit test_auto_merge.py@76f79dc0efed6766d3d975cf51b4f003ffa7c168.
 import copy
-import json
 import os
 import re
 import textwrap
