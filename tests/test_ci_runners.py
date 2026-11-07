@@ -28,6 +28,13 @@ AUTOMATION_RUNNER = (
     '(vars.CI_RUNNER_AUTOMATION_LABELS || \'[]\') || \'["ubuntu-24.04"]\') }}'
 )
 
+DEPENDENCY_APPROVAL = 'toolkit-auto-approve-reusable-de4848ae46c03248095a31edc937cddd523d7ac0.yml'
+DEPENDENCY_MERGE = 'toolkit-auto-merge-413248b9fdb724e787097c5c56802412a49e9467.yml'
+DEPENDENCY_WORKFLOWS = {
+    'auto-approve-dependencies.yml', 'auto-merge.yml',
+    DEPENDENCY_APPROVAL, DEPENDENCY_MERGE,
+}
+
 
 class RunnerBoundaryTests(unittest.TestCase):
     def test_public_jobs_preserve_scoped_runner_and_token_boundaries(self):
@@ -39,6 +46,7 @@ class RunnerBoundaryTests(unittest.TestCase):
             'release-build.yml': {'contents': 'read', 'actions': 'read'},
             'auto-approve.yml': {'contents': 'read', 'actions': 'read', 'pull-requests': 'write'},
         }
+        permissions.update({name: {'contents': 'read'} for name in DEPENDENCY_WORKFLOWS})
         paths = list((ROOT / '.github/workflows').glob('*.yml'))
         self.assertEqual({path.name for path in paths}, set(permissions))
         calls = {
@@ -60,6 +68,10 @@ class RunnerBoundaryTests(unittest.TestCase):
         for path in paths:
             workflow = yaml.safe_load(path.read_text())
             self.assertEqual(workflow['permissions'], permissions[path.name])
+            if path.name in DEPENDENCY_WORKFLOWS:
+                # These exact metadata workflows have separate token/runner
+                # assertions below; the six source/release workflows keep theirs.
+                continue
             self.assertNotIn('secrets.', path.read_text())
             for name, job in workflow['jobs'].items():
                 with self.subTest(workflow=path.name, job=name):
@@ -104,10 +116,17 @@ class RunnerBoundaryTests(unittest.TestCase):
             'release-pipeline.yml': {'push', 'schedule', 'workflow_dispatch'},
             'auto-approve.yml': {'workflow_run'},
         }
+        expected.update({
+            'auto-approve-dependencies.yml': {'pull_request_target'},
+            'auto-merge.yml': {'pull_request_target', 'workflow_run', 'status', 'check_run', 'schedule', 'workflow_dispatch'},
+            DEPENDENCY_APPROVAL: {'workflow_call'},
+            DEPENDENCY_MERGE: {'workflow_call'},
+        })
         for path in (ROOT / '.github/workflows').glob('*.yml'):
             workflow = yaml.load(path.read_text(), Loader=yaml.BaseLoader)
             self.assertEqual(set(workflow['on']), expected[path.name])
-            self.assertNotIn('pull_request_target', workflow['on'])
+            if path.name not in DEPENDENCY_WORKFLOWS:
+                self.assertNotIn('pull_request_target', workflow['on'])
             if path.name == 'auto-approve.yml':
                 self.assertEqual(workflow['on']['workflow_run'], {'workflows': ['Quality gate'], 'types': ['completed']})
                 steps = workflow['jobs']['approve']['steps']
@@ -115,6 +134,54 @@ class RunnerBoundaryTests(unittest.TestCase):
                 source = next(step['run'] for step in steps if 'run' in step)
                 self.assertIn("pr['head']['sha'] == head", source)
                 self.assertIn("run['conclusion'] == 'success'", source)
+
+    def test_dependency_metadata_paths_do_not_execute_pull_request_code(self):
+        root = ROOT / '.github/workflows'
+        callers = {
+            'auto-approve-dependencies.yml': ('auto-approve', DEPENDENCY_APPROVAL, {'BOT_PAT', 'APPROVAL_PAT'}),
+            'auto-merge.yml': ('auto-merge', DEPENDENCY_MERGE, {'BOT_PAT'}),
+        }
+        for filename, (job_name, target, secrets) in callers.items():
+            workflow = yaml.safe_load((root / filename).read_text())
+            self.assertEqual(set(workflow['jobs']), {job_name})
+            job = workflow['jobs'][job_name]
+            self.assertEqual(job['uses'], './.github/workflows/' + target)
+            self.assertNotIn('steps', job)
+            self.assertNotIn('runs-on', job)
+            self.assertEqual(job['permissions'], {'contents': 'read', 'pull-requests': 'write'})
+            self.assertEqual(set(job['secrets']), secrets)
+            for name, expression in job['secrets'].items():
+                self.assertEqual(expression, '${{ secrets.' + name + ' }}')
+            self.assertIn('github.event.pull_request.head.repo.full_name == github.repository', job['if'])
+            self.assertIn('californiantiramisu', job['if'])
+            self.assertIn('renovate[bot]', job['if'])
+            # This public repository always uses hosted metadata execution.
+            self.assertIn('github.event.repository.private &&', job['with']['runner-labels'])
+            self.assertTrue(job['with']['runner-labels'].endswith('|| \'["ubuntu-24.04"]\' }}'))
+        approval = yaml.safe_load((root / 'auto-approve-dependencies.yml').read_text())['jobs']['auto-approve']
+        self.assertNotIn('"4alvit"', approval['if'])
+        merge = yaml.safe_load((root / 'auto-merge.yml').read_text())['jobs']['auto-merge']
+        self.assertTrue(merge['with']['reviewed-merge'])
+        self.assertTrue(merge['with']['reviewed-single-pass'])
+        self.assertTrue(merge['with']['allow-owned-bot-actions-review'])
+        self.assertEqual(merge['with']['required-status-checks'], 'CI gate')
+        self.assertIn('"schedule"', merge['if'])
+        for filename, job_name in [(DEPENDENCY_APPROVAL, 'auto-approve'), (DEPENDENCY_MERGE, 'auto-merge')]:
+            workflow = yaml.safe_load((root / filename).read_text())
+            self.assertEqual(set(workflow['jobs']), {job_name})
+            job = workflow['jobs'][job_name]
+            self.assertEqual(job['permissions'], {'contents': 'read', 'pull-requests': 'write'})
+            self.assertIn('inputs.runner-labels', job['runs-on'])
+            self.assertEqual(len(job['steps']), 2)
+            for step in job['steps']:
+                if 'uses' in step:
+                    self.assertRegex(step['uses'], r'^step-security/harden-runner@[0-9a-f]{40}$')
+                else:
+                    self.assertIn('run', step)
+                    self.assertIn('python3 -I', step.get('shell', '') + step['run'])
+                    self.assertNotIn('${{', step['run'])
+                    self.assertNotIn('actions/checkout', step['run'])
+                    self.assertNotIn('download-artifact', step['run'])
 
     def test_runners_do_not_mount_host_or_kubernetes_credentials(self):
         docs = list(yaml.safe_load_all((ROOT / 'deploy/github-actions-k3s/runners.yaml').read_text()))
