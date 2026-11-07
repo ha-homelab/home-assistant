@@ -1,0 +1,42 @@
+# Metadata only: never check out or run pull-request code with the bot token.
+name: Auto Merge PRs
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled, edited, converted_to_draft]
+  workflow_run:
+    workflows: ["Quality gate", "Approve opted-in checked PR", "Approve dependency updates"]
+    types: [completed]
+  status:
+  check_run:
+    types: [completed]
+  schedule:
+    - cron: '25 4 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  auto-merge:
+    # The reusable workflow resolves every candidate and enforces same-repo,
+    # author, label, review, exact-head checks and current-base ancestry itself.
+    if: >-
+      ((github.event_name == 'pull_request_target' &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        contains(fromJSON('["4alvit","californiantiramisu","dependabot[bot]","renovate[bot]"]'), github.event.pull_request.user.login)) ||
+       (contains(fromJSON('["workflow_run","status","check_run","workflow_dispatch","schedule"]'), github.event_name) &&
+        github.ref == format('refs/heads/{0}', github.event.repository.default_branch)))
+    concurrency:
+      group: automerge-reviewed-${{ github.repository }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: ./.github/workflows/toolkit-auto-merge-413248b9fdb724e787097c5c56802412a49e9467.yml                         # main
+    with:
+      runner-labels: ${{ github.event.repository.private && (vars.CI_RUNNER_MODE == 'self-hosted' || vars.CI_RUNNER_MODE == 'k3s') && (vars.CI_RUNNER_AUTOMATION_LABELS || '["private-runner-not-configured"]') || '["ubuntu-24.04"]' }}
+      reviewed-merge: true
+      reviewed-single-pass: true
+      allow-dependabot-actions-review: true
+      allow-owned-bot-actions-review: true
+      required-status-checks: "CI gate"
+    secrets:
+      BOT_PAT: ${{ secrets.BOT_PAT }}

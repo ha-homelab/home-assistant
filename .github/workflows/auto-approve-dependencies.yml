@@ -1,0 +1,25 @@
+# Read PR metadata only; the pinned workflow never checks out repository code.
+name: Approve dependency updates
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
+permissions:
+  contents: read
+concurrency:
+  group: auto-approve-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  auto-approve:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      contains(fromJSON('["californiantiramisu","renovate[bot]"]'), github.event.pull_request.user.login) &&
+      !github.event.pull_request.draft
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: ./.github/workflows/toolkit-auto-approve-reusable-de4848ae46c03248095a31edc937cddd523d7ac0.yml                         # main
+    with:
+      runner-labels: ${{ github.event.repository.private && (vars.CI_RUNNER_MODE == 'self-hosted' || vars.CI_RUNNER_MODE == 'k3s') && (vars.CI_RUNNER_AUTOMATION_LABELS || '["private-runner-not-configured"]') || '["ubuntu-24.04"]' }}
+    secrets:
+      BOT_PAT: ${{ secrets.BOT_PAT }}
+      APPROVAL_PAT: ${{ secrets.APPROVAL_PAT }}
