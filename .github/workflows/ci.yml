@@ -1,6 +1,11 @@
 name: Configuration CI
 'on':
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      run-maintenance-runtime:
+        description: Run pinned Home Assistant runtime scenarios; disable only for proven documentation scope
+        type: boolean
+        default: true
 permissions:
   contents: read
 jobs:
@@ -90,94 +95,116 @@ jobs:
       with:
         persist-credentials: false
     - name: Verify RF matching and guarded transmission without hardware I/O
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_rf_airbridge.py -v
     - name: Verify RM433 player navigation and bounded delivery without hardware I/O
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_ott_d1_remote.py -v
     - name: Verify living curtain RF start and independent Wi-Fi fallback
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_living_curtain_morning.py -v
     - name: Verify LG wake, Harmony fallback and OTT Power without hardware I/O
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p 'test_lg_tv_*.py' -v
     - name: Verify Victron battery telemetry without hardware I/O
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p 'test_victron_*.py' -v
     - name: Verify garage button OTA artifacts and native ZHA registration
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_garage_button_artifacts.py -v
     - name: Verify Recorder protection and selective retention boundaries
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_recorder_retention.py -v
     - name: Render office curtain connection and position templates
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_office_cover_template.py -v
     - name: Execute maintenance scenarios in the deployed HA image
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_hacs_maintenance.py -v
     - name: Execute explicit Core update approvals without deployment I/O
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p 'test_core_update*.py' -v
     - name: Execute lighting recovery scenarios in the deployed HA image
       env:
         REQUIRE_PRIVATE_DEPENDENCIES: '1'
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --env REQUIRE_PRIVATE_DEPENDENCIES
         --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly" --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_motion_light_off.py -v
     - name: Verify dining media evening guards without hardware I/O
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_dining_media_evening.py -v
     - name: Verify living room presence lighting without hardware I/O
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_living_room_presence.py -v
     - name: Verify sticky overrides across motion, dimming and camera lighting
       env:
         REQUIRE_PRIVATE_DEPENDENCIES: '1'
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --env REQUIRE_PRIVATE_DEPENDENCIES
         --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly" --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_sticky_lighting.py -v
     - name: Verify migrated self-consumption targets with the pinned selector
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --env SELF_CONSUMPTION_SELECTOR=/workspace/config/python_scripts/select_devices.py
         --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly" --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s dependencies/automations/tests -p test_self_consumption_runtime.py -v
     - name: Verify Bath 2 light routing and screen notification exclusion
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1
         --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly" --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_bath_2_light.py -v
     - name: Execute optional notification resilience scenarios
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_runtime_resilience.py -v
     - name: Execute cooktop notification scenarios
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_cooktop_notifications.py -v
     - name: Execute nonblocking Cisco motion notification scenarios
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_cisco_motion_notifications.py -v
     - name: Execute camera snapshot preservation scenarios
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_camera_snapshots.py -v
     - name: Execute bounded Ring video readiness scenarios
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_ring_video_ready.py -v
     - name: Execute notification frame cache reuse scenarios
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_notification_frame_cache.py -v
@@ -185,26 +212,32 @@ jobs:
       timeout-minutes: 5
       env:
         REQUIRE_PRIVATE_DEPENDENCIES: '1'
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --env REQUIRE_PRIVATE_DEPENDENCIES
         --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly" --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p 'test_water_*.py' -v
     - name: Verify read-only vacuum positions, map identity and stale-data handling
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_vacuum_floorplan_position.py -v
     - name: Execute Roomba network recovery scenarios
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_roomba_recovery.py -v
     - name: Verify passive Roomba telemetry and native connection lifecycle
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_roomba_insights.py -v
     - name: Verify bounded relative Roomba path images without hardware I/O
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --env REQUIRE_HA_RUNTIME=1 --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_roomba_trail.py -v
     - name: Execute Echo Plex queue reuse scenarios
+      if: ${{ inputs.run-maintenance-runtime }}
       run: docker run --rm --network none --read-only --tmpfs /tmp:rw --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/workspace,readonly"
         --workdir /workspace --entrypoint python ghcr.io/home-assistant/home-assistant@sha256:612d76760b544cb40b7ba01387fdac964c59a6a550a50a4d30b4773c822d2918
         -m unittest discover -s tests -p test_echo_plex_music.py -v
