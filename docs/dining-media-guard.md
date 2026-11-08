@@ -75,8 +75,8 @@ After **all four sensors have individually stayed off for ten minutes**:
 - Dining Media guard and Living bookshelf turn off regardless of the TV state, if both overrides
   above are off.
 - Living TV Guard turns off only if `media_player.living_room_tv_77`, the native
-  webOS entity, has continuously reported `off` for **two hours**. A DLNA entity
-  reporting `idle` is not proof that the TV is off. Living Sticky must also be off. The outlet must have
+  webOS entity, reports `off` or `unavailable`. A DLNA entity reporting `idle` is not
+  proof that the TV is off. Living Sticky must also be off. The outlet must have
   continuously reported `on` for **two minutes**, and
   `timer.living_room_tv_wake_grace` must be `idle`.
 
@@ -88,25 +88,21 @@ wake requests do not extend it. Missing or unknown timer state blocks automatic
 TV power-off. Dining Media guard and Living bookshelf do not depend on either
 TV startup protection.
 
-If the TV is switched off later, its two-hour off interval must finish before
-the same inactivity condition is checked again. Returning to any other state
-restarts that interval. The periodic check cannot bypass it. `unknown`,
-`unavailable`, or missing sensor states never count as inactivity. An unknown or unavailable TV protects its outlet
-without preventing Dining Media guard from shutting down.
-
-The two-hour standby allowance is a conservative power policy, not a signal
-that panel maintenance has completed. LG says OLED care can take up to 1.5 hours
-on some models and must not be interrupted by unplugging the TV; see the
-[LG OLED care guide](https://kr.eguide.lgappstv.com/manual/w24_mr2/global/Contents/settings/oledcare_k_u_b_e_c_a_t_j/enga/w24__settings__oledcare_k_u_b_e_c_a_t_j__enga.html).
-Manual outlet controls are unchanged. Keep Living Sticky enabled when power
-must remain uninterrupted beyond this interval, including manually scheduled care.
+If the TV switches off or becomes unavailable later, that transition rechecks the
+same inactivity condition. `unknown`, `unavailable`, or missing sensor states
+never count as inactivity. An unknown or missing TV entity protects its outlet without preventing Dining
+Media guard from shutting down. An **unavailable TV permits cutoff**, according
+to the owner's chosen policy. This is an operational convention, not proof of
+physical power state: a network failure can also make an active TV unavailable.
+There is no additional TV-off delay or OLED maintenance hold. Active states,
+including `on`, `playing`, `paused`, `idle` and `buffering`, block TV outlet cutoff.
 
 ## Reload, recovery and manual control
 
 The automation uses a ten-minute state trigger and repeats the elapsed-state
 check once per minute. This catches a deadline whose pending trigger was lost
 when automations reloaded, with at most one extra minute of delay. A full HA
-restart begins fresh observed inactivity and TV-off intervals; downtime is not evidence
+restart begins a fresh observed inactivity interval; downtime is not evidence
 that rooms were empty. See Home Assistant's [state conditions](https://www.home-assistant.io/conditions/state/)
 and [automation triggers](https://www.home-assistant.io/docs/automation/trigger/).
 

@@ -66,19 +66,17 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         def shorten(value):
             if isinstance(value, dict):
                 if 'for' in value:
-                    self.assertIn(value['for'], ('00:10:00', '00:02:00', '02:00:00'))
+                    self.assertIn(value['for'], ('00:10:00', '00:02:00'))
                     self.duration_count += 1
-                    value['for'] = {'milliseconds': {'00:02:00': 150, '00:10:00': 250, '02:00:00': 500}[value['for']]}
+                    value['for'] = {'milliseconds': 150 if value['for'] == '00:02:00' else 250}
                 for item in value.values():
                     shorten(item)
             elif isinstance(value, list):
                 for item in value:
                     shorten(item)
         shorten(self.config)
-        # Restore seven when the paused bookshelf shutdown block is enabled.
-        self.assertEqual(self.duration_count, 6)
-        # Baseline is an already sleeping TV; transition tests reset this age.
-        await asyncio.sleep(.55)
+        # Restore five when the paused bookshelf shutdown block is enabled.
+        self.assertEqual(self.duration_count, 4)
 
     async def asyncTearDown(self):
         await self.hass.async_stop(force=True)
@@ -160,7 +158,7 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_non_off_tv_states_protect_tv_but_not_dining(self):
         await self.load()
-        for state in ('on', 'playing', 'paused', 'idle', 'unknown', 'unavailable', None):
+        for state in ('on', 'playing', 'paused', 'idle', 'buffering', 'unknown', None):
             with self.subTest(tv=state):
                 self.set_sensors('on')
                 if state is None:
@@ -175,7 +173,7 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(self.calls, [('turn_off', self.media_entity)])
                 self.assertEqual(self.hass.states.get(TV_POWER).state, 'on')
 
-    async def test_tv_off_waits_for_oled_hold_after_room_timeout(self):
+    async def test_tv_off_after_timeout_triggers_tv_shutdown(self):
         self.hass.states.async_set(TV, 'playing')
         await self.load()
         self.set_sensors('off')
@@ -183,39 +181,27 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.calls, [('turn_off', self.media_entity)])
         self.hass.states.async_set(TV, 'off')
         await self.settle(.04)
-        self.assertNotIn(('turn_off', TV_POWER), self.calls)
-        await self.settle(.55)
         self.assertEqual(self.calls[-1], ('turn_off', TV_POWER))
 
-    async def test_interrupted_off_interval_must_start_again(self):
+    async def test_unavailable_tv_after_timeout_triggers_tv_shutdown(self):
         self.hass.states.async_set(TV, 'playing')
         await self.load()
         self.set_sensors('off')
         await self.settle()
-        self.hass.states.async_set(TV, 'off')
-        await self.settle(.3)
+        self.assertEqual(self.calls, [('turn_off', self.media_entity)])
         self.hass.states.async_set(TV, 'unavailable')
         await self.settle(.04)
-        self.hass.states.async_set(TV, 'off')
-        await self.settle(.3)
-        self.assertNotIn(('turn_off', TV_POWER), self.calls)
-        await self.settle(.3)
         self.assertEqual(self.calls[-1], ('turn_off', TV_POWER))
 
-    async def test_periodic_recheck_cannot_bypass_fresh_off_age(self):
-        # Also models fresh state after HA startup or return from playing.
-        self.hass.states.async_set(TV, 'playing')
-        self.set_sensors('off')
+    async def test_unavailable_tv_still_respects_occupancy_and_sticky(self):
+        self.hass.states.async_set(TV, 'unavailable')
         await self.load()
         await self.settle()
-        off_rule = next(s.entity_id for s in self.hass.states.async_all('automation')
-            if s.attributes.get('id') == 'ha_homelab_dining_media_guard_evening_power_off')
-        self.hass.states.async_set(TV, 'off')
-        await self.hass.services.async_call('automation', 'trigger',
-            {'entity_id': off_rule, 'skip_condition': False}, blocking=True)
-        self.assertNotIn(('turn_off', TV_POWER), self.calls)
-        await self.settle(.55)
-        self.assertEqual(self.calls[-1], ('turn_off', TV_POWER))
+        self.assertEqual(self.calls, [])
+        self.hass.states.async_set(LIVING_STICKY, 'on')
+        self.set_sensors('off')
+        await self.settle()
+        self.assertEqual(self.calls, [])
 
     async def test_manual_off_waits_for_new_activity(self):
         await self.load()
