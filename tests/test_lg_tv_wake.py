@@ -307,7 +307,7 @@ class LGWakeTest(unittest.IsolatedAsyncioTestCase):
         def shorten(value):
             if isinstance(value, dict):
                 if 'for' in value:
-                    self.assertIn(value['for'], ('00:10:00', '00:02:00'))
+                    self.assertIn(value['for'], ('00:10:00', '00:02:00', '02:00:00'))
                     value['for'] = {'milliseconds': 20}
                 for item in value.values():
                     shorten(item)
@@ -354,6 +354,8 @@ class LGWakeTest(unittest.IsolatedAsyncioTestCase):
         self.hass.states.async_set(TV, 'off')
         await self.inactivity_tick()
         self.assertNotIn('power_off', self.events)
+        # The OLED hold must elapse as well as the independent wake timer.
+        await asyncio.sleep(.03)
         # Finish the real HA timer to simulate its bounded expiry, then tick.
         await self.hass.services.async_call('timer', 'finish', {'entity_id': GRACE}, blocking=True)
         await self.inactivity_tick()

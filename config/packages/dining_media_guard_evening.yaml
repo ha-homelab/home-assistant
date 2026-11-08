@@ -103,9 +103,9 @@ automation:
 - id: ha_homelab_dining_media_guard_evening_power_off
   alias: 'Media guards: Turn off after shared inactivity'
   description: After all four Living/Lobby/Dining sensors are off for ten minutes,
-    turn off Dining Media guard and, only when the native LG TV is off, Living TV
-    Guard. Room Sticky overrides preserve manual outlet states. Unknown or
-    unavailable sensor states never count as inactivity.
+    turn off Dining Media guard and, only after the native LG TV has been off
+    continuously for two hours, Living TV Guard. Room Sticky overrides preserve
+    manual outlet states. Unknown or unavailable sensor states never count as inactivity.
   triggers:
   - trigger: state
     entity_id:
@@ -118,6 +118,7 @@ automation:
   - trigger: state
     entity_id: media_player.living_room_tv_77
     to: 'off'
+    for: '02:00:00'
   # State timers are lost on automation reload. Recheck elapsed state ages, not
   # outlet state changes, so a manual off never causes an immediate turn-on.
   - trigger: time_pattern
@@ -187,6 +188,8 @@ automation:
     - condition: state
       entity_id: media_player.living_room_tv_77
       state: 'off'
+      # Preserve standby power for OLED care; uncertain states never qualify.
+      for: '02:00:00'
     - condition: state
       entity_id: switch.living_tv_guard
       state: 'on'
