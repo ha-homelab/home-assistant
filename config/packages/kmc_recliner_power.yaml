@@ -1,0 +1,23 @@
+# Single-point, per-device correction supplied by the owner: 55 W -> 29 W.
+# The ESPHome meter remains raw. Do not also apply this gain in firmware.
+template:
+  - sensor:
+      - name: KMC Recliner Total Power
+        unique_id: ha_homelab_kmc_recliner_total_power
+        default_entity_id: sensor.kmc_recliner_total_power
+        device_class: power
+        state_class: measurement
+        unit_of_measurement: W
+        availability: >-
+          {{ is_number(states('sensor.kmc_recliner_total_power_raw'))
+             and states('sensor.kmc_recliner_total_power_raw') | float(0) >= 0 }}
+        state: >-
+          {{ (states('sensor.kmc_recliner_total_power_raw') | float(0)
+              * 29 / 55) | round(1) }}
+        attributes:
+          source_entity: sensor.kmc_recliner_total_power_raw
+          calibration_method: Single-point gain; owner-supplied reference
+          reference_raw_w: 55
+          reference_actual_w: 29
+          calibration_date: '2026-11-10'
+          measurement_scope: Whole strip, not an individual outlet
