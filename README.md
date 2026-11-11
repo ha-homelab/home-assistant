@@ -160,7 +160,7 @@ commands and the Music Assistant player, with audio served inside the home LAN.
 
 Home Assistant loads automation lists with `!include_dir_merge_list` and scripts with `!include_dir_merge_named`. The folder libraries are edited in Git. Their stable IDs keep the UI names and dashboard references independent of file names. The existing `automations.yaml` and `scripts.yaml` files are not loaded; do not edit them expecting a runtime change.
 
-Only active configuration is imported. The duplicate `input_number` key previously shadowed an entire helper file; the effective `nightime` helper is preserved and the inactive file is archived. Duplicate theme properties retain their effective final values. Recorder keeps its existing database and 28-day retention; the connection string is now a local secret and the ignored `purge_interval` setting is removed.
+Only active configuration is imported. The duplicate `input_number` key previously shadowed an entire helper file; the effective `nightime` helper is preserved and the inactive file is archived. Duplicate theme properties retain their effective final values. Recorder keeps its existing database, with one-day raw retention and preserved hourly long-term statistics; the connection string is now a local secret and the ignored `purge_interval` setting is removed.
 
 ## Weekly backups and maintenance
 

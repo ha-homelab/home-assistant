@@ -26,8 +26,8 @@ def main():
         raise ValueError("Do not activate formerly shadowed helpers")
     if config["recorder"]["db_url"] != {"!secret": "recorder_db_url"}:
         raise ValueError("Recorder database must use the recorder_db_url secret")
-    if config["recorder"]["purge_keep_days"] != 28:
-        raise ValueError("Recorder retention must remain 28 days")
+    if config["recorder"]["purge_keep_days"] != 1:
+        raise ValueError("Recorder raw retention must remain 1 day")
     if "purge_interval" in config["recorder"]:
         raise ValueError("Recorder purge_interval is not supported")
     if config["homeassistant"]["time_zone"] != "America/Los_Angeles":

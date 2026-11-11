@@ -15,7 +15,7 @@ input_number:
   nightime: {}
 recorder:
   db_url: !secret recorder_db_url
-  purge_keep_days: 28
+  purge_keep_days: 1
 homeassistant:
   time_zone: America/Los_Angeles
 """
@@ -34,8 +34,8 @@ class ValidationOptimizationTest(unittest.TestCase):
                 (VALID_CONFIG, None),
                 (VALID_CONFIG.replace("nightime: {}", "unexpected: {}"), "shadowed helpers"),
                 (VALID_CONFIG.replace("!secret recorder_db_url", "!secret wrong_database"), "recorder_db_url secret"),
-                (VALID_CONFIG.replace("purge_keep_days: 28", "purge_keep_days: 999"), "28 days"),
-                (VALID_CONFIG.replace("purge_keep_days: 28", "purge_keep_days: 28\n  purge_interval: 1"), "purge_interval"),
+                (VALID_CONFIG.replace("purge_keep_days: 1", "purge_keep_days: 999"), "1 day"),
+                (VALID_CONFIG.replace("purge_keep_days: 1", "purge_keep_days: 1\n  purge_interval: 1"), "purge_interval"),
                 (VALID_CONFIG.replace("America/Los_Angeles", "UTC"), "time zone"),
             ]
             for arguments, optimized in (([], None), (["-O"], None), (["-OO"], None), ([], "1")):

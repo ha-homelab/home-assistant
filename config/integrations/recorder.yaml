@@ -1,6 +1,8 @@
-# Keep 28 days of history in the existing database. Credentials stay in secrets.yaml.
+# Keep one day of raw history; hourly long-term statistics remain preserved.
+# See docs/recorder-storage-budget.md: retention is not a hard disk quota.
 db_url: !secret 'recorder_db_url'
-purge_keep_days: 28
+purge_keep_days: 1
+auto_purge: true
 # Purging remains automatic; MySQL table rebuilds require a separate capacity check.
 auto_repack: false
 # Exact overrides preserve battery protection and extrema history despite the voltage glob.
