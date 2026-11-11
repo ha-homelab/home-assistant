@@ -12,16 +12,19 @@ Runtime discovery may add configured Energy sources; it cannot remove an absent
 base entity or weaken its expectations. Change that contract only through a
 reviewed policy change, never to make a failed snapshot pass.
 
-Current storage policy remains **28 days globally** and **seven days of raw
-history for the exact 32 JBD cell entities**. No additional signal has a shorter
-retention period. Both physical monitors, including the `_2` identities, remain
-protected. The optimization exclusion cohort contains **23 exact entities**:
+Current storage policy retains **one day of raw history and short-term
+statistics globally**, including all 32 JBD cell entities. Hourly long-term
+statistics remain preserved. Both physical monitors, including the `_2`
+identities, remain protected. The optimization exclusion cohort contains **23 exact entities**:
 13 Emporia L1 aliases, eight heater diagnostics and two Tasmota solar L1 aliases.
 This count excludes the older unrelated exclusions already in the configuration.
 Canonical power, Energy counters and JBD safety measurements remain recorded.
 
 `auto_repack: false` disables automatic table rebuilding; it does not disable
-automatic purging. The separate daily cell cleanup retains its backup-idle gate.
+automatic purging. The former seven-day cell cleanup has been retired.
+See [storage budget](recorder-storage-budget.md) for the proposed monitoring
+contract. This policy does not deploy an external size guard or enforce a hard
+database quota.
 These verification tools never invoke purge, repack or configuration changes.
 See [Recorder retention](recorder-retention.md) for cleanup semantics.
 
@@ -138,8 +141,9 @@ python3 tools/prepare_recorder_quality.py \
 
 The dates illustrate syntax only. Exclusion cutoff means the time the deployed
 filter was effective: there must be no rows at or after it. Retention cutoff
-means the recorded purge request time minus seven days: there must be no rows
-strictly before it. Retention IDs must also be protected raw-history entities.
+means the recorded purge request time minus the requested retention interval:
+there must be no rows strictly before it. Retention IDs must also be protected
+raw-history entities.
 For exclusions activated at different times, use the appropriate fixed cutoff
 for each separately evaluated cohort. Never silently replace an original cutoff
 with the current time.
@@ -149,8 +153,9 @@ to numeric epochs before binding SQL parameters. MySQL must never compare a
 numeric timestamp column with an ISO date string. The verifier requires snapshot
 cutoffs to match policy cutoffs exactly and every scoped boundary query to have
 completed. A boundary pass proves the queried condition; separately check the
-automation trace, trigger time and backup gate to establish that the scheduled
-cleanup ran. The purge service returns before backend cleanup completes.
+request receipt and fixed cutoff to establish that cleanup was requested.
+A completed request must not be inferred from an automation trace. The purge
+service returns before backend cleanup completes.
 
 ## Known legacy dependency
 

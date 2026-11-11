@@ -1,7 +1,7 @@
 """Guard the audited Recorder boundaries without a database or production I/O.
 
 The fixtures describe separate battery packs, canonical power streams, and
-historical consumers. Runtime-only checks use HA's real filter/service schema
+historical consumers. Runtime-only checks use HA's real filter schema
 when this suite runs in the pinned HA image; the other checks also run in CI.
 """
 
@@ -19,10 +19,8 @@ with patch.object(sys, "path", [str(ROOT / "tools"), *sys.path]):
 
 try:
     from homeassistant.helpers.entityfilter import INCLUDE_EXCLUDE_FILTER_SCHEMA
-    from homeassistant.components.recorder.services import SERVICE_PURGE_ENTITIES_SCHEMA
 except ImportError:
     INCLUDE_EXCLUDE_FILTER_SCHEMA = None
-    SERVICE_PURGE_ENTITIES_SCHEMA = None
 
 
 # Two independent MQTT device registrations, each containing four four-cell BMSs.
@@ -64,7 +62,7 @@ HISTORICAL_INPUTS = {
     "sensor.sensor_total_battery_out_integral",
     "sensor.corrected_battery_soc", "sensor.battery_percent", "sensor.battery_w",
     "sensor.water_level_2_water_level", "sensor.water_speed",
-    "climate.thermostat_2",  # Existing five-day raw-history chart.
+    "climate.thermostat_2",  # Still recorded; raw charts now have a one-day window.
     # Meter totals used by Energy must survive even if instantaneous power
     # aliases or diagnostics are excluded.
     "sensor.home_123_1d", "sensor.home_balance_1d", "sensor.bath_1_12_1d",
@@ -144,8 +142,8 @@ class RecorderPolicyTest(unittest.TestCase):
     def setUpClass(cls):
         cls.policy = read(ROOT / "config/integrations/recorder.yaml")
 
-    def test_global_history_and_existing_purge_policy_are_preserved(self):
-        self.assertEqual(self.policy["purge_keep_days"], 28)
+    def test_one_day_history_keeps_native_purge_and_disables_automatic_repack(self):
+        self.assertEqual(self.policy["purge_keep_days"], 1)
         self.assertNotEqual(self.policy.get("auto_purge"), False)
         self.assertIs(self.policy["auto_repack"], False)
         self.assertNotIn("purge_interval", self.policy)
@@ -187,57 +185,13 @@ class RecorderPolicyTest(unittest.TestCase):
                 self.assertEqual(actual(entity_id), expected)
 
 
-class CellRetentionAutomationTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.package = read(ROOT / "config/packages/recorder_retention.yaml")
-        rules = cls.package["automation"]
-        if len(rules) != 1:
-            raise AssertionError("The retention package must contain one reviewed automation")
-        cls.rule = rules[0]
-
-    def test_package_is_loaded_without_replacing_the_automation_library(self):
+class RetiredCellRetentionTest(unittest.TestCase):
+    def test_superseded_purge_package_is_loaded_but_enqueues_no_tasks(self):
+        package = read(ROOT / "config/packages/recorder_retention.yaml")
         resolved = resolve(ROOT / "config/configuration.yaml", permit_missing_components=True)
-        self.assertEqual(resolved["homeassistant"]["packages"]["recorder_retention"], self.package)
-        self.assertEqual(resolved["recorder"]["purge_keep_days"], 28)
-        self.assertEqual(set(self.package), {"automation"})
-
-    def test_only_daily_time_trigger_and_stable_identity(self):
-        self.assertEqual(self.rule["id"], "ha_homelab_recorder_jbd_cell_retention")
-        self.assertEqual(self.rule["triggers"], [{"trigger": "time", "at": "07:30:00"}])
-        self.assertEqual(self.rule["mode"], "single")
-        self.assertNotIn("trigger", self.rule)  # No parallel legacy/startup trigger.
-
-    def test_backup_gate_fails_closed_for_busy_or_unknown_state(self):
-        # A positive state condition fails on missing/unknown/unavailable too;
-        # an "is not busy" template would allow those states through.
-        self.assertEqual(self.rule["conditions"], [{
-            "condition": "state", "entity_id": "sensor.backup_backup_manager_state", "state": "idle",
-        }])
-
-    def test_purge_cannot_expand_to_domains_globs_repack_or_all_history(self):
-        actions = self.rule["actions"]
-        self.assertEqual(len(actions), 1)
-        action = actions[0]
-        self.assertEqual(set(action), {"action", "data"})
-        self.assertEqual(action["action"], "recorder.purge_entities")
-        data = action["data"]
-        # In particular, keep_days must never disappear: this service defaults
-        # to zero rather than the recorder's global history retention.
-        self.assertEqual(set(data), {"entity_id", "keep_days"})
-        self.assertEqual(data["keep_days"], 7)
-        self.assertIsInstance(data["entity_id"], list)
-        self.assertEqual(set(data["entity_id"]), CELL_ENTITIES)
-        self.assertEqual(len(data["entity_id"]), 32)
-        self.assertTrue(set(data["entity_id"]).isdisjoint(BATTERY_OVERRIDES | HISTORICAL_INPUTS))
-
-    @unittest.skipUnless(SERVICE_PURGE_ENTITIES_SCHEMA, "Home Assistant runtime is not installed")
-    def test_actual_home_assistant_purge_schema_accepts_only_reviewed_scope(self):
-        data = SERVICE_PURGE_ENTITIES_SCHEMA(deepcopy(self.rule["actions"][0]["data"]))
-        self.assertEqual(data["keep_days"], 7)
-        self.assertEqual(set(data["entity_id"]), CELL_ENTITIES)
-        self.assertFalse(data.get("domains"))
-        self.assertFalse(data.get("entity_globs"))
+        self.assertEqual(resolved["homeassistant"]["packages"]["recorder_retention"], package)
+        self.assertEqual(resolved["recorder"]["purge_keep_days"], 1)
+        self.assertEqual(package, {"automation": []})
 
 
 if __name__ == "__main__":
