@@ -12,8 +12,8 @@ existing Core Updates dashboard and mobile notification actions still work.
 2. The updater verifies that proposal and announces an available update. An
    installed beta is never downgraded to an older stable version.
 3. Review the release notes and PR link, then press **Install** in Home Assistant.
-4. The independent updater checks maintenance is idle, makes a fresh backup,
-   checks the target image against the configuration, requests the exact PR merge,
+4. The independent updater checks maintenance is idle, applies the selected backup
+   policy, checks the target image against the configuration, requests the exact PR merge,
    verifies main, then deploys and checks Core health.
 5. HA may disconnect during its restart. The external updater continues and
    publishes the outcome when HA returns. In-progress is intentionally
@@ -47,9 +47,13 @@ from MQTT discovery, set the worker's `native_update_entity` to true, retire the
 old MQTT entity, then load the new integration with the same entity ID. Do not
 leave two competing update entities. All status topics remain read-only.
 
-The site uses configuration-only pre-upgrade backups, including HA settings,
-keys and device registries. Oracle Recorder history is not part of that gate.
-The generic worker defaults to full backups unless configured explicitly.
+The site now explicitly selects `backup_mode: scheduled`: Core updates rely on
+independently scheduled backups and do not create or verify a fresh archive for
+each update. Changes since the chosen recovery point may be lost. Preserve the
+configuration, keys and device-registry backup route; Recorder history is not a
+mandatory update gate. Explicit configuration-only or full-history modes remain
+available, and the generic worker falls back to full mode when the setting is
+absent. See [Recorder database and backup boundaries](recorder-heatwave-local.md).
 
 ## Troubleshooting
 

@@ -58,12 +58,22 @@ hourly-statistic charts retain their long-term history. Daily purging alone can
 retain nearly 48 hours before the next run; `keep_days: 1` is a cutoff per run,
 not continuous expiration.
 
-## Proposed monitoring contract
+## Deployed follow-up and historical monitoring proposal
 
-This change deploys no size-driven controller. The following contract describes
-follow-up work, with existing private authentication and maintenance facilities
-reused where practical. For a host-based implementation, run one controller
-outside k3s so a datastore failure does not disable its own monitor. Use a timer
+The retention change itself did not install a controller. The later
+[shared runtime PR #65](https://github.com/ha-homelab/k3s-self-healing/pull/65)
+added the MySQL budget worker to the existing Core updater. On November 11, 2026,
+the installed settings enable that worker with qualified purge. It measures every
+five minutes and latches a Recorder pause at 4.5 GB; it never automatically resumes
+recording. This remains backpressure, not a hard storage quota. The implementation
+and recovery procedure live in the private deployment runbook; see also
+[database switching and backup boundaries](recorder-heatwave-local.md).
+
+The following is the **earlier design proposal**, retained to explain its intent;
+it is not an inventory of deployed services. The selected implementation reuses
+the updater inside k3s, rather than adding the host timer proposed below. For a
+separate host-based implementation, run one controller outside k3s so a datastore
+failure does not disable its own monitor. Use a timer
 every five minutes, a process lock and private persistent request state.
 Keep SQL credentials schema-scoped and never place credentials in command-line
 values or public YAML.
@@ -92,9 +102,9 @@ values or public YAML.
   while statistics/import tasks can still write. Its flag also resets at startup.
   Do not use it as evidence that a hard size cap has been enforced.
 
-The contract is a proposal until the selected implementation is installed and
-its scheduling, authentication and status checks are verified. Documentation
-alone is not enforcement.
+Do not deploy a second controller from this historical proposal alongside the
+installed worker. Its actual scheduling, private settings and durable receipts
+are the operational source of truth; documentation alone is not enforcement.
 
 ## Distinguish the storage measurements
 
