@@ -89,16 +89,40 @@ addresses and hardware identities are deliberately outside this role change.
 
 Overview / Lighting shows **KMC Recliner Total Power** immediately above
 `switch.recliner` and **KMC Living TV Total Power** immediately above
-`switch.living_tv_guard`. Each row displays the existing ESPHome total-power
-sensor, in watts, belonging to the same device as the switch below it. These
-are whole-strip readings, not estimates for the single named outlet.
+`switch.living_tv_guard`. Both are whole-strip readings, not measurements of
+the single named outlet.
 
-Select each sensor by matching its device-registry ID to the corresponding
-switch and verifying `device_class: power` and `unit_of_measurement: W`.
-The exact diagnostic IDs and runtime dashboard backup remain private.
-Only the two sensor rows and their display names were added; the underlying
-entities and relay controls were preserved. Saving and reading back the
-Lovelace configuration requires no relay commands or firmware changes.
+### Recliner strip power correction
+
+On 2026-11-10 the owner reported 55 W for a single 29 W lamp, with no other
+active load on the Recliner strip. Its firmware reported power as uncalibrated.
+The [power package](../config/packages/kmc_recliner_power.yaml) applies the
+single-point gain **29 / 55 = 0.5272727...** in Home Assistant:
+
+- `sensor.kmc_recliner_total_power_raw` is the original ESPHome sensor,
+  renamed through the entity registry. Its unique ID and hardware remain intact.
+- `sensor.kmc_recliner_total_power` is the corrected template sensor, named
+  **KMC Recliner Total Power**, used by the Lighting row.
+- Invalid, missing, unavailable or negative raw readings make the corrected
+  sensor unavailable. They are not displayed as zero consumption.
+- Zero remains zero; 55 W becomes 29 W. Readings retain natural load variation.
+  This is an owner-supplied single-point correction, not full-range calibration.
+
+The previous Lovelace row had only a `name` override; the underlying sensor
+still displayed the device name followed by Power. The corrected entity now
+has a matching name and logical entity ID. Other KMC strips are unchanged.
+Current, voltage, firmware energy-since-boot and historical statistics are not
+rescaled by this power-only correction. If power is later calibrated in
+firmware, remove the HA gain before using the corrected firmware readings;
+otherwise the same correction would be applied twice.
+
+For a fresh installation, identify the raw power sensor by the device shared
+with `switch.recliner` and verify `device_class: power` and W units. Rename it
+through the HA entity-registry API; do not copy a hardware ID from another
+installation. Install the package, validate configuration and reload Template
+entities, then point the existing Lighting row at the corrected entity.
+No relay command, firmware update or HA restart is required. The full dashboard
+and hardware identities remain private runtime data.
 
 ## Dashboard controls for retained plugs
 
