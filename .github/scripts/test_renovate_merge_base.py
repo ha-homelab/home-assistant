@@ -140,6 +140,8 @@ class SinglePassReviewedTests(unittest.TestCase):
             return copy.deepcopy(current)
 
         def transport(*args):
+            if args == ("api", "user", "--jq", "{id,login,type}"):
+                return json.dumps({"id": 123456, "login": "merge-account", "type": "User"})
             if args == ("api", "repos/example/repo", "--jq", ".default_branch"):
                 return "main"
             if args[:2] == ("pr", "merge"):

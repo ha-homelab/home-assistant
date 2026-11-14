@@ -7,8 +7,11 @@ rather than repeated identical values or large attributes, dominates recording.
 
 ## Recorded measurements
 
-Global history retention remains **28 days**. Exact `include.entities` entries
-restore 12 JBD extrema and voltage-fault entities previously caught by the
+Global raw history and short-term statistics retention is **one day**.
+Hourly long-term statistics remain preserved. See the [5 GB operating
+budget](recorder-storage-budget.md) for monitoring, extra purge requests and
+physical reclamation. The budget is not a hard quota. Exact `include.entities`
+entries restore 12 JBD extrema and voltage-fault entities previously caught by the
 existing `sensor.*_voltage` exclusion. Other exclusion domains and globs remain
 unchanged. Exact includes preserve the default recording behavior for unrelated
 entities; do not convert them to include domains or globs.
@@ -69,63 +72,46 @@ presence/fall publication active throughout. For rollback, disable only module
 publication first, then restore the changed files from their private backups,
 validate and restart; unrelated history must remain intact.
 
-## Selective cell history
+## Raw history and storage budget
 
-The `recorder_retention` package runs at **07:30 America/Los_Angeles**. It requires
-the backup manager to report `idle`, then calls `recorder.purge_entities` with
-exactly 32 reviewed JBD cell IDs and `keep_days: 7`. The unsuffixed and `_2` IDs
-belong to different devices and both remain recorded.
+The former daily seven-day JBD cell purge is retired because one-day global
+retention now supersedes it. Both physical monitors, including the `_2` IDs,
+remain recorded. The entity filters and canonical Energy sources are unchanged.
 
-This deletes old raw state detail and unused attributes while retaining generated
-statistics. Global 28-day retention still governs short-term statistics; hourly
-statistics remain subject to Home Assistant's normal long-term policy. Daily
-execution normally leaves between seven and eight days of raw detail. Busy or
-unavailable backup status skips that day's run, extending the retained window.
+The November audit measured approximately 43.71 GB of data/index allocation,
+including 32.18 GB of states, 9.01 GB of state attributes and 145.5 MB of hourly
+long-term statistics. A bounded recent sample contained about 40 state rows per
+second. These measurements explain why 28 days cannot fit a 5 GB operating
+budget; they do not predict the exact post-purge physical file size.
 
-There is no startup trigger. The service queues cleanup and returns before it
-finishes; `mode: single` prevents simultaneous automation actions, not multiple
-backend purge requests. Avoid manually triggering repeated cleanup while a prior
-request is pending. Completion requires indexed checks that all 32 entities have
-no raw rows before the fixed requested cutoff. A successful service response or
-completed trace alone is insufficient.
+The dishwasher's current-day runtime input remains recorded. Calculations and
+raw history charts have only the retained window available; a 25-hour daylight
+saving transition day can exceed the rolling 24-hour cutoff.
+Energy charts backed by hourly statistics retain their long-term data.
 
-## Expected effect and limits
+Native `auto_purge: true` supplies daily cleanup. This policy does not deploy
+an external controller. Any future hourly or size-triggered controller must
+persist and verify each fixed cutoff before sending another request.
+`recorder.purge` returns after enqueueing work, not after finishing deletion.
 
-The exact exclusions account for **3.5–15.4% of state rows** in the three samples.
-Restoring battery summaries adds an unmeasured amount of recording, so these are
-gross reductions, not guaranteed net daily savings. The seven-day cell policy
-reduces retained history without reducing incoming writes. A constant-row-cost
-model for all changes gives **15.7–30.1% less table allocation at steady state**;
-it is not a forecast of immediate filesystem space reclaimed.
-
-No indexes are removed and no `OPTIMIZE TABLE`/repack is requested. Do not confuse
-OCI disk usage with table allocation. MySQL can reuse freed pages without an
-immediate reduction in its allocated files.
-
-`auto_repack: false` also prevents the default periodic table rebuild. Automatic
-purging remains enabled. Any future rebuild needs a separate capacity and
-maintenance-window assessment; it is not a remedy for a high incoming write rate.
-
-The October 2 follow-up found that the database still had less than 28 days of
-raw history. A second physical JBD monitor started recording on September 24,
-and a later MQTT outage temporarily reduced incoming data. Compare equivalent
-hardware and availability periods before attributing storage changes to this
-policy. The first global expiration is not necessarily a storage plateau, and
-selective deletion can free reusable pages without shrinking files.
+`auto_repack: false` keeps automatic table rebuilding disabled. Deletion makes
+pages reusable; it does not guarantee that MySQL files shrink. Physical
+reclamation is a separate capacity-checked maintenance operation. No indexes,
+hourly statistics or unrelated database schemas are removed.
 
 ## Deployment and verification
 
 Use the current live files as the deployment baseline and retain a private backup.
-Stage both changed YAML files against the installed HA version, validate the full
+Stage the changed YAML files against the installed HA version, validate the full
 configuration, and reject live-file drift before promotion. Recorder filters
 require a Home Assistant restart. The first authorized backlog purge is an explicit
 separate action after checking Recorder freshness, backup idleness, and current
-cell statistics; restarts do not trigger it.
+cell statistics; configuration deployment alone does not trigger it.
 
 Before and after deployment, verify Energy configuration and existing automation
 identities, continued canonical and cell statistics, restored battery history,
 and absence of new rows for the 23 exclusions after their respective activations. Check the fixed
-seven-day cutoff for all 32 cells after cleanup. Measure net recording and OCI
+one-day cutoff across raw state/event and short-term statistic tables after cleanup. Measure net recording and OCI
 growth over a full operating cycle, rather than extrapolating one short sample.
 
 Use the [Recorder quality verification runbook](recorder-quality-verification.md)
@@ -133,9 +119,10 @@ for explicit expected coverage, real Energy IDs, finite numeric values, recent
 completed statistic buckets and bounded indexed queries. Advancement since an
 old snapshot is reported separately from present health.
 
-The focused regression suite exercises the actual HA filter and purge schema in
-the pinned HA 2026.9.1 runtime, including protected historical inputs, exact purge
-scope, the mandatory nonzero retention period, and the fail-closed backup gate.
+The focused regression suite preserves the filter boundaries for canonical
+Energy, safety and live motion data, enforces nonzero one-day retention and
+verifies that the superseded selective purge cannot enqueue extra tasks.
+Run the optional HA filter checks inside the installed HA runtime.
 
 If cell history stops while the global Recorder remains fresh, follow the
 [JBD MQTT availability runbook](jbd-mqtt-availability.md) before changing filters
@@ -144,7 +131,7 @@ or retention. A retained `offline` status can hide actively publishing cells.
 ## Rollback
 
 Restore only the files changed by the release being rolled back, validate and
-restart Home Assistant. Keep the existing cell-retention package when rolling
+restart Home Assistant. Do not reactivate the retired seven-day cell cleanup when rolling
 back a later filter-only change. Do not restore an old whole-configuration bundle over
 unrelated changes. Rollback resumes future recording; it cannot recreate history
 that was excluded or purged. Keep the private deployment backup and database

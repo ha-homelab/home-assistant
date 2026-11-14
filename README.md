@@ -10,8 +10,10 @@
 
 The [Core updates package and dashboard](docs/core-updates.md) show stable Home
 Assistant releases and offer explicit version-specific approval. The independent
-k3s worker takes a verified backup, checks the target configuration and performs
-the update. HACS maintenance waits while Core updating or recovery is active.
+k3s worker follows the selected backup policy, checks the target configuration and
+performs the update. This installation relies on independently scheduled backups;
+it does not create a fresh archive for every update. HACS maintenance waits while
+Core updating or recovery is active.
 Credentials stay in private HA secrets; no token is sent to the dashboard.
 
 
@@ -160,7 +162,9 @@ commands and the Music Assistant player, with audio served inside the home LAN.
 
 Home Assistant loads automation lists with `!include_dir_merge_list` and scripts with `!include_dir_merge_named`. The folder libraries are edited in Git. Their stable IDs keep the UI names and dashboard references independent of file names. The existing `automations.yaml` and `scripts.yaml` files are not loaded; do not edit them expecting a runtime change.
 
-Only active configuration is imported. The duplicate `input_number` key previously shadowed an entire helper file; the effective `nightime` helper is preserved and the inactive file is archived. Duplicate theme properties retain their effective final values. Recorder keeps its existing database and 28-day retention; the connection string is now a local secret and the ignored `purge_interval` setting is removed.
+Only active configuration is imported. The duplicate `input_number` key previously shadowed an entire helper file; the effective `nightime` helper is preserved and the inactive file is archived. Duplicate theme properties retain their effective final values. Recorder keeps its existing database, with one-day raw retention and preserved hourly long-term statistics; the connection string is now a local secret and the ignored `purge_interval` setting is removed.
+
+For the full operating procedure, see [Recorder: HeatWave, local storage, and switching back](docs/recorder-heatwave-local.md). It covers fresh SQLite, local MySQL, backup compatibility, disk budgets and recovery without implying that histories merge.
 
 ## Weekly backups and maintenance
 
