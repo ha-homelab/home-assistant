@@ -75,7 +75,7 @@ After **all four sensors have individually stayed off for ten minutes**:
 - Dining Media guard and Living bookshelf turn off regardless of the TV state, if both overrides
   above are off.
 - Living TV Guard turns off only if `media_player.living_room_tv_77`, the native
-  webOS entity, explicitly reports `off`. A DLNA entity reporting `idle` is not
+  webOS entity, reports `off` or `unavailable`. A DLNA entity reporting `idle` is not
   proof that the TV is off. Living Sticky must also be off. The outlet must have
   continuously reported `on` for **two minutes**, and
   `timer.living_room_tv_wake_grace` must be `idle`.
@@ -88,10 +88,14 @@ wake requests do not extend it. Missing or unknown timer state blocks automatic
 TV power-off. Dining Media guard and Living bookshelf do not depend on either
 TV startup protection.
 
-If the TV is switched off later, its state transition immediately rechecks the
+If the TV switches off or becomes unavailable later, that transition rechecks the
 same inactivity condition. `unknown`, `unavailable`, or missing sensor states
-never count as inactivity. An unknown or unavailable TV protects its outlet
-without preventing Dining Media guard from shutting down.
+never count as inactivity. An unknown or missing TV entity protects its outlet without preventing Dining
+Media guard from shutting down. An **unavailable TV permits cutoff**, according
+to the owner's chosen policy. This is an operational convention, not proof of
+physical power state: a network failure can also make an active TV unavailable.
+There is no additional TV-off delay or OLED maintenance hold. Active states,
+including `on`, `playing`, `paused`, `idle` and `buffering`, block TV outlet cutoff.
 
 ## Reload, recovery and manual control
 
