@@ -158,10 +158,13 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_non_off_tv_states_protect_tv_but_not_dining(self):
         await self.load()
-        for state in ('on', 'playing', 'idle', 'unknown', 'unavailable'):
+        for state in ('on', 'playing', 'paused', 'idle', 'buffering', 'unknown', None):
             with self.subTest(tv=state):
                 self.set_sensors('on')
-                self.hass.states.async_set(TV, state)
+                if state is None:
+                    self.hass.states.async_remove(TV)
+                else:
+                    self.hass.states.async_set(TV, state)
                 self.hass.states.async_set(self.media_entity, 'on')
                 await self.settle(.02)
                 self.calls.clear()
@@ -179,6 +182,26 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
         self.hass.states.async_set(TV, 'off')
         await self.settle(.04)
         self.assertEqual(self.calls[-1], ('turn_off', TV_POWER))
+
+    async def test_unavailable_tv_after_timeout_triggers_tv_shutdown(self):
+        self.hass.states.async_set(TV, 'playing')
+        await self.load()
+        self.set_sensors('off')
+        await self.settle()
+        self.assertEqual(self.calls, [('turn_off', self.media_entity)])
+        self.hass.states.async_set(TV, 'unavailable')
+        await self.settle(.04)
+        self.assertEqual(self.calls[-1], ('turn_off', TV_POWER))
+
+    async def test_unavailable_tv_still_respects_occupancy_and_sticky(self):
+        self.hass.states.async_set(TV, 'unavailable')
+        await self.load()
+        await self.settle()
+        self.assertEqual(self.calls, [])
+        self.hass.states.async_set(LIVING_STICKY, 'on')
+        self.set_sensors('off')
+        await self.settle()
+        self.assertEqual(self.calls, [])
 
     async def test_manual_off_waits_for_new_activity(self):
         await self.load()
