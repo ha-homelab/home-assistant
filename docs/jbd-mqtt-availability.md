@@ -101,8 +101,9 @@ following, rather than merely checking that a timestamp differs from yesterday:
   no full history scans are necessary.
 
 The [Recorder policy](recorder-retention.md) remains independent: global retention
-is 28 days, the exact 32 cell entities have seven-day raw history, and the
-21 exclusions and 12 protection/extrema includes remain unchanged. Recovery
+is one day of raw history and short-term statistics, with hourly long-term
+statistics retained. Both sets of 16 cells and the 12 protection/extrema includes
+remain recorded; the approved diagnostic/alias exclusions are unchanged. Recovery
 resumes future history; it does not recreate the missing interval.
 
 ## September 30, 2026 incident
