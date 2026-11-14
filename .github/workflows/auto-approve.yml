@@ -9,7 +9,7 @@ permissions:
   pull-requests: write
 jobs:
   approve:
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && github.event.workflow_run.name == 'Quality gate' && github.event.workflow_run.status == 'completed' && github.event.workflow_run.head_repository.full_name == github.repository
     # This reviewed metadata-only workflow_run path uses the isolated automation pool.
     # The general reserve generator intentionally refuses local automation steps.
     runs-on: ${{ fromJSON((vars.CI_RUNNER_MODE == 'self-hosted' || vars.CI_RUNNER_MODE == 'k3s') && (github.event_name == 'workflow_run' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && github.event.workflow_run.name == 'Quality gate' && github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.status == 'completed' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository) && (vars.CI_RUNNER_AUTOMATION_LABELS || '[]') || '["ubuntu-24.04"]') }}
@@ -22,7 +22,7 @@ jobs:
       - name: Approve the currently opted-in checked commit
         shell: python3 -I {0}
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.BOT_PAT }}
           RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
           import json
@@ -31,13 +31,16 @@ jobs:
 
           repository = os.environ['GITHUB_REPOSITORY']
           prefix = f'repos/{repository}'
+          token = os.environ.get('GH_TOKEN', '').strip()
+          if not token:
+              raise SystemExit('BOT_PAT is required for the separate maintainer reviewer')
 
           def api(path, payload=None):
               request = urllib.request.Request(
                   f'https://api.github.com/{path}',
                   data=json.dumps(payload).encode() if payload is not None else None,
                   headers={
-                      'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
+                      'Authorization': f'Bearer {token}',
                       'Accept': 'application/vnd.github+json',
                       'Content-Type': 'application/json',
                       'X-GitHub-Api-Version': '2022-11-28',
@@ -56,6 +59,11 @@ jobs:
               and (run.get('head_repository') or {}).get('full_name') == repository
           ):
               raise SystemExit('The current run is not an eligible successful Quality gate')
+          reviewer = api('user')
+          if not (reviewer.get('login') == 'californiantiramisu'
+                  and reviewer.get('id') == 319626568
+                  and reviewer.get('type') == 'User'):
+              raise SystemExit('BOT_PAT must authenticate the separate maintainer bot account')
           head = run['head_sha']
           for candidate in api(f'{prefix}/commits/{head}/pulls?per_page=100'):
               pr = api(f"{prefix}/pulls/{int(candidate['number'])}")
@@ -72,6 +80,6 @@ jobs:
               api(f"{prefix}/pulls/{int(pr['number'])}/reviews", {
                   'event': 'APPROVE',
                   'commit_id': head,
-                  'body': 'Maintainer opt-in via auto-approve: the complete Quality gate passed for this exact commit. This records CI status, not an independent human code review.',
+                  'body': 'Maintainer opt-in via auto-approve: the complete Quality gate passed for this exact commit. Approved by the separate maintainer bot account; no independent human code review is implied.',
               })
               print(f"Approved PR #{pr['number']} at {head}")

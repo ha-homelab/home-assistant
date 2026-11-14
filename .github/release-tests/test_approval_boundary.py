@@ -41,10 +41,13 @@ class ApprovalBoundaryTests(unittest.TestCase):
             "labels": [{"name": "auto-approve"}],
         }
         self.posts = []
+        self.requests = []
+        self.reviewer = {'login': 'californiantiramisu', 'id': 319626568, 'type': 'User'}
 
-    def execute(self):
+    def execute(self, token="synthetic"):
         prefix = f"/repos/{self.repository}"
         responses = {
+            "/user": self.reviewer,
             prefix + "/actions/runs/7": self.run,
             prefix + "/actions/workflows/quality-gate.yml": {"id": 11},
             prefix + "/commits/" + self.run["head_sha"] + "/pulls": [{"number": 9}],
@@ -52,6 +55,7 @@ class ApprovalBoundaryTests(unittest.TestCase):
         }
 
         def request(req, timeout):
+            self.requests.append(urlsplit(req.full_url).path)
             self.assertEqual(timeout, 30)
             if req.data is not None:
                 self.posts.append((urlsplit(req.full_url).path, json.loads(req.data)))
@@ -66,12 +70,38 @@ class ApprovalBoundaryTests(unittest.TestCase):
                 {
                     "GITHUB_REPOSITORY": self.repository,
                     "RUN_ID": "7",
-                    "GH_TOKEN": "synthetic",
+                    "GH_TOKEN": token,
                 },
             ),
             patch("urllib.request.urlopen", request),
         ):
             exec(compile(self.code, "approval-workflow", "exec"), {})  # noqa: S102 - tracked workflow, fake API only
+
+    def test_human_review_uses_the_separate_maintainer_secret(self):
+        workflow = yaml.safe_load((ROOT / ".github/workflows/auto-approve.yml").read_text())
+        step = next(step for step in workflow["jobs"]["approve"]["steps"] if "run" in step)
+        self.assertEqual(step["env"]["GH_TOKEN"], "${{ secrets.BOT_PAT }}")
+        self.execute()
+        self.assertEqual(len(self.posts), 1)
+
+    def test_wrong_reviewer_identity_never_writes(self):
+        for reviewer in (
+            {"login": "4alvit", "id": 272257197, "type": "User"},
+            {"login": "github-actions[bot]", "id": 41898282, "type": "Bot"},
+            {"login": "californiantiramisu", "id": 1, "type": "User"},
+            {"login": "californiantiramisu", "id": 319626568, "type": "Bot"},
+        ):
+            with self.subTest(reviewer=reviewer):
+                self.reviewer = reviewer
+                with self.assertRaises(SystemExit):
+                    self.execute()
+                self.assertEqual(self.posts, [])
+
+    def test_missing_bot_secret_refuses_before_any_api_request(self):
+        with self.assertRaises(SystemExit):
+            self.execute(token="")
+        self.assertEqual(self.requests, [])
+        self.assertEqual(self.posts, [])
 
     def test_eligible_exact_head_is_the_only_approval_target(self):
         self.execute()
