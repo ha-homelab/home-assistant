@@ -28,6 +28,8 @@ AUTOMATION_RUNNER = (
     '(vars.CI_RUNNER_AUTOMATION_LABELS || \'[]\') || \'["ubuntu-24.04"]\') }}'
 )
 
+APPROVAL_CONDITION = "github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && github.event.workflow_run.name == 'Quality gate' && github.event.workflow_run.status == 'completed' && github.event.workflow_run.head_repository.full_name == github.repository"
+
 DEPENDENCY_APPROVAL = 'toolkit-auto-approve-reusable-de4848ae46c03248095a31edc937cddd523d7ac0.yml'
 DEPENDENCY_MERGE = 'toolkit-auto-merge-413248b9fdb724e787097c5c56802412a49e9467.yml'
 DEPENDENCY_WORKFLOWS = {
@@ -37,6 +39,53 @@ DEPENDENCY_WORKFLOWS = {
 
 
 class RunnerBoundaryTests(unittest.TestCase):
+    def assert_workflow_token_boundary(self, filename, text):
+        if filename != 'auto-approve.yml':
+            self.assertNotIn('secrets.', text)
+            return
+        allowed = '${{ secrets.BOT_PAT }}'
+        self.assertEqual(text.count(allowed), 1)
+        self.assertNotIn('secrets.', text.replace(allowed, ''))
+        workflow = yaml.safe_load(text)
+        self.assertEqual(set(workflow['jobs']), {'approve'})
+        job = workflow['jobs']['approve']
+        self.assertEqual(job['if'], APPROVAL_CONDITION)
+        scripts = [step for step in job['steps'] if 'run' in step]
+        self.assertEqual(len(scripts), 1)
+        self.assertEqual(scripts[0]['shell'], 'python3 -I {0}')
+        self.assertEqual(scripts[0]['env']['GH_TOKEN'], allowed)
+        self.assertNotIn('${{', scripts[0]['run'])
+        self.assertNotIn('actions/checkout', text)
+        self.assertNotIn('download-artifact', text)
+
+    def test_human_review_secret_refuses_other_slots_secrets_and_untrusted_events(self):
+        source = (ROOT / '.github/workflows/auto-approve.yml').read_text()
+        self.assert_workflow_token_boundary('auto-approve.yml', source)
+        allowed = '${{ secrets.BOT_PAT }}'
+        mutations = {
+            'other-secret': source.replace(allowed, '${{ secrets.OTHER_PAT }}'),
+            'duplicate-secret': source + '\n# ' + allowed,
+            'wrong-slot': source.replace('GH_TOKEN: ' + allowed, 'OTHER_TOKEN: ' + allowed),
+            'wrong-script': source.replace('shell: python3 -I {0}', 'shell: bash'),
+            'checkout': source + '\n# actions/checkout',
+            'artifact': source + '\n# download-artifact',
+        }
+        for guard in (
+            "github.event.workflow_run.conclusion == 'success'",
+            "github.event.workflow_run.event == 'pull_request'",
+            "github.ref == format('refs/heads/{0}', github.event.repository.default_branch)",
+            "github.event.workflow_run.name == 'Quality gate'",
+            "github.event.workflow_run.status == 'completed'",
+            "github.event.workflow_run.head_repository.full_name == github.repository",
+        ):
+            mutations['guard-' + guard] = source.replace('if: ' + APPROVAL_CONDITION,
+                'if: ' + APPROVAL_CONDITION.replace(guard, 'true'), 1)
+        for name, changed in mutations.items():
+            with self.subTest(case=name), self.assertRaises((AssertionError, KeyError)):
+                self.assert_workflow_token_boundary('auto-approve.yml', changed)
+        with self.assertRaises(AssertionError):
+            self.assert_workflow_token_boundary('ci.yml', source)
+
     def test_public_jobs_preserve_scoped_runner_and_token_boundaries(self):
         permissions = {
             'ci.yml': {'contents': 'read'},
@@ -72,7 +121,7 @@ class RunnerBoundaryTests(unittest.TestCase):
                 # These exact metadata workflows have separate token/runner
                 # assertions below; the six source/release workflows keep theirs.
                 continue
-            self.assertNotIn('secrets.', path.read_text())
+            self.assert_workflow_token_boundary(path.name, path.read_text())
             for name, job in workflow['jobs'].items():
                 with self.subTest(workflow=path.name, job=name):
                     self.assertEqual(job.get('permissions'), job_permissions.get((path.name, name)))
