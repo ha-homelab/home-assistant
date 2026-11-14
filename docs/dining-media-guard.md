@@ -1,14 +1,10 @@
 # Dining Media guard
 
-> **Living bookshelf is temporarily excluded from occupancy control.** Its
-> recovery trigger and both action blocks are commented out while it supplies
-> a Zigbee router. Leave the outlet on. Resume only after that router has a
-> separate power supply; there is no automatic next-day reactivation. The
-> bookshelf policy below is retained for that later restoration.
-
-To resume, uncomment both marked bookshelf action blocks and its recovery entry,
-re-enable `BookshelfOccupancyTest`, restore its duration-count expectation, and
-validate before reloading automations.
+**Living bookshelf occupancy control resumed on November 14, 2026.** The owner
+confirmed that the Zigbee router's PoE supply was moved to a separate outlet.
+Its recovery trigger and both occupancy action blocks are active again, with
+the same Living and Dining Sticky protections as Dining Media guard. The
+temporary always-on exception is removed.
 
 The converted JH-G01U outlet is **Dining Media guard**, controlled through
 `switch.dining_media_guard`. It restores the former Dining guard 2 role: power

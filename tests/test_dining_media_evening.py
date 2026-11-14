@@ -75,8 +75,7 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
                 for item in value:
                     shorten(item)
         shorten(self.config)
-        # Restore five when the paused bookshelf shutdown block is enabled.
-        self.assertEqual(self.duration_count, 4)
+        self.assertEqual(self.duration_count, 5)
 
     async def asyncTearDown(self):
         await self.hass.async_stop(force=True)
@@ -440,7 +439,6 @@ class MediaOccupancyTest(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(self.hass.states.get(TV_POWER).state, 'on')
 
 
-@unittest.skip('Bookshelf occupancy is paused until its Zigbee router has separate power')
 class BookshelfOccupancyTest(MediaOccupancyTest):
     """The bookshelf must satisfy the same behavioral contract as Dining Media."""
     media_entity = 'switch.living_bookshelf'
