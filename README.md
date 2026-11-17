@@ -49,6 +49,8 @@ See [public source and deployment boundaries](docs/public-source.md).
 - `dependencies/scripts/`: 50 active scripts with stable object keys, English descriptions and documented inputs.
 - `tools/`: strict YAML validation, reproducible assembly and validation inside the installed container.
 - `docs/`: deployment, rollback, architecture and validation evidence.
+
+Docs index: [docs/README.md](docs/README.md).
 - `archive/`: previously shadowed configuration, kept outside HA include paths.
 - `secrets.yaml.example`: names of required local secrets, with placeholders only.
 
