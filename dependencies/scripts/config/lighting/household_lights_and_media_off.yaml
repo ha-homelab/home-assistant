@@ -17,6 +17,7 @@ turn_off_living_room:
     - light.bathroom_mirror_light
     - light.bath_2
     - light.dining_lights_dimmer_l
+    - light.adining_lamp_m
     - light.balcony
     - light.porch_one
     - light.porch_two
@@ -38,6 +39,8 @@ turn_off_living_room:
     - switch.tv_backlight_l
     - switch.mishka_bedroom_desk_lamp_l
     - switch.dining_wall_lights_l
+    - switch.dining_wall_light_2
+    - switch.dining_arc_lamp
     - switch.living_room_light_l
     - switch.living_lamp
     - switch.audiosystem_l
