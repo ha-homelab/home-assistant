@@ -43,6 +43,12 @@ without credentials, message contents or runtime state attributes.
 - Nine-player shutdown uses one loop and continues after an individual failure.
   Household shutdown continues from lights to switches and host shutdown after
   independent service failures. Targets and order are preserved.
+- Household shutdown also includes the current Dining wall light, Dining Arc lamp
+  and Dining lamp controls. Keeping the unavailable legacy wall-light target does
+  not cover its replacement: all three current entities are explicit targets.
+  An inventory regression checks these controls and the retained Bedroom/Living
+  lamps, while excluding repurposed water and Laundry outlets. This check parses
+  configuration only and does not switch physical devices.
 - Repeated porch fades, Cree reset cycles and mailbox flashes use loops with the
   exact original command order and delays, verified against the original sequence.
 - Kodi supplied IDs no longer contain a literal inline comment. Selected-channel
