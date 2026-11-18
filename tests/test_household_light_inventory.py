@@ -27,7 +27,7 @@ class HouseholdLightInventoryTest(unittest.TestCase):
         }
         self.assertFalse(current_dining_controls - targets,
                          f'Missing Dining controls: {sorted(current_dining_controls - targets)}')
-        self.assertTrue({'light.bedroom_lamp', 'switch.living_lamp'} <= targets)
+        self.assertLessEqual({'light.bedroom_lamp', 'switch.living_lamp'}, targets)
         self.assertFalse({'switch.pump_power_enable', 'switch.moen_flo_water_monitor_power',
                           'switch.laundry'} & targets)
 
