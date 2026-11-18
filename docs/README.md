@@ -104,6 +104,8 @@ before the details.
 
 ## Operate and maintain
 
+- [ESPHome build isolation](esphome-build-isolation.md): separate outlet build
+  directories, pinned-builder boundaries and explicit firmware selection.
 - [Approving Core updates](core-updates.md) and
   [Core in the native Updates screen](core-native-updates.md).
 - [Automatic HACS maintenance](hacs-maintenance.md).
