@@ -1,8 +1,10 @@
 """Control requests must preserve stable IDs and reject incomplete target groups."""
 import importlib.util
+import io
 import json
 from pathlib import Path
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('kodi_ha', ROOT / 'tools/kodi_ha.py')
@@ -73,12 +75,38 @@ class KodiHaTests(unittest.TestCase):
             ha.run_alias(client, 'M', COMMANDS)
         self.assertFalse(any(method == 'POST' for method, _, _ in client.calls))
 
-    def test_audio_shortcuts_only_control_audio(self):
-        for alias, service in [('aa', 'toggle'), ('aaf', 'turn_off')]:
-            client = FakeClient({'switch.audio_l': {'state': 'off'}})
-            ha.run_alias(client, alias, COMMANDS)
-            self.assertEqual(client.calls[-1], ('POST', 'services/switch/' + service,
-                                                {'entity_id': ['switch.audio_l']}))
+    def test_repurposed_outlet_shortcuts_are_explicitly_retired(self):
+        aliases = ('oz', 'au', 'aa', 'aaf', 'audiooff', 'af', 'audioon', 'ao',
+                   'tablet', 'tabletf')
+        for alias in aliases:
+            with self.subTest(alias=alias):
+                self.assertEqual(set(COMMANDS[alias]), {'retired'})
+                self.assertTrue(COMMANDS[alias]['retired'])
+                client = FakeClient({'switch.audio_l': {'state': 'on'},
+                                     'switch.tablet': {'state': 'on'},
+                                     'switch.ozon': {'state': 'on'}})
+                with self.assertRaises(ha.ClientError):
+                    ha.run_alias(client, alias, COMMANDS)
+                self.assertEqual(client.calls, [])
+
+    def test_retired_cli_shortcuts_skip_credentials_and_transport(self):
+        aliases = ('oz', 'au', 'aa', 'aaf', 'audiooff', 'af', 'audioon', 'ao',
+                   'tablet', 'tabletf')
+        for alias in aliases:
+            with self.subTest(alias=alias), \
+                    mock.patch.object(ha, 'connection') as connection, \
+                    mock.patch.object(ha, 'Client') as client, \
+                    mock.patch('sys.stderr', new_callable=io.StringIO) as stderr:
+                self.assertEqual(ha.main([alias]), 1)
+                self.assertIn(COMMANDS[alias]['retired'], stderr.getvalue())
+                connection.assert_not_called()
+                client.assert_not_called()
+
+    def test_active_shortcuts_do_not_target_retired_outlet_ids(self):
+        retired_ids = {'switch.audio_l', 'switch.tablet', 'switch.ozon'}
+        for alias, command in COMMANDS.items():
+            with self.subTest(alias=alias):
+                self.assertFalse(retired_ids.intersection(command.get('entities', [])))
 
     def test_removed_lamp_shortcuts_make_no_requests(self):
         for alias in ('aaa', 'al-o-mbp', 'al-o-mbpf'):
