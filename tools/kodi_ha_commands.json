@@ -34,10 +34,7 @@
     "retired": "This legacy scene targets retired cloud Tuya switches and a removed kitchen light."
   },
   "oz": {
-    "service": "switch.toggle",
-    "entities": [
-      "switch.ozon"
-    ]
+    "retired": "The former Ozon outlet was migrated to Ping02. The old Ozon shortcut is retired; no replacement control is selected."
   },
   "wa": {
     "service": "light.toggle",
@@ -67,34 +64,19 @@
     "retired": "The old purple table lamp has been retired."
   },
   "au": {
-    "service": "switch.toggle",
-    "entities": [
-      "switch.audio_l"
-    ]
+    "retired": "The former Audio outlet was repurposed as Living lamp. This audio shortcut is retired; no replacement audio outlet is selected."
   },
   "aa": {
-    "service": "switch.toggle",
-    "entities": [
-      "switch.audio_l"
-    ]
+    "retired": "The former Audio outlet was repurposed as Living lamp. This audio shortcut is retired; no replacement audio outlet is selected."
   },
   "aaf": {
-    "service": "switch.turn_off",
-    "entities": [
-      "switch.audio_l"
-    ]
+    "retired": "The former Audio outlet was repurposed as Living lamp. This audio shortcut is retired; no replacement audio outlet is selected."
   },
   "tablet": {
-    "service": "switch.toggle",
-    "entities": [
-      "switch.tablet"
-    ]
+    "retired": "The former Tablet outlet was repurposed as Recliner. This tablet shortcut is retired; no replacement tablet outlet is selected."
   },
   "tabletf": {
-    "service": "switch.toggle",
-    "entities": [
-      "switch.tablet"
-    ]
+    "retired": "The former Tablet outlet was repurposed as Recliner. This tablet shortcut is retired; no replacement tablet outlet is selected."
   },
   "lg": {
     "retired": "The owner retired switch.tv_l; no replacement is configured."
@@ -115,28 +97,16 @@
     "retired": "The owner retired switch.tv_l; no replacement is configured."
   },
   "audiooff": {
-    "service": "switch.turn_off",
-    "entities": [
-      "switch.audio_l"
-    ]
+    "retired": "The former Audio outlet was repurposed as Living lamp. This audio shortcut is retired; no replacement audio outlet is selected."
   },
   "af": {
-    "service": "switch.turn_off",
-    "entities": [
-      "switch.audio_l"
-    ]
+    "retired": "The former Audio outlet was repurposed as Living lamp. This audio shortcut is retired; no replacement audio outlet is selected."
   },
   "audioon": {
-    "service": "switch.turn_on",
-    "entities": [
-      "switch.audio_l"
-    ]
+    "retired": "The former Audio outlet was repurposed as Living lamp. This audio shortcut is retired; no replacement audio outlet is selected."
   },
   "ao": {
-    "service": "switch.turn_on",
-    "entities": [
-      "switch.audio_l"
-    ]
+    "retired": "The former Audio outlet was repurposed as Living lamp. This audio shortcut is retired; no replacement audio outlet is selected."
   },
   "livingdisplayoff": {
     "service": "switch.turn_off",
