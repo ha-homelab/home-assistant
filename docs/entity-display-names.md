@@ -59,11 +59,15 @@ All targets in a shortcut are checked before one service call. Missing or
 unavailable targets fail visibly without partly executing a group. Retired
 kitchen-table, purple-lamp, TV-relay, `oneon` and `resetcreebulb` shortcuts report
 why they are retired; they are not redirected to guessed replacement devices.
-The `aa` and `aaf` commands retain only `switch.audio_l`. The former lamp
-now powers the MPPT fan and is intentionally absent from audio commands.
-The lamp-only `aaa`, `al-o-mbp` and `al-o-mbpf` shortcuts are removed and
-fail as unknown commands without a service request. The historical `tabletf`
-toggle behavior is preserved.
+The former Audio outlet now serves Living lamp, the former Tablet outlet serves
+Recliner, and Ozon was migrated to Ping02. Their obsolete shortcuts are explicitly
+retired: `au`, `aa`, `aaf`, `audiooff`, `af`, `audioon`, `ao`, `tablet`, `tabletf`
+and `oz`. They return an explanation before reading credentials or creating a
+network client, including if an old entity ID is later reused. They do not
+control the repurposed loads. Other shortcuts retain their services and targets.
+The lamp-only `aaa`, `al-o-mbp` and `al-o-mbpf` shortcuts remain removed and
+fail as unknown commands without a service request; the MPPT fan has no legacy
+lamp or audio shortcut.
 
 Use `~/k ha-check` for a read-only connectivity/integration check, and
 `KODI_HA_DRY_RUN=1 ~/k po` to validate and display the Porch command without

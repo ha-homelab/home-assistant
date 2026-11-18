@@ -21,6 +21,9 @@ Home Assistant discovery topics were removed, including `switch.ozon`,
 `binary_sensor.sonoff_button1_3`, and `sensor.sonoff_status_3`. The latter two
 obsolete customization entries were removed. No Ozon LocalTuya match existed.
 No active automations, scripts or other dashboard rows referenced these old IDs.
+The obsolete local Kodi shortcut `oz` is explicitly retired in both command-map
+copies. It fails before credentials or network access and is not redirected to
+Ping02.
 
 Private sources `ping01.yaml` and `ping02.yaml` are stored in both HA
 `/config/esphome` and the ESPHome Dashboard `/config`. Credentials, firmware

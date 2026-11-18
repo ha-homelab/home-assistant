@@ -24,10 +24,11 @@ sticky, and unrelated controls unchanged.
 ## Remove the old Kodi relationship
 
 Update both `tools/kodi_ha_commands.json` and its installed copy beside the
-resolved `~/k` launcher. `aa` and `aaf` retain only `switch.audio_l` with their
-existing toggle and off services. Remove `aaa`, `al-o-mbp` and `al-o-mbpf`.
-These lamp-only aliases then fail without sending a service request. Do not
-redirect them to cooling, and do not edit or publish the private Kodi launcher.
+resolved `~/k` launcher. The Audio outlet was subsequently repurposed as Living
+lamp, so `au`, `aa`, `aaf`, `audiooff`, `af`, `audioon` and `ao` are explicitly
+retired. Keep `aaa`, `al-o-mbp` and `al-o-mbpf` removed. These aliases fail before
+credentials or network access; none is redirected to cooling or Living lamp.
+Do not edit or publish the private Kodi launcher.
 
 ## Adopt and verify
 
