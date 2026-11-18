@@ -75,6 +75,34 @@ class BatteryTelemetryTest(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(Template(config['availability'], self.hass).async_render())
         self.assertEqual(Template(config['state'], self.hass).async_render(), 0)
 
+    async def test_corrected_soc_falls_back_without_inventing_zero(self):
+        sensors = yaml.safe_load((ROOT / 'config/template_sensors.yaml').read_text())
+        config = next(s for s in sensors if s.get('unique_id') == 'corrected_battery_soc')
+        availability = Template(config['availability'], self.hass)
+        state = Template(config['state'], self.hass)
+        inputs = (
+            'sensor.compensation_sensor_battery_voltage',
+            'sensor.battery_w',
+            'sensor.smartshunt_500a_50mv_id_289_charge',
+        )
+        cases = (
+            ('80', '280', '100', 75.0),
+            ('80', '-180', '100', 85.0),
+            ('80', '0', '100', 80.0),
+            ('unavailable', 'unavailable', '100', 100.0),
+            ('unknown', '-180', '82.7', 82.7),
+            ('80', 'unavailable', '100', 100.0),
+            ('80', 'unavailable', 'unknown', 80.0),
+            ('nan', '0', 'unavailable', None),
+            ('unknown', '0', '0', 0.0),
+        )
+        for estimated, power, measured, expected in cases:
+            with self.subTest(estimated=estimated, power=power, measured=measured):
+                for entity, value in zip(inputs, (estimated, power, measured), strict=True):
+                    self.hass.states.async_set(entity, value)
+                self.assertEqual(availability.async_render(), expected is not None)
+                self.assertEqual(state.async_render(), expected)
+
 
 @unittest.skipUnless(HA_AVAILABLE, 'Home Assistant runtime is not installed')
 class OffGridRestoreTest(unittest.IsolatedAsyncioTestCase):

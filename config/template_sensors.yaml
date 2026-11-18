@@ -117,11 +117,35 @@
   unit_of_measurement: '%'
   state_class: measurement
   device_class: battery
-  state: "{% set soc = states('sensor.compensation_sensor_battery_voltage') | float(0) %} {% set power = states('sensor.battery_w')\
-    \ | float(0) %} {% set capacity = 280 %} {% set capacity2 = 180 %} {% set efficiency = 0.95 %}\n{% if power\
-    \ < 0 %}\n  {% set correction = ((power | abs) / capacity2) * 100 * (1 - efficiency) %}\n  {{ [soc + correction,\
-    \ 100] | min | round(2) }}\n{% elif power > 0 %}\n  {% set correction = (power / capacity) * 100 * (1 - efficiency)\
-    \ %}\n  {{ [soc - correction, 0] | max | round(2) }}\n{% else %}\n  {{ soc }}\n{% endif %}\n"
+  availability: >-
+    {{ is_number(states('sensor.compensation_sensor_battery_voltage'))
+       or is_number(states('sensor.smartshunt_500a_50mv_id_289_charge')) }}
+  state: >-
+    {% set estimated_soc = states('sensor.compensation_sensor_battery_voltage') %}
+    {% set measured_soc = states('sensor.smartshunt_500a_50mv_id_289_charge') %}
+    {% set battery_power = states('sensor.battery_w') %}
+    {% if is_number(estimated_soc) and is_number(battery_power) %}
+      {% set soc = estimated_soc | float %}
+      {% set power = battery_power | float %}
+      {% set capacity = 280 %}
+      {% set capacity2 = 180 %}
+      {% set efficiency = 0.95 %}
+      {% if power < 0 %}
+        {% set correction = ((power | abs) / capacity2) * 100 * (1 - efficiency) %}
+        {{ [soc + correction, 100] | min | round(2) }}
+      {% elif power > 0 %}
+        {% set correction = (power / capacity) * 100 * (1 - efficiency) %}
+        {{ [soc - correction, 0] | max | round(2) }}
+      {% else %}
+        {{ soc }}
+      {% endif %}
+    {% elif is_number(measured_soc) %}
+      {{ measured_soc | float }}
+    {% elif is_number(estimated_soc) %}
+      {{ estimated_soc | float }}
+    {% else %}
+      {{ none }}
+    {% endif %}
 - name: sensor.self_consumption_w
   unit_of_measurement: W
   state: '{{ (states(''sensor.home_123_1s'') | float(0)) - (states(''sensor.battery_w'') | float(0)) }}
