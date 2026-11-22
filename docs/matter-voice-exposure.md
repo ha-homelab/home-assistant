@@ -35,16 +35,19 @@ is gone, `light.backdoor_porch` keeps its existing entry and the porch group lis
 one member. The counts in the dated deployment record below describe the
 2026-10-22 publication, not the current manifest.
 
-The individual HA names were aligned with the Matter names, the existing Porch
-area was assigned, and previous HA voice aliases were retained. Those aliases
-apply to HA Assist only. Matter has one name per endpoint; it does not carry
+At that publication the individual HA names were aligned with the Matter names,
+the existing Porch area was assigned, and the then-current HA voice aliases were
+retained. On 2026-11-22 the `Porch One` and `Porch Light One` aliases were removed
+from the renamed backdoor lamp, because they would otherwise keep steering voice
+requests to the porch. Those aliases apply to HA Assist only. Matter has one name per endpoint; it does not carry
 multiple voice aliases into Alexa or Google Home. Explicit HAMH `customName`
 mappings keep names stable even when HA changes its generated `friendly_name`.
 See the project's [name and alias explanation](https://riddix.github.io/home-assistant-matter-hub/faq).
 
 Expected commands after each controller has accepted the endpoints include
-“turn on Porch Light”, “turn off Porch Light 1”, and “turn on Porch Light 2”.
-The first controls the group; numbered commands control individual lights.
+“turn on Porch Light” and “turn on Porch Light 2”. The first controls the group,
+the second controls the remaining individual light. “Porch Light 1” no longer
+resolves: that endpoint was removed on 2026-11-22.
 
 ## Recorded deployment result — 2026-10-22
 
