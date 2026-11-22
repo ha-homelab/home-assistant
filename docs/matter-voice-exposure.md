@@ -7,19 +7,33 @@ into HA. No new bridge or controller fabric is needed to publish another light.
 
 ## Porch names and controls
 
-The canonical controls are:
+The current controls are:
 
-- `light.porch_one` → **Porch Light 1**
-- `light.porch_two` → **Porch Light 2**
-- `light.porch_light` → **Porch Light**, the two-light group
+- `light.porch_two` → **Porch Light 2**, the remaining front-porch fixture
+- `light.porch_light` → **Porch Light**, the helper group
+- `light.backdoor_porch` → **Backdoor Porch Light**, the backdoor lamp
 
-The group is a persistent HA UI helper. Its two members are `light.porch_one`
-and `light.porch_two`, with `hide_members: false` and `all: false`. It was created
-once through the group configuration flow. Preserve the existing helper and its
-entity ID; do not recreate it during every YAML deployment. On an installation
-where it is missing, create a Light Group helper with these members and confirm
-its entity ID before applying the exposure manifest. The publisher deliberately
-fails if a manifest entity is absent from the bridge's filter preview.
+The group is a persistent HA UI helper, entry `01M5KDM0VX6RXZYRN83HX36VMJ`, with
+`hide_members: false` and `all: false`. It was created once through the group
+configuration flow. Preserve the existing helper and its entity ID; do not
+recreate it during every YAML deployment. On an installation where it is missing,
+create a Light Group helper and confirm its entity ID before applying the exposure
+manifest. The publisher deliberately fails if a manifest entity is absent from the
+bridge's filter preview.
+
+On 2026-11-22 the group lost its second member: `light.porch_one` became
+`light.backdoor_porch` when the owner moved that bulb to the backdoor fixture. The
+helper now stores `["light.porch_two"]` only and stays `unavailable` while that
+socket is empty. Removing the stale member mattered: a helper that still names a
+deleted entity never becomes available, and `group.set` would only have changed the
+in-memory group until the next restart. See the
+[porch lamp migration record](porch-lamp-migration-2026-11-22.md) for the API calls,
+the alias removal and the evidence.
+
+The manifest now lists 45 controls instead of the original 46: `light.porch_one`
+is gone, `light.backdoor_porch` keeps its existing entry and the porch group lists
+one member. The counts in the dated deployment record below describe the
+2026-10-22 publication, not the current manifest.
 
 The individual HA names were aligned with the Matter names, the existing Porch
 area was assigned, and previous HA voice aliases were retained. Those aliases
@@ -185,9 +199,11 @@ ecosystem. The publisher does not log into cloud accounts or perform pairing.
 - [Google's setup and multi-admin guide](https://support.google.com/googlehome/answer/13127223?hl=en)
 - [HAMH's multiple-controller guide](https://riddix.github.io/home-assistant-matter-hub/guides/connect-multiple-fabrics)
 
-Verify a numbered Porch light in each app, observe its HA state, then issue the
-spoken command. Separately test the Porch Light group. A working group should
-control both members; an individual command should affect only its member.
+Verify a Porch light in each app, observe its HA state, then issue the spoken
+command. Separately test the Porch Light group. A working group controls every
+member it currently has; an individual command should affect only its member. The
+helper has one member since the 2026-11-22 migration, so a group command and a
+Porch Light 2 command now reach the same bulb.
 Bridge endpoint reachability, app control and spoken-name recognition are three
 different checks. Record them separately rather than declaring all controllers
 working from a successful API request.

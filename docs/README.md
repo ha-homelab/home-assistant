@@ -120,6 +120,9 @@ before the details.
   [Email in Home Assistant](mail.md).
 - [Automation and script resilience](runtime-resilience.md) and
   [display templates during startup](template-startup-resilience.md).
+- [Authoring automations: live debugging first, GitHub second](automation-authoring-workflow.md):
+  the YAML-mode edit loop, the migration inventory gate, the pull request and the
+  reviewed deployment that follows.
 - [LocalTuya cover hotfix](localtuya-cover-hotfix.md) and
   [managed go2rtc startup recovery](go2rtc-startup-recovery.md).
 
@@ -151,6 +154,9 @@ before the details.
   [battery cell numbering](releases/2026-10-01-battery-cell-numbering.md).
 - [Curtain commissioning — 24 September 2026](curtain-live-verification-2026-09-24.md) and
   [Living-room morning power repair](living-curtain-morning-power.md).
+- [Porch lamp migration — 2026-11-22](porch-lamp-migration-2026-11-22.md): the
+  backdoor-lamp entity rename, the Porch Light helper member removal and the
+  voice-alias cleanup, with the references still open in source.
 
 Shared repository policy (`release-workflow.md`, `quality.md`, `fuzzing.md`,
 `rc-fuzzing.md`, `runner-preflight.md`, `release-read-safety.md`,
