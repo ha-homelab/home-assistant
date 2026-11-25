@@ -1,5 +1,6 @@
 """Render the actual MQTT/derived battery templates in isolated Home Assistant."""
 from pathlib import Path
+import json
 import os
 import tempfile
 import unittest
@@ -17,6 +18,8 @@ else:
     HA_AVAILABLE = True
 
 ROOT = Path(__file__).resolve().parents[1]
+DISCOVERY = ROOT / 'config/packages/victron_vebus_discovery.yaml'
+GRID_CONFIG = 'homeassistant/binary_sensor/victron_grid_connected/config'
 
 
 @unittest.skipUnless(HA_AVAILABLE, 'Home Assistant runtime is not installed')
@@ -26,7 +29,31 @@ class BatteryTelemetryTest(unittest.IsolatedAsyncioTestCase):
         self.hass = HomeAssistant(self.temp.name)
         mqtt = yaml.safe_load((ROOT / 'config/mqtt.yaml').read_text())
         self.battery = next(s for s in mqtt['sensor'] if s.get('unique_id') == 'battery_voltage')
-        self.grid = next(s for s in mqtt['binary_sensor'] if s.get('unique_id') == 'victron_grid_connected')
+        self.grid_payload = self.grid_discovery()
+        self.grid = {
+            'value_template': self.grid_payload['value_template'],
+            'availability_template': self.grid_payload['availability'][0]['value_template'],
+            'expire_after': self.grid_payload['expire_after'],
+        }
+
+    def grid_discovery(self):
+        """Render the retained discovery payload the package publishes at runtime."""
+        package = yaml.safe_load(DISCOVERY.read_text())
+        rule = next(a for a in package['automation']
+                    if a['id'] == 'victron_vebus_instance_discovery')
+        variables = {}
+        for step in rule['actions']:
+            variables.update(step.get('variables') or {})
+        publish = next(step['data'] for step in rule['actions']
+                       if (step.get('data') or {}).get('topic') == GRID_CONFIG)
+        values = {'portal': '000000000000', 'instance': '301',
+                  'base': 'victron/N/000000000000/vebus/301'}
+        for name in ('grid_state', 'grid_availability'):
+            values[name] = Template(variables[name], self.hass).async_render()
+        # MQTT publishes the rendered text; Home Assistant renders a JSON
+        # object template to a wrapper, so ask for the raw text explicitly.
+        return json.loads(Template(publish['payload'], self.hass)
+                          .async_render(values, parse_result=False))
 
     async def asyncTearDown(self):
         await self.hass.async_stop(force=True)
@@ -63,6 +90,18 @@ class BatteryTelemetryTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.battery['expire_after'], 90)
         self.assertEqual(self.grid['expire_after'], 90)
         self.assertLess(self.grid['expire_after'], 120)
+
+    async def test_grid_discovery_follows_the_announced_instance(self):
+        # Retained discovery owns this entity now: it must keep the reviewed
+        # registry identity and follow whatever VE.Bus instance is announced.
+        self.assertEqual(self.grid_payload['unique_id'], 'victron_grid_connected')
+        self.assertEqual(self.grid_payload['default_entity_id'],
+                         'binary_sensor.victron_grid_connected')
+        self.assertEqual(self.grid_payload['device_class'], 'connectivity')
+        self.assertEqual(self.grid_payload['state_topic'],
+                         'victron/N/000000000000/vebus/301/Ac/ActiveIn/Connected')
+        self.assertEqual(self.grid_payload['availability'][0]['topic'],
+                         self.grid_payload['state_topic'])
 
     async def test_derived_soc_keeps_unknown_and_real_zero_distinct(self):
         config = next(s for s in yaml.safe_load((ROOT / 'config/template_sensors.yaml').read_text())

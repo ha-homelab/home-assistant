@@ -28,18 +28,63 @@ therefore do not accumulate while an invocation is running or queued. The second
 slot allows a birth-triggered bootstrap to wait behind one in-flight refresh;
 there is at most one running invocation and one waiting invocation.
 
-Each accepted five-second heartbeat and birth invocation also issues two exact
-read requests to refresh the existing 90-second expiry measurements even when
-their values do not change:
+Each accepted five-second heartbeat and birth invocation also issues an exact
+read request to refresh the existing 90-second battery expiry even when the
+value does not change:
 
 - `victron/R/000000000000/system/0/Dc/Battery/Voltage` supplies
   `sensor.battery_voltage`.
-- `victron/R/000000000000/vebus/290/Ac/ActiveIn/Connected` supplies
-  `binary_sensor.victron_grid_connected`.
 
-Keep these topics aligned with [the MQTT entity definitions](../config/mqtt.yaml).
-The existing bridge carries the `victron/` namespace. Requests remain reads;
-there are no inverter mode commands or `W/` writes in this automation.
+`binary_sensor.victron_grid_connected` expires on the same 90-second schedule,
+but its request carries the VE.Bus device instance. The
+[instance-following discovery package](#instance-following-mqtt-entities) reads
+it at the announced instance, so this rule pins no device instance. The existing
+bridge carries the `victron/` namespace. Requests remain reads; there are no
+inverter mode commands or `W/` writes in this automation.
+
+## Instance-following MQTT entities
+
+`289` was the VE.Bus device instance of the Quattro
+(`com.victronenergy.vebus.ttyUSB1`) while the MK3-USB adapter enumerated on
+`ttyUSB1`. Venus derives the instance from the USB port index (`288 + N`), and
+v3.85 has no persisted instance setting for the VE.Bus class, so a reboot that
+enumerates the adapter on a different `ttyUSB` number publishes the whole device
+under a new instance. MQTT YAML entities cannot wildcard a topic, so
+[`mqtt.yaml`](../config/mqtt.yaml) no longer defines these three entities at all.
+
+[`config/packages/victron_vebus_discovery.yaml`](../config/packages/victron_vebus_discovery.yaml)
+follows the instance instead. It subscribes to `victron/N/+/vebus/+/Mode`, takes
+the portal identifier and instance from that topic, and republishes retained MQTT
+discovery for:
+
+- `switch.victron_quattro` (`unique_id: victron_quattro`) on `vebus/<n>/Mode`,
+- `binary_sensor.victron_grid_connected` (`unique_id: victron_grid_connected`)
+  on `vebus/<n>/Ac/ActiveIn/Connected`, and
+- `number.cerbo_gx_netz_max_strom` (`unique_id: multiplus_ac_current_limit`)
+  on `vebus/<n>/Ac/ActiveIn/CurrentLimit`, still with `min: 0`, `max: 100`.
+
+The payloads repeat the reviewed `unique_id` and `default_entity_id` values, so
+the entity registry, automations, dashboards and history keep the same entities;
+only their topics change. The same package refreshes the grid input every five
+seconds at the announced instance, which is why rule 118 no longer reads it.
+Nothing in either file carries a portal identifier or a device instance: both
+come from the topics the installation already uses.
+
+On start the retained discovery configurations are consumed before any telemetry
+arrives, and the `homeassistant` start and MQTT birth triggers republish them
+from the last announced topic stored in
+`input_text.victron_vebus_grid_topic`. A renumbered instance is adopted from the
+next `Mode` publication, which the keepalive bootstrap requests through the
+Serial alias. An unchanged, still-present instance also keeps republishing its
+configuration, so a broker that lost retained messages recovers without an edit.
+
+The first deployment publishes these configurations only after the inverter
+announces its instance; a configuration without them leaves the three entities
+absent, so confirm the retained topics
+(`homeassistant/{switch,binary_sensor,number}/…/config`), the unchanged entity
+IDs, and valid states before relying on the midnight rule. If the package fails,
+restore the previous `mqtt.yaml`, reload `mqtt` and `automations`, and clear the
+retained discovery topics.
 
 Sending a request does not make a measurement fresh. Only received notifications
 refresh the MQTT entities. Invalid or absent measurements retain their existing

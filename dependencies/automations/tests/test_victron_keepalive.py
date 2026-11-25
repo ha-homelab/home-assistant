@@ -13,8 +13,12 @@ import yaml
 try:
     from homeassistant import loader
     from homeassistant.bootstrap import async_load_base_functionality
-    from homeassistant.components.automation import AutomationEntity, _async_process_if
+    from homeassistant.components.automation import AutomationEntity
     from homeassistant.components.automation.config import PLATFORM_SCHEMA
+    try:  # Home Assistant 2026.10 moved this helper into automation.util
+        from homeassistant.components.automation.util import _async_process_if
+    except ImportError:
+        from homeassistant.components.automation import _async_process_if
     from homeassistant.components.trace.const import DATA_TRACE
     from homeassistant.config_entries import ConfigEntries
     from homeassistant.core import Context, HomeAssistant
@@ -30,7 +34,6 @@ else:
 ROOT = Path(__file__).resolve().parents[1]
 RULE_PATH = ROOT / 'config' / '118_victron_keep_mqtt_telemetry_active.yaml'
 SERIAL = 'victron/R/000000000000/system/0/Serial'
-GRID = 'victron/R/000000000000/vebus/290/Ac/ActiveIn/Connected'
 BATTERY = 'victron/R/000000000000/system/0/Dc/Battery/Voltage'
 SUPPRESSED = {'keepalive-options': ['suppress-republish']}
 ENTITY_ID = 'automation.victron_mqtt_keep_alive'
@@ -127,19 +130,21 @@ class VictronKeepaliveRuntimeTest(unittest.IsolatedAsyncioTestCase):
             self.assertEqual((domain, service), ('mqtt', 'publish'))
             self.assertEqual(set(data), {'topic', 'payload'})
             # These are exact read requests, never W/ settings writes or
-            # subscriptions/wildcards that could hide other traffic.
-            self.assertIn(data['topic'], {SERIAL, GRID, BATTERY})
+            # subscriptions/wildcards that could hide other traffic. The grid
+            # input is refreshed by the package bound to the announced VE.Bus
+            # instance, so this rule must not pin a device instance.
+            self.assertIn(data['topic'], {SERIAL, BATTERY})
             actual.append((data['topic'], json.loads(data['payload'])))
         self.assertEqual(actual, expected)
 
-    async def test_heartbeat_suppresses_tree_and_refreshes_both_expiring_inputs(self):
+    async def test_heartbeat_suppresses_tree_and_refreshes_the_expiring_input(self):
         await self.trigger('heartbeat')
-        self.assert_publish_trace([(SERIAL, SUPPRESSED), (GRID, {}), (BATTERY, {})])
+        self.assert_publish_trace([(SERIAL, SUPPRESSED), (BATTERY, {})])
         self.assertEqual(self.current(), 0)
 
-    async def test_mqtt_birth_bootstraps_tree_and_refreshes_both_expiring_inputs(self):
+    async def test_mqtt_birth_bootstraps_tree_and_refreshes_the_expiring_input(self):
         await self.trigger('mqtt_connected')
-        self.assert_publish_trace([(SERIAL, {}), (GRID, {}), (BATTERY, {})])
+        self.assert_publish_trace([(SERIAL, {}), (BATTERY, {})])
         self.assertEqual(self.current(), 0)
 
     async def test_overlapping_heartbeat_preserves_queue_slot_for_mqtt_birth(self):
@@ -164,15 +169,15 @@ class VictronKeepaliveRuntimeTest(unittest.IsolatedAsyncioTestCase):
         self.release_publish.set()
         await asyncio.wait_for(asyncio.gather(heartbeat, birth), timeout=2)
         expected = [
-            (SERIAL, SUPPRESSED), (GRID, {}), (BATTERY, {}),
-            (SERIAL, {}), (GRID, {}), (BATTERY, {}),
+            (SERIAL, SUPPRESSED), (BATTERY, {}),
+            (SERIAL, {}), (BATTERY, {}),
         ]
         self.assert_publish_trace(expected)
         self.assertEqual(self.current(), 0)
 
         # A dropped overlapping tick must not suppress later normal heartbeats.
         await self.trigger('heartbeat')
-        self.assert_publish_trace(expected + [(SERIAL, SUPPRESSED), (GRID, {}), (BATTERY, {})])
+        self.assert_publish_trace(expected + [(SERIAL, SUPPRESSED), (BATTERY, {})])
         self.assertEqual(self.current(), 0)
 
 
