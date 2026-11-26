@@ -1,5 +1,35 @@
 # Portable library changelog
 
+## [0.1.6] - Unreleased
+
+### Changed
+
+- Preserve battery SOC when MQTT inputs disappear (#107).
+- Fix Dining lights omitted from household shutdown (#103).
+- Document isolated ESPHome builds and verified rollout (#106).
+- Retire launcher shortcuts for repurposed outlets (#104).
+- add a navigation index for docs/.
+- bind maintainer review to trusted workflow events.
+- Restore Living bookshelf occupancy control (#97).
+- Correct Recliner strip power and align its entity name (#92).
+- Allow TV inactivity cutoff when off or unavailable (#90).
+- Document Recorder HeatWave and local database recovery (#95).
+
+### Upgrade
+
+- These automation fixes are source configuration changes. The wheel and source
+  distribution contain only the portable `notification_frame_cache` library,
+  whose implementation is unchanged; they do not install Home Assistant
+  configuration or firmware. Publishing this release does not deploy or restart HA.
+- Install the LG wake and Dining Media guard packages together so the timer,
+  helper and shutdown guards are present. Follow their deployment guides for
+  configuration validation and reloads; hardware acceptance is separate from CI.
+
+### Security
+
+- No credential, endpoint or private installation data is added to release
+  payloads. Existing package inventory and provenance checks remain required.
+
 ## Unreleased
 
 - Add a native Home Assistant Core update entity backed by the independent k3s
