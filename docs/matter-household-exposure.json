@@ -4,15 +4,10 @@
     "name": "Porch Light",
     "entity_id": "light.porch_light",
     "members": [
-      "light.porch_one",
       "light.porch_two"
     ]
   },
   "entities": [
-    {
-      "entity_id": "light.porch_one",
-      "name": "Porch Light 1"
-    },
     {
       "entity_id": "light.porch_two",
       "name": "Porch Light 2"
