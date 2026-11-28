@@ -1,0 +1,140 @@
+# Follow the Quattro's VE.Bus instance instead of pinning it in mqtt.yaml.
+# Venus derives the instance from the MK3-USB port index (288 + N), so a reboot
+# that enumerates the adapter on another ttyUSB renumbers every vebus/ topic.
+# These retained discovery configurations keep the reviewed entity IDs bound to
+# the instance the inverter announces, and the grid read below keeps the
+# 90-second expiry of the grid sensor satisfied. No portal or device instance is
+# written here: both are taken from the topics the installation already carries.
+input_text:
+  victron_vebus_grid_topic:
+    name: Victron VE.Bus grid read topic
+    icon: mdi:transit-connection-variant
+    max: 255
+    # No initial value: the last announced topic survives a restart, and the
+    # retained discovery messages stay valid until the instance changes.
+
+automation:
+  - id: victron_vebus_instance_discovery
+    alias: 'Victron: Bind MQTT entities to the current VE.Bus instance'
+    description: >-
+      Bind the Quattro switch, grid sensor and AC current limit to the VE.Bus
+      instance the inverter currently announces. Retained MQTT discovery keeps
+      the reviewed entity IDs and needs no manual edit after a reboot that
+      renumbers the MK3-USB adapter.
+    mode: queued
+    max: 3
+    trace:
+      stored_traces: 5
+    triggers:
+      # The inverter publishes Mode on change and again when the keepalive rule
+      # requests a full tree, which is also how a renumbered instance appears.
+      - platform: mqtt
+        topic: victron/N/+/vebus/+/Mode
+        id: vebus_mode
+      - platform: mqtt
+        topic: homeassistant/status
+        payload: online
+        id: mqtt_connected
+      - platform: homeassistant
+        event: start
+        id: start
+    actions:
+      - variables:
+          source: >-
+            {{ trigger.topic if trigger.id == 'vebus_mode'
+               else states('input_text.victron_vebus_grid_topic') }}
+          instance: >-
+            {{ source.split('/')[4] if source.split('/') | length > 4
+               and source.split('/')[3] == 'vebus'
+               and is_number(source.split('/')[4]) else '' }}
+          portal: >-
+            {{ source.split('/')[2] if source.split('/') | length > 4
+               and source.split('/')[3] == 'vebus' else '' }}
+      - condition: template
+        value_template: "{{ instance != '' and portal != '' }}"
+      - variables:
+          base: 'victron/N/{{ portal }}/vebus/{{ instance }}'
+          # Rendered as text: the MQTT integration renders these per message.
+          grid_state: >-
+            {% raw %}{% set sample = value_json | default({}) %}{% set v = sample.get('value') if sample is mapping else none %}{{ 'ON' if v is not boolean and is_number(v) and v | float == 1 else 'OFF' }}{% endraw %}
+          grid_availability: >-
+            {% raw %}{% set sample = value_json | default({}) %}{% set v = sample.get('value') if sample is mapping else none %}{{ 'online' if v is not boolean and is_number(v) and v | float in [0, 1] else 'offline' }}{% endraw %}
+      - service: input_text.set_value
+        target:
+          entity_id: input_text.victron_vebus_grid_topic
+        data:
+          value: 'victron/R/{{ portal }}/vebus/{{ instance }}/Ac/ActiveIn/Connected'
+      - service: mqtt.publish
+        data:
+          topic: homeassistant/switch/victron_quattro/config
+          retain: true
+          payload: >-
+            {{ {'name': 'Victron Quattro',
+                 'unique_id': 'victron_quattro',
+                 'default_entity_id': 'switch.victron_quattro',
+                 'state_topic': base ~ '/Mode',
+                 'command_topic': 'victron/W/' ~ portal ~ '/vebus/' ~ instance ~ '/Mode',
+                 'payload_on': '{"value":3}',
+                 'payload_off': '{"value":4}'} | tojson }}
+      # Discovery carries no retain flag of its own: the retained publish below
+      # is what keeps these configurations available across restarts.
+      - service: mqtt.publish
+        data:
+          topic: homeassistant/binary_sensor/victron_grid_connected/config
+          retain: true
+          payload: >-
+            {{ {'name': 'Victron Grid Connected',
+                 'unique_id': 'victron_grid_connected',
+                 'default_entity_id': 'binary_sensor.victron_grid_connected',
+                 'device_class': 'connectivity',
+                 'state_topic': base ~ '/Ac/ActiveIn/Connected',
+                 'value_template': grid_state,
+                 'availability': [{'topic': base ~ '/Ac/ActiveIn/Connected',
+                                   'value_template': grid_availability}],
+                 'expire_after': 90} | tojson }}
+      - service: mqtt.publish
+        data:
+          topic: homeassistant/number/multiplus_ac_current_limit/config
+          retain: true
+          payload: >-
+            {{ {'name': 'AC Current limit',
+                 'unique_id': 'multiplus_ac_current_limit',
+                 'default_entity_id': 'number.cerbo_gx_netz_max_strom',
+                 'min': 0,
+                 'max': 100,
+                 'step': 1,
+                 'mode': 'box',
+                 'command_topic': 'victron/W/' ~ portal ~ '/vebus/' ~ instance ~ '/Ac/ActiveIn/CurrentLimit',
+                 'command_template': '{"value": {{ value }} }',
+                 'state_topic': base ~ '/Ac/ActiveIn/CurrentLimit',
+                 'value_template': '{{ value_json.value }}',
+                 'device_class': 'current',
+                 'unit_of_measurement': 'A',
+                 'icon': 'mdi:current-ac',
+                 'device': {'identifiers': ['Victron Cerbo GX'],
+                            'manufacturer': 'Victron Energy',
+                            'model': 'Cerbo GX',
+                            'name': 'Cerbo GX'}} | tojson }}
+
+  - id: victron_refresh_vebus_grid_input
+    alias: 'Victron: Refresh the current VE.Bus grid input'
+    description: >-
+      Request the grid-input measurement for the announced VE.Bus instance, so
+      the 90-second expiry of the grid sensor stays satisfied without pinning a
+      device instance in this repository. The request is a read, never a write.
+    mode: single
+    max_exceeded: silent
+    trace:
+      stored_traces: 5
+    triggers:
+      - platform: time_pattern
+        seconds: /5
+    conditions:
+      - condition: template
+        value_template: >-
+          {{ states('input_text.victron_vebus_grid_topic') not in ['unknown', 'unavailable', ''] }}
+    actions:
+      - service: mqtt.publish
+        data:
+          topic: "{{ states('input_text.victron_vebus_grid_topic') }}"
+          payload: '{}'

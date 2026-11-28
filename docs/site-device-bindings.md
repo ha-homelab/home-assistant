@@ -13,6 +13,11 @@ paths are:
 - `automations/118_victron_keep_mqtt_telemetry_active.yaml`
 - `mqtt.yaml` from the root configuration, with matching portal IDs in all topics
 
+The Victron Quattro switch, grid sensor and AC current limit are no longer listed
+there. `config/packages/victron_vebus_discovery.yaml` publishes them as retained
+MQTT discovery and takes the portal identifier and device instance from the
+topics the inverter announces, so those three need no installation-specific edit.
+
 Keep the complete known-good files, compare their SHA-256 hashes, and select them
 explicitly through the deployment composition wrapper's `--overrides` directory.
 That wrapper replaces existing files and records their hashes in `release.json`.

@@ -109,10 +109,11 @@ also requests the entire Venus item tree; repeating it can build up subscriber
 queues and delay MQTT keepalive responses. Suppression retains the streaming
 lease and exact Serial response without the periodic tree replay.
 
-The rule also reads `vebus/290/Ac/ActiveIn/Connected` and
-`system/0/Dc/Battery/Voltage` explicitly. These two Home Assistant inputs expire
-after 90 seconds and must receive real observations even when values stay
-constant. The enabled MQTT birth message, `homeassistant/status = online`,
+The rule also reads `system/0/Dc/Battery/Voltage` explicitly. That Home Assistant
+input expires after 90 seconds and must receive real observations even when its
+value stays constant. The grid input expires the same way, but the root
+configuration's `victron_vebus_discovery` package reads it at the VE.Bus instance
+the inverter announces, so this rule carries no device instance. The enabled MQTT birth message, `homeassistant/status = online`,
 requests one complete tree when HA reconnects, bootstrapping the other sensors.
 A two-run queue lets this connection event wait for an in-flight heartbeat;
 overlapping periodic ticks are skipped to reserve that queue slot.
